@@ -71,4 +71,19 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation("androidx.hilt:hilt-navigation-fragment:1.2.0")
 
+    // Navigation
+    val navVersion = "2.8.3"
+
+    // Jetpack Compose integration
+    implementation("androidx.navigation:navigation-compose:$navVersion")
+
+    // Views/Fragments integration
+    implementation("androidx.navigation:navigation-fragment:$navVersion")
+    implementation("androidx.navigation:navigation-ui:$navVersion")
+
+    // Feature module support for Fragments
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:$navVersion")
+
+    // Testing Navigation
+    androidTestImplementation("androidx.navigation:navigation-testing:$navVersion")
 }
