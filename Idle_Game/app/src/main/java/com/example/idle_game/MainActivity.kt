@@ -16,8 +16,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.idle_game.ui.navigation.BottomBar
 import com.example.idle_game.ui.navigation.NavigationGraph
 import com.example.idle_game.ui.theme.Idle_GameTheme
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

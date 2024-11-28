@@ -13,11 +13,12 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object repomodule {
 
+    /*
     @Provides
     fun providesDatabase(@ApplicationContext context: Context): GameDatabase {
         return Room.databaseBuilder(
             context, GameDatabase::class.java, "gamedatabase"
         ).build()
-    }
+    }*/
 
 }

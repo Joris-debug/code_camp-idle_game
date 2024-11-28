@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 @Composable
 fun StartView(modifier: Modifier = Modifier) {
     Text(
-        text = "Welcome on the start-page!",
+        text = "Welcome on the start-page!!!",
         modifier = modifier
     )
 }
