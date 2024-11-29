@@ -1,4 +1,10 @@
 package com.example.idle_game.api.models
 
-class SignUpRequest {
-}
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
+data class SignUpRequest(
+    @Json(name = "username") val username: String,
+    @Json(name = "password") val password: String
+)
