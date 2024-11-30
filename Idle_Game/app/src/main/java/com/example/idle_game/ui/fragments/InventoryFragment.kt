@@ -1,19 +1,18 @@
-package com.example.idle_game.ui.fragments;
+package com.example.idle_game.ui.fragments
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.example.idle_game.R
 
-import androidx.fragment.app.Fragment;
+class InventoryFragment : Fragment() {
 
-import com.example.idle_game.R;
-
-public class InventoryFragment extends Fragment {
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_inventory, container, false);
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_inventory, container, false)
     }
 }

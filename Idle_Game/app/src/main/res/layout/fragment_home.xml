@@ -5,12 +5,40 @@
     android:layout_height="match_parent"
     tools:context="com.example.idle_game.ui.fragments.HomeFragment">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Home Fragment"
-        android:textSize="25dp"
-        android:layout_centerInParent="true"/>
+    <Button
+        android:id="@+id/buttonHacker"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:text="Hacker"
+        android:textSize="16sp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="130dp"
+        />
+
+
+    <Button
+        android:id="@+id/buttonBotnet"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:text="Bot-Net"
+        android:textSize="16sp"
+        android:layout_below="@id/buttonHacker"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        />
+
+
+    <Button
+        android:id="@+id/buttonCryptoMiner"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:text="Crypto Miner"
+        android:textSize="16sp"
+        android:layout_below="@id/buttonBotnet"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
 
 
 </RelativeLayout>
