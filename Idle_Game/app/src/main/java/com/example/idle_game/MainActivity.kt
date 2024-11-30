@@ -2,20 +2,21 @@ package com.example.idle_game
 
 
 import android.os.Bundle
-import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import com.example.idle_game.ui.fragments.HomeFragment
-import com.example.idle_game.ui.fragments.InventoryFragment
-import com.example.idle_game.ui.fragments.ScoreboardFragment
+import androidx.lifecycle.Observer
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.idle_game.data.workers.NotWorker
+import com.example.idle_game.viewmodel.NavigationViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var bottomNavigationView: BottomNavigationView
-    private val homeFragment = HomeFragment()
-    private val inventoryFragment = InventoryFragment()
-    private val scoreboardFragment = ScoreboardFragment()
+    private val navigationViewModel: NavigationViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,37 +24,19 @@ class MainActivity : AppCompatActivity() {
 
         bottomNavigationView = findViewById(R.id.bottom_navigation)
 
-        supportFragmentManager.beginTransaction().replace(R.id.container, homeFragment).commit()
-
-        val badgeDrawable = bottomNavigationView.getOrCreateBadge(R.id.inventory)
-        badgeDrawable.isVisible = true
-        badgeDrawable.number = 8
+        navigationViewModel.selectedFragment.observe(this, Observer { fragment ->
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.container, fragment)
+                .commit()
+        })
 
         bottomNavigationView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.home -> {
-                    Log.d("Navigation", "Home selected")
-                    loadFragment(homeFragment)
-                    true
-                }
-                R.id.inventory -> {
-                    Log.d("Navigation", "Inventory selected")
-                    loadFragment(inventoryFragment)
-                    true
-                }
-                R.id.scoreboard -> {
-                    Log.d("Navigation", "Scoreboard selected")
-                    loadFragment(scoreboardFragment)
-                    true
-                }
-                else -> false
-            }
+            navigationViewModel.selectFragment(item.itemId)
+            true
         }
-    }
 
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.container, fragment)
-            .commit()
+        val workRequest = PeriodicWorkRequestBuilder<NotWorker>(15, TimeUnit.MINUTES).build()
+        WorkManager.getInstance(this).enqueue(workRequest)
+
     }
 }
