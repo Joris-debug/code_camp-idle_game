@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.idle_game"
-        minSdk = 35
+        minSdk = 29
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -89,6 +89,11 @@ dependencies {
 
     // Feature module support for Fragments
     implementation("androidx.navigation:navigation-dynamic-features-fragment:$navVersion")
+
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.9.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+    implementation("junit:junit:4.+")
 
     // Testing Navigation
     androidTestImplementation("androidx.navigation:navigation-testing:$navVersion")

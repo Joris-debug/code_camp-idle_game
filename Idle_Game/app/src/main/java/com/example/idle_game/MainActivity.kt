@@ -1,58 +1,59 @@
 package com.example.idle_game
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
-import com.example.idle_game.ui.navigation.BottomBar
-import com.example.idle_game.ui.navigation.NavigationGraph
-import com.example.idle_game.ui.theme.Idle_GameTheme
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+import android.os.Bundle
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import com.example.idle_game.ui.fragments.HomeFragment
+import com.example.idle_game.ui.fragments.InventoryFragment
+import com.example.idle_game.ui.fragments.ScoreboardFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var bottomNavigationView: BottomNavigationView
+    private val homeFragment = HomeFragment()
+    private val inventoryFragment = InventoryFragment()
+    private val scoreboardFragment = ScoreboardFragment()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        setContentView(R.layout.activity_main)
 
-        setContent {
-            Idle_GameTheme {
-                val navController = rememberNavController()
-                Scaffold (
-                    modifier = Modifier.fillMaxSize(),
-                    bottomBar = { BottomBar(navController = navController) },
-                    content = { it ->
-                        Row(modifier = Modifier.padding(it)) {
-                            NavigationGraph(navController = navController)
-                        }
-                    }
-                )
+        bottomNavigationView = findViewById(R.id.bottom_navigation)
+
+        supportFragmentManager.beginTransaction().replace(R.id.container, homeFragment).commit()
+
+        val badgeDrawable = bottomNavigationView.getOrCreateBadge(R.id.inventory)
+        badgeDrawable.isVisible = true
+        badgeDrawable.number = 8
+
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.home -> {
+                    Log.d("Navigation", "Home selected")
+                    loadFragment(homeFragment)
+                    true
+                }
+                R.id.inventory -> {
+                    Log.d("Navigation", "Inventory selected")
+                    loadFragment(inventoryFragment)
+                    true
+                }
+                R.id.scoreboard -> {
+                    Log.d("Navigation", "Scoreboard selected")
+                    loadFragment(scoreboardFragment)
+                    true
+                }
+                else -> false
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Idle_GameTheme {
-        Greeting("Android")
+    private fun loadFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.container, fragment)
+            .commit()
     }
 }
