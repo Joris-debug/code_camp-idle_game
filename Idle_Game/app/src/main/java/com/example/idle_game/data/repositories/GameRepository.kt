@@ -13,14 +13,15 @@ class GameRepository(
     private val sharedPreferences: SharedPreferences
 ) {
     val playerDataFlow = gameDao.getPlayer()
+    val inventoryDataFlow = gameDao.getInventory()
 
     suspend fun signUp(username: String, password: String) {
         val signUpRequest = SignUpRequest(username = username, password = password)
         val resp = api.signUp(signUpRequest)
 
-        if (resp.error == null && resp.message != null) {
+        if(resp.error == null && resp.message != null) {
             val refreshToken = sharedPreferences.getString("refresh_token", null)
-            if (refreshToken != null) {
+            if(refreshToken != null) {
                 val playerData = PlayerData(
                     username = username,
                     password = password,
@@ -31,4 +32,5 @@ class GameRepository(
             }
         }
     }
+
 }
