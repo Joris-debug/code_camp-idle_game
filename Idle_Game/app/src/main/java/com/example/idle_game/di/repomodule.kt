@@ -2,6 +2,7 @@ package com.example.idle_game.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.idle_game.api.CookieInterceptor
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.data.database.GameDatabase
 import com.example.idle_game.data.repositories.GameRepository
@@ -39,11 +40,21 @@ object repomodule {
     }
 
     @Provides
-    fun providesAPI(moshi: Moshi): GameApi {
+    fun providesCookieInterceptor(): CookieInterceptor {
+        return CookieInterceptor()
+    }
+
+    @Provides
+    fun providesAPI(moshi: Moshi, cookieInterceptor: CookieInterceptor): GameApi {
+
+        val okHttpClient = okhttp3.OkHttpClient.Builder()
+            .addInterceptor(cookieInterceptor)
+            .build()
 
         val retrofit = Retrofit.Builder()
             .baseUrl(GameApi.BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .client(okHttpClient)
             .build()
 
         return retrofit.create(GameApi::class.java)

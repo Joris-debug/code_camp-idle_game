@@ -14,7 +14,7 @@ class TestViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            gameRepository.signUp("45fgd3w4", "123")
+            gameRepository.signUp("45fg123d3w4", "123")
         }
     }
 }
