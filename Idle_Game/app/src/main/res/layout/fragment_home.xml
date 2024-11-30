@@ -5,6 +5,16 @@
     android:layout_height="match_parent"
     tools:context="com.example.idle_game.ui.fragments.HomeFragment">
 
+    <TextView
+        android:id="@+id/counterText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/buttonHacker"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="-70dp"
+        android:text="Counter: 0"
+        android:textSize="24sp" />
+
     <Button
         android:id="@+id/buttonHacker"
         android:layout_width="120dp"
@@ -13,7 +23,7 @@
         android:textSize="16sp"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"
-        android:layout_marginTop="130dp"
+        android:layout_marginTop="100dp"
         />
 
 
@@ -31,7 +41,7 @@
 
 
     <Button
-        android:id="@+id/buttonCryptoMiner"
+        android:id="@+id/buttonMiner"
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:text="Crypto Miner"
