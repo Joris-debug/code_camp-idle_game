@@ -5,12 +5,8 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import com.example.idle_game.data.workers.NotWorker
 import com.example.idle_game.viewmodel.NavigationViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,9 +30,6 @@ class MainActivity : AppCompatActivity() {
             navigationViewModel.selectFragment(item.itemId)
             true
         }
-
-        val workRequest = PeriodicWorkRequestBuilder<NotWorker>(15, TimeUnit.MINUTES).build()
-        WorkManager.getInstance(this).enqueue(workRequest)
 
     }
 }

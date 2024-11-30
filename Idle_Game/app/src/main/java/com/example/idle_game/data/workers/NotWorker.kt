@@ -11,24 +11,18 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.example.idle_game.R
 
-class NotWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
+class NotWorker(appContext: Context, workerParams: WorkerParameters) :
+    Worker(appContext, workerParams) {
     override fun doWork(): Result {
-        val conditionMet = checkCondition()
-
-        if (conditionMet) {
-            sendNotification()
-        }
-
+        sendNotification()
         return Result.success()
     }
 
-    private fun checkCondition(): Boolean {
-        return true
-    }
 
     @SuppressLint("NotificationPermission", "ObsoleteSdkInt")
     private fun sendNotification() {
-        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val notificationChannelId = "default_channel"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

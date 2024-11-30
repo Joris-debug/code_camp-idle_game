@@ -8,8 +8,14 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import com.example.idle_game.R
+import com.example.idle_game.data.workers.NotWorker
 import com.example.idle_game.databinding.FragmentHomeBinding
+import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment() {
 
@@ -29,16 +35,19 @@ class HomeFragment : Fragment() {
         buttonHacker.setOnClickListener {
             counter++
             updateCounter(counterText)
+            scheduleNotWorker(15)
         }
 
         buttonBotNet.setOnClickListener {
             counter+=2
             updateCounter(counterText)
+            scheduleNotWorker(20)
         }
 
         buttonMiner.setOnClickListener {
             counter+=3
             updateCounter(counterText)
+            scheduleNotWorker(30)
         }
 
         return binding.root
@@ -46,5 +55,15 @@ class HomeFragment : Fragment() {
 
     private fun updateCounter(counterText: TextView) {
         counterText.text = "Counter: $counter"
+    }
+
+    private fun scheduleNotWorker(delayMinutes: Long) {
+        val workRequest: WorkRequest = OneTimeWorkRequest.Builder(NotWorker::class.java)
+            .setInitialDelay(delayMinutes, TimeUnit.MINUTES)
+            .build()
+
+        Log.e("Work scheduled", "Notification set.")
+
+        WorkManager.getInstance(requireContext()).enqueue(workRequest)
     }
 }
