@@ -1,6 +1,7 @@
 package com.example.idle_game.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.example.idle_game.api.CookieInterceptor
 import com.example.idle_game.api.GameApi
@@ -25,8 +26,12 @@ object repomodule {
 
     @Singleton
     @Provides
-    fun providesGameRepository(api: GameApi, gameDb: GameDatabase): GameRepository {
-        return GameRepository(api, gameDb.gameDao)
+    fun providesGameRepository(
+        api: GameApi,
+        gameDb: GameDatabase,
+        sharedPreferences: SharedPreferences
+    ): GameRepository {
+        return GameRepository(api, gameDb.gameDao, sharedPreferences)
     }
 
     @Provides
@@ -40,8 +45,13 @@ object repomodule {
     }
 
     @Provides
-    fun providesCookieInterceptor(): CookieInterceptor {
-        return CookieInterceptor()
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences("CookiePreferences", Context.MODE_PRIVATE)
+    }
+
+    @Provides
+    fun providesCookieInterceptor(sharedPreferences: SharedPreferences): CookieInterceptor {
+        return CookieInterceptor(sharedPreferences)
     }
 
     @Provides

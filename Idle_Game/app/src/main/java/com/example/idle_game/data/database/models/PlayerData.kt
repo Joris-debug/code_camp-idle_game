@@ -10,4 +10,6 @@ data class PlayerData (
     val uid: Int = 1,
     @Json(name = "username") val username: String,
     @Json(name = "password") val password: String,
+    @Json(name = "refresh_token") val refreshToken: String,
+    @Json(name = "access_token") val accessToken: String?,
 )
