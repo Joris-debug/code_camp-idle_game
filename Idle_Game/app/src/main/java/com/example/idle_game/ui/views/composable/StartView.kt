@@ -1,4 +1,4 @@
-package com.example.idle_game.ui.views
+package com.example.idle_game.ui.views.composable
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
