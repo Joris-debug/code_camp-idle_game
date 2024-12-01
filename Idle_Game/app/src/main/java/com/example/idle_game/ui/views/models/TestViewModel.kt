@@ -25,7 +25,7 @@ class TestViewModel @Inject constructor(
                 Log.d("TestViewModel", "Active until: ${inventoryData.boostActiveUntil}")
             }*/
 
-            gameRepository.signUp("uziunhg", "123")
+            gameRepository.signUp("uziu1412313we867890sfvghnhg", "123")
             gameRepository.login()
 
         }

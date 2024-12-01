@@ -37,11 +37,15 @@ class GameRepository(
         }
     }
 
+    // Makes a server request and gets a new access_token
     suspend fun login() {
         val playerData = playerDataFlow.first()
         try {
-            val resp = api.login("refresh_token="+playerData.refreshToken)
-            println(resp)
+            val resp = api.login(playerData.refreshToken)
+            val accessToken = sharedPreferences.getString("access_token", null)
+            if(accessToken != null) {
+                gameDao.updateAccessToken(accessToken)
+            }
         } catch (e: HttpException) {
             println(e);
             //TODO add better error handling
