@@ -7,6 +7,7 @@ import okhttp3.Response
 class CookieInterceptor(private val sharedPreferences: SharedPreferences) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
+
         val response = chain.proceed(chain.request())
         val cookies = response.headers("Set-Cookie")
 
