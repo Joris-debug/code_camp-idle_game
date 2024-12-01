@@ -5,6 +5,7 @@ import com.example.idle_game.api.GameApi
 import com.example.idle_game.api.models.SignUpRequest
 import com.example.idle_game.api.models.SignUpResponse
 import com.example.idle_game.data.database.GameDao
+import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
 import retrofit2.HttpException
 
@@ -33,6 +34,10 @@ class GameRepository(
         } catch (e: HttpException) {
             println(e);
         }
+    }
+
+    suspend fun createNewInventory() {
+        gameDao.insertInventory(InventoryData())
     }
 
     suspend fun updateBitcoins(bitcoins: Int) {
@@ -93,6 +98,24 @@ class GameRepository(
             if(unusedBotnets > 0) {
                 gameDao.updateHackers(++activeBotnets, --unusedBotnets);
             }
+        }
+    }
+
+    // Adds a new boost to the inventory
+    suspend fun addBoost() {
+        inventoryDataFlow.collect { inventoryData ->
+            var boosts = inventoryData.boosts
+            gameDao.updateBoosts(++boosts);
+        }
+    }
+
+    // Activates a single boost
+    suspend fun activateBoost() {
+        inventoryDataFlow.collect { inventoryData ->
+            var boosts = inventoryData.boosts
+            //TODO add real boost duration
+            val activeUntil = System.currentTimeMillis() + 100_000;
+            gameDao.updateBoostActivation(++boosts, activeUntil);
         }
     }
 

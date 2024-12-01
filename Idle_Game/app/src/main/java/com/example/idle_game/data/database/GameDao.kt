@@ -11,13 +11,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface GameDao {
 
-    @Query("SELECT * FROM playerdata")
+    @Query("SELECT * FROM playerdata WHERE uid = 1")
     fun getPlayer(): Flow<PlayerData>
 
     @Upsert
     suspend fun insertPlayer(player: PlayerData)
 
-    @Query("SELECT * FROM inventorydata")
+    @Query("SELECT * FROM inventorydata WHERE uid = 1")
     fun getInventory(): Flow<InventoryData>
 
     @Upsert
@@ -26,23 +26,29 @@ interface GameDao {
     @Query("UPDATE inventorydata SET bitcoins = :bitcoins")
     suspend fun updateBitcoins(bitcoins: Int)
 
-    @Query("UPDATE inventorydata SET activeHackers = :active, unusedHackers = :unused")
+    @Query("UPDATE inventorydata SET active_hackers = :active, unused_hackers = :unused")
     suspend fun updateHackers(active: Int, unused: Int)
 
-    @Query("UPDATE inventorydata SET unusedHackers = :unusedHackers")
+    @Query("UPDATE inventorydata SET unused_hackers = :unusedHackers")
     suspend fun updateUnusedHackers(unusedHackers: Int)
 
-    @Query("UPDATE inventorydata SET activeCryptoMiners = :active, unusedCryptoMiners = :unused")
+    @Query("UPDATE inventorydata SET active_crypto_miners = :active, unused_crypto_miners = :unused")
     suspend fun updateCryptoMiners(active: Int, unused: Int)
 
-    @Query("UPDATE inventorydata SET unusedHackers = :unusedCryptoMiners")
+    @Query("UPDATE inventorydata SET unused_crypto_miners = :unusedCryptoMiners")
     suspend fun updateUnusedCryptoMiners(unusedCryptoMiners: Int)
 
-    @Query("UPDATE inventorydata SET activeBotnets = :active, unusedBotnets = :unused")
+    @Query("UPDATE inventorydata SET active_botnets = :active, unused_botnets = :unused")
     suspend fun updateBotnets(active: Int, unused: Int)
 
-    @Query("UPDATE inventorydata SET unusedBotnets = :unusedBotnets")
+    @Query("UPDATE inventorydata SET unused_botnets = :unusedBotnets")
     suspend fun updateUnusedBotnets(unusedBotnets: Int)
+
+    @Query("UPDATE inventorydata SET boosts = :boosts")
+    suspend fun updateBoosts(boosts: Int)
+
+    @Query("UPDATE inventorydata SET boosts = :boosts, boost_active_until = :until")
+    suspend fun updateBoostActivation(boosts: Int, until: Long)
 
     @Query("SELECT * FROM scoreboarddata")
     fun getScoreBoard(): Flow<ScoreBoardData>
