@@ -1,5 +1,6 @@
 package com.example.idle_game.data.database.models
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
@@ -8,8 +9,8 @@ import com.squareup.moshi.Json
 data class PlayerData (
     @PrimaryKey(autoGenerate = false)
     val uid: Int = 1,
-    @Json(name = "username") val username: String,
-    @Json(name = "password") val password: String,
-    @Json(name = "refresh_token") val refreshToken: String,
-    @Json(name = "access_token") val accessToken: String?,
+    @ColumnInfo(name = "username") val username: String,
+    @ColumnInfo(name = "password") val password: String,
+    @ColumnInfo(name = "refresh_token") val refreshToken: String,
+    @ColumnInfo(name = "access_token") val accessToken: String?,
 )

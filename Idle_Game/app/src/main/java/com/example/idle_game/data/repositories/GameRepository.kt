@@ -3,7 +3,6 @@ package com.example.idle_game.data.repositories
 import android.content.SharedPreferences
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.api.models.SignUpRequest
-import com.example.idle_game.api.models.SignUpResponse
 import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
@@ -34,6 +33,18 @@ class GameRepository(
             }
         } catch (e: HttpException) {
             println(e);
+            //TODO add better error handling
+        }
+    }
+
+    suspend fun login() {
+        val playerData = playerDataFlow.first()
+        try {
+            val resp = api.login("refresh_token="+playerData.refreshToken)
+            println(resp)
+        } catch (e: HttpException) {
+            println(e);
+            //TODO add better error handling
         }
     }
 
