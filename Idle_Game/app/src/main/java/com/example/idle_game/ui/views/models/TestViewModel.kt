@@ -1,5 +1,6 @@
 package com.example.idle_game.ui.views.models
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.repositories.GameRepository
@@ -14,7 +15,15 @@ class TestViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            gameRepository.signUp("45fg121233d3w4", "123")
+            gameRepository.createNewInventory()  // Ensure the inventory is created first
+            gameRepository.addBoost()  // Add boost after inventory is created
+            gameRepository.activateBoost()
+            // Collect data from the flow
+            gameRepository.inventoryDataFlow.collect { inventoryData ->
+                Log.d("TestViewModel", "Boost count: ${inventoryData.boosts}")  // Log the boosts
+                Log.d("TestViewModel", "Active until: ${inventoryData.boostActiveUntil}")
+            }
         }
+
     }
 }

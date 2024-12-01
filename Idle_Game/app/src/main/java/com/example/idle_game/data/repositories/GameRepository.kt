@@ -7,6 +7,7 @@ import com.example.idle_game.api.models.SignUpResponse
 import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
+import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 
 class GameRepository(
@@ -36,86 +37,80 @@ class GameRepository(
         }
     }
 
+    // Call this function before accessing the inventory for the first time
     suspend fun createNewInventory() {
         gameDao.insertInventory(InventoryData())
     }
 
+    // TODO add error handing if no inventory exists (all functions)
     suspend fun updateBitcoins(bitcoins: Int) {
         gameDao.updateBitcoins(bitcoins)
     }
 
     // Adds a new hacker to the inventory
     suspend fun addUnusedHacker() {
-        inventoryDataFlow.collect { inventoryData ->
-            var unusedHackers = inventoryData.unusedHackers
-            gameDao.updateUnusedHackers(++unusedHackers);
-        }
+        val inventoryData = inventoryDataFlow.first()
+        var unusedHackers = inventoryData.unusedHackers
+        gameDao.updateUnusedHackers(++unusedHackers)
     }
 
     // Activates a single unused hacker
     suspend fun activateHacker() {
-        inventoryDataFlow.collect { inventoryData ->
-            var activeHackers = inventoryData.activeHackers
-            var unusedHackers = inventoryData.unusedHackers
-            if(unusedHackers > 0) {
-                gameDao.updateHackers(++activeHackers, --unusedHackers);
-            }
+        val inventoryData = inventoryDataFlow.first()
+        var activeHackers = inventoryData.activeHackers
+        var unusedHackers = inventoryData.unusedHackers
+        if (unusedHackers > 0) {
+            gameDao.updateHackers(++activeHackers, --unusedHackers)
         }
     }
 
     // Adds a new crypto miner to the inventory
     suspend fun addUnusedCryptoMiner() {
-        inventoryDataFlow.collect { inventoryData ->
-            var unusedCryptoMiners = inventoryData.unusedCryptoMiners
-            gameDao.updateUnusedHackers(++unusedCryptoMiners);
-        }
+        val inventoryData = inventoryDataFlow.first()
+        var unusedCryptoMiners = inventoryData.unusedCryptoMiners
+        gameDao.updateUnusedHackers(++unusedCryptoMiners)
     }
 
     // Activates a single unused crypto miner
     suspend fun activateCryptoMiner() {
-        inventoryDataFlow.collect { inventoryData ->
-            var activeCryptoMiners = inventoryData.activeCryptoMiners
-            var unusedCryptoMiners = inventoryData.unusedCryptoMiners
-            if(unusedCryptoMiners > 0) {
-                gameDao.updateHackers(++activeCryptoMiners, --unusedCryptoMiners);
-            }
+        val inventoryData = inventoryDataFlow.first()
+        var activeCryptoMiners = inventoryData.activeCryptoMiners
+        var unusedCryptoMiners = inventoryData.unusedCryptoMiners
+        if (unusedCryptoMiners > 0) {
+            gameDao.updateHackers(++activeCryptoMiners, --unusedCryptoMiners)
         }
     }
 
     // Adds a new botnet to the inventory
     suspend fun addUnusedBotnet() {
-        inventoryDataFlow.collect { inventoryData ->
-            var unusedBotnets = inventoryData.unusedBotnets
-            gameDao.updateUnusedHackers(++unusedBotnets);
-        }
+        val inventoryData = inventoryDataFlow.first()
+        var unusedBotnets = inventoryData.unusedBotnets
+        gameDao.updateUnusedHackers(++unusedBotnets)
     }
 
     // Activates a single unused botnet
     suspend fun activateBotnet() {
-        inventoryDataFlow.collect { inventoryData ->
-            var activeBotnets = inventoryData.activeBotnets
-            var unusedBotnets = inventoryData.unusedBotnets
-            if(unusedBotnets > 0) {
-                gameDao.updateHackers(++activeBotnets, --unusedBotnets);
-            }
+        val inventoryData = inventoryDataFlow.first()
+        var activeBotnets = inventoryData.activeBotnets
+        var unusedBotnets = inventoryData.unusedBotnets
+        if (unusedBotnets > 0) {
+            gameDao.updateHackers(++activeBotnets, --unusedBotnets)
         }
     }
 
     // Adds a new boost to the inventory
     suspend fun addBoost() {
-        inventoryDataFlow.collect { inventoryData ->
-            var boosts = inventoryData.boosts
-            gameDao.updateBoosts(++boosts);
-        }
+        var boosts = gameDao.getInventory().first().boosts
+        gameDao.updateBoosts(++boosts)
     }
 
     // Activates a single boost
     suspend fun activateBoost() {
-        inventoryDataFlow.collect { inventoryData ->
-            var boosts = inventoryData.boosts
+        var boosts = gameDao.getInventory().first().boosts
+        if(boosts > 0) {
             //TODO add real boost duration
             val activeUntil = System.currentTimeMillis() + 100_000;
-            gameDao.updateBoostActivation(++boosts, activeUntil);
+            gameDao.updateBoostActivation(--boosts, activeUntil);
         }
     }
 
