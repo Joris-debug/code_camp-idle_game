@@ -16,14 +16,13 @@ class TestViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             gameRepository.createNewInventory()  // Ensure the inventory is created first
-            gameRepository.addBoost()  // Add boost after inventory is created
-            gameRepository.activateBoost()
+            gameRepository.addLowBoost()  // Add boost after inventory is created
+            gameRepository.activateLowBoost()
             // Collect data from the flow
-            /*
             gameRepository.inventoryDataFlow.collect { inventoryData ->
-                Log.d("TestViewModel", "Boost count: ${inventoryData.boosts}")  // Log the boosts
+                Log.d("TestViewModel", "Boost count: ${inventoryData.lowBoosts}")  // Log the boosts
                 Log.d("TestViewModel", "Active until: ${inventoryData.boostActiveUntil}")
-            }*/
+            }
 
             gameRepository.signUp("uziu1412313we867890sfvghnhg", "123")
             gameRepository.login()

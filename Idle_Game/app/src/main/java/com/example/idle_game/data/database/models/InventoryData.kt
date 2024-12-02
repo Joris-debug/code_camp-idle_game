@@ -15,6 +15,9 @@ data class InventoryData (
     @ColumnInfo(name = "unused_hackers") val unusedHackers: Int = 0,
     @ColumnInfo(name = "unused_crypto_miners") val unusedCryptoMiners: Int = 0,
     @ColumnInfo(name = "unused_botnets") val unusedBotnets: Int = 0,
-    @ColumnInfo(name = "boosts") val boosts: Int = 0,
+    @ColumnInfo(name = "low_boosts") val lowBoosts: Int = 0,
+    @ColumnInfo(name = "medium_boosts") val mediumBoosts: Int = 0,
+    @ColumnInfo(name = "high_boosts") val highBoosts: Int = 0,
+    @ColumnInfo(name = "active_boost_type") val activeBoostType: Int = 0, // 1, 2 or 3
     @ColumnInfo(name = "boost_active_until") val boostActiveUntil: Long = 0
 )

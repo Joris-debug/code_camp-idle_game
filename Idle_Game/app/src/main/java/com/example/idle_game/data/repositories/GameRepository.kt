@@ -17,6 +17,12 @@ class GameRepository(
     val playerDataFlow = gameDao.getPlayer()
     val inventoryDataFlow = gameDao.getInventory()
 
+    companion object {
+        const val lowBoostId = 1
+        const val mediumBoostId = 2
+        const val highBoostId = 3
+    }
+
     suspend fun signUp(username: String, password: String) {
         val signUpRequest = SignUpRequest(username = username, password = password)
         try {
@@ -113,20 +119,67 @@ class GameRepository(
         }
     }
 
-    // Adds a new boost to the inventory
-    suspend fun addBoost() {
-        var boosts = gameDao.getInventory().first().boosts
-        gameDao.updateBoosts(++boosts)
+    // Adds a new low boost to the inventory
+    suspend fun addLowBoost() {
+        var boosts = gameDao.getInventory().first().lowBoosts
+        gameDao.updateLowBoosts(++boosts)
     }
 
-    // Activates a single boost
-    suspend fun activateBoost() {
-        var boosts = gameDao.getInventory().first().boosts
-        if(boosts > 0) {
-            //TODO add real boost duration
-            val activeUntil = System.currentTimeMillis() + 100_000;
-            gameDao.updateBoostActivation(--boosts, activeUntil);
+    // Adds a new medium boost to the inventory
+    suspend fun addMediumBoost() {
+        var boosts = gameDao.getInventory().first().mediumBoosts
+        gameDao.updateMediumBoosts(++boosts)
+    }
+
+    // Adds a new high boost to the inventory
+    suspend fun addHighBoost() {
+        var boosts = gameDao.getInventory().first().highBoosts
+        gameDao.updateHighBoosts(++boosts)
+    }
+
+    // Activates a single low boost
+    suspend fun activateLowBoost() {
+        activateBoost(lowBoostId);
+    }
+
+    // Activates a single medium boost
+    suspend fun activateMediumBoost() {
+        activateBoost(mediumBoostId);
+    }
+
+    // Activates a single medium boost
+    suspend fun activateHighBoost() {
+        activateBoost(highBoostId);
+    }
+
+    // Activates a single medium boost
+    private suspend fun activateBoost(boostId: Int) {
+        val inventory = gameDao.getInventory().first()
+        var boosts = when(boostId) {
+            lowBoostId -> inventory.lowBoosts
+            mediumBoostId -> inventory.mediumBoosts
+            highBoostId -> inventory.highBoosts
+            else -> 0
+        }
+
+        if (boosts > 0) {
+            //TODO add real boost duration (read out of db)
+            val activeUntil = System.currentTimeMillis() + 100_000
+            gameDao.updateBoostActivation(boostId, activeUntil)
+
+            when (boostId) {
+                lowBoostId -> {
+                    gameDao.updateLowBoosts(--boosts)
+                }
+                mediumBoostId -> {
+                    gameDao.updateMediumBoosts(--boosts)
+                }
+                highBoostId -> {
+                    gameDao.updateHighBoosts(--boosts)
+                }
+            }
         }
     }
+
 
 }

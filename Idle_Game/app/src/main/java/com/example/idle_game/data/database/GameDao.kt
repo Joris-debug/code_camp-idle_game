@@ -47,11 +47,17 @@ interface GameDao {
     @Query("UPDATE inventorydata SET unused_botnets = :unusedBotnets")
     suspend fun updateUnusedBotnets(unusedBotnets: Int)
 
-    @Query("UPDATE inventorydata SET boosts = :boosts")
-    suspend fun updateBoosts(boosts: Int)
+    @Query("UPDATE inventorydata SET low_boosts = :boosts")
+    suspend fun updateLowBoosts(boosts: Int)
 
-    @Query("UPDATE inventorydata SET boosts = :boosts, boost_active_until = :until")
-    suspend fun updateBoostActivation(boosts: Int, until: Long)
+    @Query("UPDATE inventorydata SET medium_boosts = :boosts")
+    suspend fun updateMediumBoosts(boosts: Int)
+
+    @Query("UPDATE inventorydata SET high_boosts = :boosts")
+    suspend fun updateHighBoosts(boosts: Int)
+
+    @Query("UPDATE inventorydata SET active_boost_type = :type, boost_active_until = :until")
+    suspend fun updateBoostActivation(type: Int, until: Long)
 
     @Query("SELECT * FROM scoreboarddata")
     fun getScoreBoard(): Flow<ScoreBoardData>
