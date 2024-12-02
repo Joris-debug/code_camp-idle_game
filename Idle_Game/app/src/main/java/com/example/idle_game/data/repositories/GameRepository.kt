@@ -28,7 +28,7 @@ class GameRepository(
         try {
             val resp = api.signUp(signUpRequest)
             val refreshToken = sharedPreferences.getString("refresh_token", null)
-            if(refreshToken != null) {
+            if (refreshToken != null) {
                 val playerData = PlayerData(
                     username = username,
                     password = password,
@@ -46,12 +46,13 @@ class GameRepository(
     suspend fun login(onFailure: () -> Unit = {}) {
         val playerData = playerDataFlow.first()
         try {
+
             val resp = api.login(playerData.refreshToken)
             val accessToken = sharedPreferences.getString("access_token", null)
-            if(accessToken != null) {
+            if (accessToken != null) {
                 gameDao.updateAccessToken(accessToken)
             }
-        } catch (e: HttpException) {
+        } catch (e: Throwable) {
             onFailure()
         }
     }
@@ -173,7 +174,7 @@ class GameRepository(
     // Only used internally
     private suspend fun activateBoost(boostId: Int) {
         val inventory = gameDao.getInventory().first()
-        var boosts = when(boostId) {
+        var boosts = when (boostId) {
             LOW_BOOST_ID -> inventory.lowBoosts
             MEDIUM_BOOST_ID -> inventory.mediumBoosts
             HIGH_BOOST_ID -> inventory.highBoosts
@@ -189,9 +190,11 @@ class GameRepository(
                 LOW_BOOST_ID -> {
                     gameDao.updateLowBoosts(--boosts)
                 }
+
                 MEDIUM_BOOST_ID -> {
                     gameDao.updateMediumBoosts(--boosts)
                 }
+
                 HIGH_BOOST_ID -> {
                     gameDao.updateHighBoosts(--boosts)
                 }

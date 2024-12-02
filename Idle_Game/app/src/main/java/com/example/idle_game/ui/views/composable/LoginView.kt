@@ -15,16 +15,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.ui.views.models.LoginViewModel
 
 @Composable
-fun LoginView(viewModel: LoginViewModel, onLoginSuccess: () -> Unit) {
+fun LoginView(viewModel: LoginViewModel = hiltViewModel(), onLoginSuccess: () -> Unit) {
+    viewModel.init { onLoginSuccess() }
     Column (modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
         Text(
             text = "Bitte einen Benutzernamen eingeben: "
         )
         var input by remember { mutableStateOf("") }
         OutlinedTextField(value = input, onValueChange = {input = it}, label = { Text("Benutzername")})
-        OutlinedButton(onClick = {viewModel.buttonSubmit(input); onLoginSuccess()}, modifier = Modifier.background(Color.White) ) { Text("Submit") }
+        OutlinedButton(onClick = {viewModel.buttonSubmit(input, {onLoginSuccess()})}, modifier = Modifier.background(Color.White) ) { Text("Submit") }
     }
 }

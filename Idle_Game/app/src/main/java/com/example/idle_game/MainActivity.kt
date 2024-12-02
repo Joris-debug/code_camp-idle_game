@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.idle_game.ui.navigation.BottomBar
 import com.example.idle_game.ui.navigation.NavigationGraph
@@ -70,6 +71,7 @@ fun Idle_GameLauncher(modifier: Modifier = Modifier) {
             )
         }
     } else {
-        LoginView(LoginViewModel(/*hilt + */onLoginSuccess = { isLoggedIn = true }), onLoginSuccess = { isLoggedIn = true })
+//        LoginView(LoginViewModel(/*hilt + */onLoginSuccess = { isLoggedIn = true }), onLoginSuccess = { isLoggedIn = true })
+        LoginView(hiltViewModel(), onLoginSuccess = { isLoggedIn = true })//, onLoginSuccess = { isLoggedIn = true })
     }
 }
