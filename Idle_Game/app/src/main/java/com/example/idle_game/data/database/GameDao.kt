@@ -76,6 +76,9 @@ interface GameDao {
     fun getScoreBoard(): Flow<ScoreBoardData>
 
     @Query("SELECT * FROM shopdata")
-    fun getShop(): Flow<ShopData>
+    fun getShop(): Flow<List<ShopData>>
+
+    @Upsert
+    suspend fun insertShop(item: ShopData)
 
 }

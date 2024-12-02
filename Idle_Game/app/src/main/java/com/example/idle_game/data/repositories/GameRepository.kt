@@ -16,6 +16,7 @@ class GameRepository(
 ) {
     val playerDataFlow = gameDao.getPlayer()
     val inventoryDataFlow = gameDao.getInventory()
+    val shopDataFlow = gameDao.getShop()
 
     companion object {
         const val LOW_BOOST_ID = 1
@@ -50,6 +51,22 @@ class GameRepository(
             val accessToken = sharedPreferences.getString("access_token", null)
             if(accessToken != null) {
                 gameDao.updateAccessToken(accessToken)
+            }
+        } catch (e: HttpException) {
+            onFailure()
+        }
+    }
+
+    // Makes a server request and fills the shop-data table
+    suspend fun updateShop(onFailure: () -> Unit = {}) {
+        val playerData = playerDataFlow.first()
+        try {
+            if(playerData.accessToken == null) {
+                throw NullPointerException("accessToken can't be null")
+            }
+            val resp = api.getItems(playerData.accessToken)
+            for(item in resp) {
+                gameDao.insertShop(item.toShopData())
             }
         } catch (e: HttpException) {
             onFailure()
