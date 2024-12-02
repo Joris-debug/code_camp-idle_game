@@ -20,7 +20,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object repomodule {
+class RepoModule {
 
     data class RetroFitHolder(val gameRetrofit: Retrofit, val quotesRetrofit: Retrofit)
 

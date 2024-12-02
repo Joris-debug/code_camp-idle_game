@@ -18,9 +18,9 @@ class GameRepository(
     val inventoryDataFlow = gameDao.getInventory()
 
     companion object {
-        const val lowBoostId = 1
-        const val mediumBoostId = 2
-        const val highBoostId = 3
+        const val LOW_BOOST_ID = 1
+        const val MEDIUM_BOOST_ID = 2
+        const val HIGH_BOOST_ID = 3
     }
 
     suspend fun signUp(username: String, password: String) {
@@ -119,6 +119,26 @@ class GameRepository(
         }
     }
 
+    suspend fun addUpgradeLvl2() {
+        var upgrades = gameDao.getInventory().first().upgradeLvl2
+        gameDao.updateLvl2Upgrades(++upgrades)
+    }
+
+    suspend fun addUpgradeLvl3() {
+        var upgrades = gameDao.getInventory().first().upgradeLvl3
+        gameDao.updateLvl3Upgrades(++upgrades)
+    }
+
+    suspend fun addUpgradeLvl4() {
+        var upgrades = gameDao.getInventory().first().upgradeLvl4
+        gameDao.updateLvl4Upgrades(++upgrades)
+    }
+
+    suspend fun addUpgradeLvl5() {
+        var upgrades = gameDao.getInventory().first().upgradeLvl5
+        gameDao.updateLvl5Upgrades(++upgrades)
+    }
+
     // Adds a new low boost to the inventory
     suspend fun addLowBoost() {
         var boosts = gameDao.getInventory().first().lowBoosts
@@ -139,26 +159,26 @@ class GameRepository(
 
     // Activates a single low boost
     suspend fun activateLowBoost() {
-        activateBoost(lowBoostId);
+        activateBoost(LOW_BOOST_ID);
     }
 
     // Activates a single medium boost
     suspend fun activateMediumBoost() {
-        activateBoost(mediumBoostId);
+        activateBoost(MEDIUM_BOOST_ID);
     }
 
     // Activates a single medium boost
     suspend fun activateHighBoost() {
-        activateBoost(highBoostId);
+        activateBoost(HIGH_BOOST_ID);
     }
 
-    // Activates a single medium boost
+    // Only used internally
     private suspend fun activateBoost(boostId: Int) {
         val inventory = gameDao.getInventory().first()
         var boosts = when(boostId) {
-            lowBoostId -> inventory.lowBoosts
-            mediumBoostId -> inventory.mediumBoosts
-            highBoostId -> inventory.highBoosts
+            LOW_BOOST_ID -> inventory.lowBoosts
+            MEDIUM_BOOST_ID -> inventory.mediumBoosts
+            HIGH_BOOST_ID -> inventory.highBoosts
             else -> 0
         }
 
@@ -168,18 +188,17 @@ class GameRepository(
             gameDao.updateBoostActivation(boostId, activeUntil)
 
             when (boostId) {
-                lowBoostId -> {
+                LOW_BOOST_ID -> {
                     gameDao.updateLowBoosts(--boosts)
                 }
-                mediumBoostId -> {
+                MEDIUM_BOOST_ID -> {
                     gameDao.updateMediumBoosts(--boosts)
                 }
-                highBoostId -> {
+                HIGH_BOOST_ID -> {
                     gameDao.updateHighBoosts(--boosts)
                 }
             }
         }
     }
-
 
 }

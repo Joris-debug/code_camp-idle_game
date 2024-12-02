@@ -59,6 +59,18 @@ interface GameDao {
     @Query("UPDATE inventorydata SET active_boost_type = :type, boost_active_until = :until")
     suspend fun updateBoostActivation(type: Int, until: Long)
 
+    @Query("UPDATE inventorydata SET upgrade_lvl_2 = :upgrades")
+    suspend fun updateLvl2Upgrades(upgrades: Int)
+
+    @Query("UPDATE inventorydata SET upgrade_lvl_3 = :upgrades")
+    suspend fun updateLvl3Upgrades(upgrades: Int)
+
+    @Query("UPDATE inventorydata SET upgrade_lvl_4 = :upgrades")
+    suspend fun updateLvl4Upgrades(upgrades: Int)
+
+    @Query("UPDATE inventorydata SET upgrade_lvl_5 = :upgrades")
+    suspend fun updateLvl5Upgrades(upgrades: Int)
+
     @Query("SELECT * FROM scoreboarddata")
     fun getScoreBoard(): Flow<ScoreBoardData>
 
