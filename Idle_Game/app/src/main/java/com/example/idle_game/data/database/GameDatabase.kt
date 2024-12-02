@@ -5,9 +5,10 @@ import androidx.room.RoomDatabase
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
 import com.example.idle_game.data.database.models.ScoreBoardData
+import com.example.idle_game.data.database.models.ShopData
 
 @Database(
-    entities = [PlayerData::class, ScoreBoardData::class, InventoryData::class],
+    entities = [PlayerData::class, ScoreBoardData::class, InventoryData::class, ShopData::class],
     version = 1,
     exportSchema = false
 )

@@ -18,7 +18,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.idle_game.ui.views.StartView
-import com.example.idle_game.ui.views.TestView
 
 
 @Composable
@@ -34,9 +33,6 @@ fun NavigationGraph(
     ) {
         composable("StartView") {
             StartView()
-        }
-        composable("TestView") {
-            TestView()
         }
     }
 }
@@ -62,17 +58,5 @@ fun BottomBar(navController: NavController) {
                 launchSingleTop = true
                 restoreState = false }
         }, icon = { Icon(Icons.Default.Home, contentDescription = "Start")})
-
-        NavigationBarItem(selected = currentRoute == "TestView", onClick = {
-            navController.navigate("TestView") {
-                navController.graph.startDestinationRoute?.let { screenRoute ->
-                    popUpTo(screenRoute) {
-                        saveState = false
-                        inclusive = false
-                    }
-                }
-                launchSingleTop = true
-                restoreState = false }
-        }, icon = { Icon(Icons.Default.Home, contentDescription = "Test")})
     }
 }

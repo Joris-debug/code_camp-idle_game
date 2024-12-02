@@ -6,6 +6,7 @@ import androidx.room.Upsert
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
 import com.example.idle_game.data.database.models.ScoreBoardData
+import com.example.idle_game.data.database.models.ShopData
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -73,5 +74,8 @@ interface GameDao {
 
     @Query("SELECT * FROM scoreboarddata")
     fun getScoreBoard(): Flow<ScoreBoardData>
+
+    @Query("SELECT * FROM shopdata")
+    fun getShop(): Flow<ShopData>
 
 }

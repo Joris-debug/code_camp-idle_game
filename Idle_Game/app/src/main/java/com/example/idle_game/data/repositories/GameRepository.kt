@@ -23,7 +23,7 @@ class GameRepository(
         const val HIGH_BOOST_ID = 3
     }
 
-    suspend fun signUp(username: String, password: String) {
+    suspend fun signUp(username: String, password: String, onFailure: () -> Unit = {}) {
         val signUpRequest = SignUpRequest(username = username, password = password)
         try {
             val resp = api.signUp(signUpRequest)
@@ -38,13 +38,12 @@ class GameRepository(
                 gameDao.insertPlayer(playerData)
             }
         } catch (e: HttpException) {
-            println(e);
-            //TODO add better error handling
+            onFailure()
         }
     }
 
     // Makes a server request and gets a new access_token
-    suspend fun login() {
+    suspend fun login(onFailure: () -> Unit = {}) {
         val playerData = playerDataFlow.first()
         try {
             val resp = api.login(playerData.refreshToken)
@@ -53,8 +52,7 @@ class GameRepository(
                 gameDao.updateAccessToken(accessToken)
             }
         } catch (e: HttpException) {
-            println(e);
-            //TODO add better error handling
+            onFailure()
         }
     }
 
