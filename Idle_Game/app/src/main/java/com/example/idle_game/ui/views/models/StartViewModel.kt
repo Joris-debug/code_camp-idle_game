@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.concurrent.TimeUnit
 
+
 class StartViewModel : ViewModel() {
 
     private val _viewState = MutableStateFlow(StartViewState())

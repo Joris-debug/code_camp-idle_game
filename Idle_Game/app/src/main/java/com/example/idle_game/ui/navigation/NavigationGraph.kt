@@ -31,6 +31,7 @@ fun NavigationGraph(
         startDestination = startDestination,
         modifier = modifier
     ) {
+
         composable("StartView") { StartView() }
         composable("InventoryView") { InventoryView() }
         composable("ScoreboardView") { ScoreBoardView() }
