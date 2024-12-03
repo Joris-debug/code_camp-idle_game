@@ -31,9 +31,6 @@ fun NavigationGraph(
         composable("StartView") {
             StartView()
         }
-        composable("TestView") {
-            TestView()
-        }
     }
 }
 
