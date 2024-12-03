@@ -1,5 +1,6 @@
 package com.example.idle_game.api
 
+import com.example.idle_game.api.models.ItemResponse
 import com.example.idle_game.api.models.SignUpRequest
 import com.example.idle_game.api.models.ServerResponse
 import retrofit2.http.Body
@@ -21,4 +22,8 @@ interface GameApi {
     @GET("/login")
     @Headers("Content-Type: application/json")
     suspend fun login(@Header("Cookie") refreshToken: String): ServerResponse
+
+    @GET("/items")
+    @Headers("Content-Type: application/json")
+    suspend fun getItems(@Header("Authorization") accessToken: String): List<ItemResponse>
 }
