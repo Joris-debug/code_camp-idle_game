@@ -55,5 +55,17 @@ fun BottomBar(navController: NavController) {
                 launchSingleTop = true
                 restoreState = false }
         }, icon = { Icon(Icons.Default.Home, contentDescription = "Start")})
+
+        NavigationBarItem(selected = currentRoute == "TestView", onClick = {
+            navController.navigate("TestView") {
+                navController.graph.startDestinationRoute?.let { screenRoute ->
+                    popUpTo(screenRoute) {
+                        saveState = false
+                        inclusive = false
+                    }
+                }
+                launchSingleTop = true
+                restoreState = false }
+        }, icon = { Icon(Icons.Default.Home, contentDescription = "Test")})
     }
 }

@@ -30,23 +30,62 @@ interface GameDao {
     @Query("UPDATE inventorydata SET bitcoins = :bitcoins")
     suspend fun updateBitcoins(bitcoins: Int)
 
-    @Query("UPDATE inventorydata SET active_hackers = :active, unused_hackers = :unused")
-    suspend fun updateHackers(active: Int, unused: Int)
+    @Query("UPDATE inventorydata SET hackers_lvl_1 = hackers_lvl_1 + 1")
+    suspend fun addNewHacker()
 
-    @Query("UPDATE inventorydata SET unused_hackers = :unusedHackers")
-    suspend fun updateUnusedHackers(unusedHackers: Int)
+    @Query("""
+    UPDATE inventorydata 
+    SET hackers_lvl_1 = :hackersLvL1, 
+        hackers_lvl_2 = :hackersLvL2, 
+        hackers_lvl_3 = :hackersLvL3, 
+        hackers_lvl_4 = :hackersLvL4,
+        hackers_lvl_5 = :hackersLvL5
+    """)
+    suspend fun setHackers(
+        hackersLvL1: Int,
+        hackersLvL2: Int,
+        hackersLvL3: Int,
+        hackersLvL4: Int,
+        hackersLvL5: Int
+    )
 
-    @Query("UPDATE inventorydata SET active_crypto_miners = :active, unused_crypto_miners = :unused")
-    suspend fun updateCryptoMiners(active: Int, unused: Int)
+    @Query("UPDATE inventorydata SET crypto_miners_lvl_1 = crypto_miners_lvl_1 + 1")
+    suspend fun addNewCryptoMiner()
 
-    @Query("UPDATE inventorydata SET unused_crypto_miners = :unusedCryptoMiners")
-    suspend fun updateUnusedCryptoMiners(unusedCryptoMiners: Int)
+    @Query("""
+    UPDATE inventorydata 
+    SET crypto_miners_lvl_1 = :cryptoMinersLvL1, 
+        crypto_miners_lvl_2 = :cryptoMinersLvL2, 
+        crypto_miners_lvl_3 = :cryptoMinersLvL3, 
+        crypto_miners_lvl_4 = :cryptoMinersLvL4,
+        crypto_miners_lvl_5 = :cryptoMinersLvL5
+    """)
+    suspend fun setCryptoMiners(
+        cryptoMinersLvL1: Int,
+        cryptoMinersLvL2: Int,
+        cryptoMinersLvL3: Int,
+        cryptoMinersLvL4: Int,
+        cryptoMinersLvL5: Int
+    )
 
-    @Query("UPDATE inventorydata SET active_botnets = :active, unused_botnets = :unused")
-    suspend fun updateBotnets(active: Int, unused: Int)
+    @Query("UPDATE inventorydata SET botnets_lvl_1 = botnets_lvl_1 + 1")
+    suspend fun addNewBotnet()
 
-    @Query("UPDATE inventorydata SET unused_botnets = :unusedBotnets")
-    suspend fun updateUnusedBotnets(unusedBotnets: Int)
+    @Query("""
+    UPDATE inventorydata 
+    SET botnets_lvl_1 = :botnetsLvL1, 
+        botnets_lvl_2 = :botnetsLvL2, 
+        botnets_lvl_3 = :botnetsLvL3, 
+        botnets_lvl_4 = :botnetsLvL4,
+        botnets_lvl_5 = :botnetsLvL5
+    """)
+    suspend fun setBotnets(
+        botnetsLvL1: Int,
+        botnetsLvL2: Int,
+        botnetsLvL3: Int,
+        botnetsLvL4: Int,
+        botnetsLvL5: Int
+    )
 
     @Query("UPDATE inventorydata SET low_boosts = :boosts")
     suspend fun updateLowBoosts(boosts: Int)
@@ -73,9 +112,12 @@ interface GameDao {
     suspend fun updateLvl5Upgrades(upgrades: Int)
 
     @Query("SELECT * FROM scoreboarddata")
-    fun getScoreBoard(): Flow<ScoreBoardData>
+    fun getScoreBoard(): Flow<List<ScoreBoardData>>
 
     @Query("SELECT * FROM shopdata")
-    fun getShop(): Flow<ShopData>
+    fun getShop(): Flow<List<ShopData>>
+
+    @Upsert
+    suspend fun insertShop(item: ShopData)
 
 }
