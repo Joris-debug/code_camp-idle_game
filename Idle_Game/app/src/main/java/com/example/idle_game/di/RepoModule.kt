@@ -6,6 +6,7 @@ import androidx.room.Room
 import com.example.idle_game.api.CookieInterceptor
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.data.database.GameDatabase
+import com.example.idle_game.data.database.MIGRATION_1_2
 import com.example.idle_game.data.repositories.GameRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -17,6 +18,8 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
+
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -74,6 +77,7 @@ class RepoModule {
     fun providesDatabase(@ApplicationContext context: Context): GameDatabase {
         return Room.databaseBuilder(
             context, GameDatabase::class.java, "gamedatabase"
-        ).build()
+        ).fallbackToDestructiveMigration()
+            .build()
     }
 }
