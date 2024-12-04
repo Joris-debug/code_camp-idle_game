@@ -89,12 +89,7 @@ dependencies {
     // Jetpack Compose integration
     implementation("androidx.navigation:navigation-compose:$navVersion")
 
-    // Views/Fragments integration
-    implementation("androidx.navigation:navigation-fragment:$navVersion")
     implementation("androidx.navigation:navigation-ui:$navVersion")
-
-    // Feature module support for Fragments
-    implementation("androidx.navigation:navigation-dynamic-features-fragment:$navVersion")
 
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.9.0")
