@@ -2,7 +2,6 @@ package com.example.idle_game.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem
@@ -15,8 +14,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.idle_game.ui.views.composable.InventoryView
-import com.example.idle_game.ui.views.composable.ScoreBoardView
 import com.example.idle_game.ui.views.composable.StartView
 
 
@@ -24,43 +21,39 @@ import com.example.idle_game.ui.views.composable.StartView
 fun NavigationGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    startDestination: String = "StartView"
+    startDestination: String = "StartView",
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier
     ) {
-
-        composable("StartView") { StartView() }
-        composable("InventoryView") { InventoryView() }
-        composable("ScoreboardView") { ScoreBoardView() }
+        composable("StartView") {
+            StartView()
+        }
     }
 }
 
 @Composable
 fun BottomBar(navController: NavController) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
 
-    BottomAppBar(
+    BottomAppBar (
         containerColor = Color.Gray,
         contentColor = Color.White
     ) {
-        NavigationBarItem(
-            selected = currentRoute == "StartView",
-            onClick = { navController.navigate("StartView") },
-            icon = { Icon(Icons.Default.Home, contentDescription = "Start") }
-        )
-        NavigationBarItem(
-            selected = currentRoute == "InventoryView",
-            onClick = { navController.navigate("InventoryView") },
-            icon = { Icon(Icons.Default.Menu, contentDescription = "Inventory") }
-        )
-        NavigationBarItem(
-            selected = currentRoute == "ScoreboardView",
-            onClick = { navController.navigate("ScoreboardView") },
-            icon = { Icon(Icons.Default.Home, contentDescription = "Scoreboard") }
-        )
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+
+        NavigationBarItem(selected = currentRoute == "StartView", onClick = {
+            navController.navigate("StartView") {
+                navController.graph.startDestinationRoute?.let { screenRoute ->
+                    popUpTo(screenRoute) {
+                        saveState = false
+                        inclusive = false
+                    }
+                }
+                launchSingleTop = true
+                restoreState = false }
+        }, icon = { Icon(Icons.Default.Home, contentDescription = "Start")})
     }
 }
