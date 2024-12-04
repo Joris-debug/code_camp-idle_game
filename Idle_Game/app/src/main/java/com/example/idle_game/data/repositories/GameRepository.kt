@@ -142,25 +142,25 @@ class GameRepository(
             1 -> {
                 val upgrades = inventory.upgradeLvl2
                 if (cmLvl1 > 0 && upgrades > 0) {
-                    gameDao.setHackers(cmLvl1 - 1, cmLvl2 + 1, cmLvl3, cmLvl4, cmLvl5)
+                    gameDao.setCryptoMiners(cmLvl1 - 1, cmLvl2 + 1, cmLvl3, cmLvl4, cmLvl5)
                 }
             }
             2 -> {
                 val upgrades = inventory.upgradeLvl3
                 if (cmLvl2 > 0 && upgrades > 0) {
-                    gameDao.setHackers(cmLvl1, cmLvl2 - 1, cmLvl3 + 1, cmLvl4, cmLvl5)
+                    gameDao.setCryptoMiners(cmLvl1, cmLvl2 - 1, cmLvl3 + 1, cmLvl4, cmLvl5)
                 }
             }
             3 -> {
                 val upgrades = inventory.upgradeLvl4
                 if (cmLvl3 > 0 && upgrades > 0) {
-                    gameDao.setHackers(cmLvl1, cmLvl2, cmLvl3 - 1, cmLvl4 + 1, cmLvl5)
+                    gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3 - 1, cmLvl4 + 1, cmLvl5)
                 }
             }
             4 -> {
                 val upgrades = inventory.upgradeLvl5
                 if (cmLvl4 > 0 && upgrades > 0) {
-                    gameDao.setHackers(cmLvl1, cmLvl2, cmLvl3, cmLvl4 - 1, cmLvl5 + 1)
+                    gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3, cmLvl4 - 1, cmLvl5 + 1)
                 }
             }
             else -> {
@@ -182,25 +182,25 @@ class GameRepository(
             1 -> {
                 val upgrades = inventory.upgradeLvl2
                 if (bLvl1 > 0 && upgrades > 0) {
-                    gameDao.setHackers(bLvl1 - 1, bLvl2 + 1, bLvl3, bLvl4, bLvl5)
+                    gameDao.setBotnets(bLvl1 - 1, bLvl2 + 1, bLvl3, bLvl4, bLvl5)
                 }
             }
             2 -> {
                 val upgrades = inventory.upgradeLvl3
                 if (bLvl2 > 0 && upgrades > 0) {
-                    gameDao.setHackers(bLvl1, bLvl2 - 1, bLvl3 + 1, bLvl4, bLvl5)
+                    gameDao.setBotnets(bLvl1, bLvl2 - 1, bLvl3 + 1, bLvl4, bLvl5)
                 }
             }
             3 -> {
                 val upgrades = inventory.upgradeLvl4
                 if (bLvl3 > 0 && upgrades > 0) {
-                    gameDao.setHackers(bLvl1, bLvl2, bLvl3 - 1, bLvl4 + 1, bLvl5)
+                    gameDao.setBotnets(bLvl1, bLvl2, bLvl3 - 1, bLvl4 + 1, bLvl5)
                 }
             }
             4 -> {
                 val upgrades = inventory.upgradeLvl5
                 if (bLvl4 > 0 && upgrades > 0) {
-                    gameDao.setHackers(bLvl1, bLvl2, bLvl3, bLvl4 - 1, bLvl5 + 1)
+                    gameDao.setBotnets(bLvl1, bLvl2, bLvl3, bLvl4 - 1, bLvl5 + 1)
                 }
             }
             else -> {
