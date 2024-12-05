@@ -11,7 +11,7 @@ import com.example.idle_game.data.database.models.ShopData
 
 @Database(
     entities = [PlayerData::class, ScoreBoardData::class, InventoryData::class, ShopData::class],
-    version = 2,
+    version = 1,
     exportSchema = false
 )
 abstract class GameDatabase : RoomDatabase() {
