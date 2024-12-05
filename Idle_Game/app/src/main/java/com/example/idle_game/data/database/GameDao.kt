@@ -3,6 +3,7 @@ package com.example.idle_game.data.database
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
+import com.example.idle_game.api.models.ScoreResponse
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
 import com.example.idle_game.data.database.models.ScoreBoardData
@@ -113,6 +114,9 @@ interface GameDao {
 
     @Query("SELECT * FROM scoreboarddata")
     fun getScoreBoard(): Flow<List<ScoreBoardData>>
+
+    @Upsert
+    suspend fun insertScoreBoard(player: ScoreBoardData)
 
     @Query("SELECT * FROM shopdata")
     fun getShop(): Flow<List<ShopData>>

@@ -2,6 +2,7 @@ package com.example.idle_game.data.repositories
 
 import android.content.SharedPreferences
 import com.example.idle_game.api.GameApi
+import com.example.idle_game.api.models.SetScoreRequest
 import com.example.idle_game.api.models.SignUpRequest
 import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
@@ -69,6 +70,47 @@ class GameRepository(
             for (item in resp) {
                 gameDao.insertShop(item.toShopData())
             }
+        } catch (e: HttpException) {
+            onFailure()
+        }
+    }
+
+    // Makes a server request and fills the score-board-data table
+    suspend fun fetchScoreBoard(onFailure: () -> Unit = {}) {
+        val playerData = playerDataFlow.first()
+        try {
+            if (playerData.accessToken == null) {
+                throw NullPointerException("accessToken can't be null")
+            }
+            val resp = api.getScore(playerData.accessToken)
+            for (player in resp) {
+                gameDao.insertScoreBoard(player.toScoreBoardData())
+                println(player)
+            }
+        } catch (e: HttpException) {
+            onFailure()
+        }
+    }
+
+    // Makes a server request and puts the player score on the board
+    // Call fetchScoreBoard afterwards to have the ScoreBoard updated
+    suspend fun updateScoreBoard(onFailure: () -> Unit = {}) {
+        try {
+            val playerData = playerDataFlow.first()
+            if (playerData.accessToken == null) {
+                throw NullPointerException("accessToken can't be null")
+            }
+
+            val inventoryData = inventoryDataFlow.first()
+            val setScoreRequest = SetScoreRequest(
+                username = playerData.username,
+                inventoryData.bitcoins
+            )
+
+            val resp = api.postScore(
+                playerData.accessToken,
+                setScoreRequest = setScoreRequest
+            )
         } catch (e: HttpException) {
             onFailure()
         }

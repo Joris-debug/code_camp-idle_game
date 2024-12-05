@@ -55,5 +55,6 @@ fun BottomBar(navController: NavController) {
                 launchSingleTop = true
                 restoreState = false }
         }, icon = { Icon(Icons.Default.Home, contentDescription = "Start")})
+
     }
 }
