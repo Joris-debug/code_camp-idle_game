@@ -14,6 +14,7 @@ class StartViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            gameRepository.signIn()
             gameRepository.login()
             gameRepository.fetchScoreBoard()
             gameRepository.updateBitcoins(-100)

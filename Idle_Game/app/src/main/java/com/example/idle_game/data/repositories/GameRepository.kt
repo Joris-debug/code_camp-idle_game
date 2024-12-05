@@ -3,7 +3,7 @@ package com.example.idle_game.data.repositories
 import android.content.SharedPreferences
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.api.models.SetScoreRequest
-import com.example.idle_game.api.models.SignUpRequest
+import com.example.idle_game.api.models.UserCredentialsRequest
 import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
@@ -26,14 +26,40 @@ class GameRepository(
     }
 
     suspend fun signUp(username: String, password: String, onFailure: () -> Unit = {}) {
-        val signUpRequest = SignUpRequest(username = username, password = password)
+        val userCredentialsRequest = UserCredentialsRequest(
+            username = username,
+            password = password
+        )
         try {
-            val resp = api.signUp(signUpRequest)
+            val resp = api.signUp(userCredentialsRequest)
             val refreshToken = sharedPreferences.getString("refresh_token", null)
             if (refreshToken != null) {
                 val playerData = PlayerData(
                     username = username,
                     password = password,
+                    refreshToken = refreshToken,
+                    accessToken = null
+                )
+                gameDao.insertPlayer(playerData)
+            }
+        } catch (e: HttpException) {
+            onFailure()
+        }
+    }
+
+    suspend fun signIn(onFailure: () -> Unit = {}) {
+        var playerData = playerDataFlow.first()
+        val userCredentialsRequest = UserCredentialsRequest(
+            username = playerData.username,
+            password = playerData.password
+        )
+        try {
+            val resp = api.signIn(userCredentialsRequest)
+            val refreshToken = sharedPreferences.getString("refresh_token", null)
+            if (refreshToken != null) {
+                playerData = PlayerData(
+                    username = playerData.username,
+                    password = playerData.password,
                     refreshToken = refreshToken,
                     accessToken = null
                 )
