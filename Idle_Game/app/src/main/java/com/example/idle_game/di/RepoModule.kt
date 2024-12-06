@@ -36,7 +36,6 @@ class RepoModule {
 
     @Provides
     fun providesMoshi(): Moshi {
-
         val moshi = Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
             .build()
@@ -56,7 +55,6 @@ class RepoModule {
 
     @Provides
     fun providesAPI(moshi: Moshi, cookieInterceptor: CookieInterceptor): GameApi {
-
         val okHttpClient = okhttp3.OkHttpClient.Builder()
             .addInterceptor(cookieInterceptor)
             .build()
