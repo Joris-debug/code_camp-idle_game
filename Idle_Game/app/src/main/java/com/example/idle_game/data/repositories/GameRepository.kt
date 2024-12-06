@@ -8,6 +8,7 @@ import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
+import java.time.Instant
 
 class GameRepository(
     private val api: GameApi,
@@ -82,6 +83,18 @@ class GameRepository(
     // TODO add error handing if no inventory exists (all functions)
     suspend fun updateBitcoins(bitcoins: Int) {
         gameDao.updateBitcoins(bitcoins)
+    }
+
+    suspend fun getInventory(): InventoryData {
+        return inventoryDataFlow.first()
+    }
+
+    suspend fun getLastTimestamp(): Instant? {
+        return gameDao.getLastTimestamp()?.let { Instant.ofEpochMilli(it) }
+    }
+
+    suspend fun setTimestamp(timestamp: Instant) {
+        gameDao.setTimeStamp(timestamp.toEpochMilli())
     }
 
     // Adds a new lvl 1 hacker to the inventory

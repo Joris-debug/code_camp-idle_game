@@ -8,6 +8,7 @@ import com.example.idle_game.data.database.models.PlayerData
 import com.example.idle_game.data.database.models.ScoreBoardData
 import com.example.idle_game.data.database.models.ShopData
 import kotlinx.coroutines.flow.Flow
+import java.time.Instant
 
 @Dao
 interface GameDao {
@@ -120,4 +121,9 @@ interface GameDao {
     @Upsert
     suspend fun insertShop(item: ShopData)
 
+    @Query("SELECT last_timestamp FROM InventoryData")
+    suspend fun getLastTimestamp(): Long?
+
+    @Query("UPDATE InventoryData SET last_timestamp = :timeStamp")
+    suspend fun setTimeStamp(timeStamp: Long)
 }

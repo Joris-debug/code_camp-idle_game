@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val gameRepository: GameRepository,
+    private val gameRepository: GameRepository
 ) : ViewModel() {
 
     fun init(onLoginSuccess: () -> Unit) {
