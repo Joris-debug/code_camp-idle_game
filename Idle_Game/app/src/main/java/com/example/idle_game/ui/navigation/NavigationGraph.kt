@@ -2,6 +2,7 @@ package com.example.idle_game.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem
@@ -14,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.idle_game.ui.views.composable.ScoreBoardView
 import com.example.idle_game.ui.views.composable.StartView
 
 
@@ -30,6 +32,9 @@ fun NavigationGraph(
     ) {
         composable("StartView") {
             StartView()
+        }
+        composable("ScoreBoardView") {
+            ScoreBoardView()
         }
     }
 }
@@ -55,6 +60,18 @@ fun BottomBar(navController: NavController) {
                 launchSingleTop = true
                 restoreState = false }
         }, icon = { Icon(Icons.Default.Home, contentDescription = "Start")})
+
+        NavigationBarItem(selected = currentRoute == "ScoreBoardView", onClick = {
+            navController.navigate("ScoreBoardView") {
+                navController.graph.startDestinationRoute?.let { screenRoute ->
+                    popUpTo(screenRoute) {
+                        saveState = false
+                        inclusive = false
+                    }
+                }
+                launchSingleTop = true
+                restoreState = false }
+        }, icon = { Icon(Icons.Default.Star, contentDescription = "Scoreboard")})
 
     }
 }
