@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.idle_game"
-        minSdk = 35
+        minSdk = 29
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -88,21 +88,24 @@ dependencies {
     // Jetpack Compose integration
     implementation("androidx.navigation:navigation-compose:$navVersion")
 
-    // Views/Fragments integration
-    implementation("androidx.navigation:navigation-fragment:$navVersion")
     implementation("androidx.navigation:navigation-ui:$navVersion")
 
-    // Feature module support for Fragments
-    implementation("androidx.navigation:navigation-dynamic-features-fragment:$navVersion")
+    implementation("com.google.android.material:material:1.9.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+    implementation("junit:junit:4.+")
 
     // Testing Navigation
     androidTestImplementation("androidx.navigation:navigation-testing:$navVersion")
 
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
+    implementation ("androidx.work:work-runtime-ktx:2.8.1")
     //Moshi
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
     implementation("com.squareup.moshi:moshi:1.13.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.13.0")
+
 }
 
 // Allow references to generated code
