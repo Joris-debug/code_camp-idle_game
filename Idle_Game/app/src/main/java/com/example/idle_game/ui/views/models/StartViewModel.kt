@@ -65,12 +65,9 @@ class StartViewModel @Inject constructor(
 
     init {
         viewModelScope.launch { //Coroutine for passive income
-            //TODO: DB load TimeStamp for AFK time
-            // val duration = Duration.between(startTime, endTime)
-            // read seconds: duration.seconds, multiply with coinsPerSecond
             _viewState.value = _viewState.value.copy(coins = gameRepository.getInventory().bitcoins)
             val lastTimestamp = gameRepository.getLastTimestamp()
-            if(lastTimestamp != null) {
+            if (lastTimestamp != null) {
                 val duration = Duration.between(lastTimestamp, Instant.now())
                 addCoins(
                     getCoinsPerSecond(gameRepository.getInventory()) * duration.seconds.toInt(),
@@ -88,37 +85,73 @@ class StartViewModel @Inject constructor(
         }
     }
 
-    fun incrementCoins(increment: Int, delayMinutes: Long, workManager: WorkManager) {
-        _viewState.value = _viewState.value.copy(
-            coins = _viewState.value.coins + increment,
-            isLoading = true,
-            errorMessage = null
-        )
-        scheduleNotWorker(delayMinutes, workManager)
+    fun coinClick() {
+        viewModelScope.launch {
+            _viewState.value =
+                _viewState.value.copy(activeBoost = gameRepository.getInventory().activeBoostType)
+            //Todo: ist Booster noch aktiv?
+
+            addCoins(1 + _viewState.value.activeBoost, gameRepository.getInventory())
+        }
     }
 
-
-    private fun scheduleNotWorker(delayMinutes: Long, workManager: WorkManager) {
-        val workRequest: WorkRequest = OneTimeWorkRequest.Builder(NotWorker::class.java)
-            .setInitialDelay(delayMinutes, TimeUnit.MINUTES)
-            .build()
-
-        workManager.enqueue(workRequest)
-
-        _viewState.value = _viewState.value.copy(isLoading = false)
-    }
+//    fun incrementCoins(increment: Int, delayMinutes: Long, workManager: WorkManager) {
+//        _viewState.value = _viewState.value.copy(
+//            coins = _viewState.value.coins + increment,
+//            isLoading = true,
+//            errorMessage = null
+//        )
+//        scheduleNotWorker(delayMinutes, workManager)
+//    }
+//
+//
+//    private fun scheduleNotWorker(delayMinutes: Long, workManager: WorkManager) {
+//        val workRequest: WorkRequest = OneTimeWorkRequest.Builder(NotWorker::class.java)
+//            .setInitialDelay(delayMinutes, TimeUnit.MINUTES)
+//            .build()
+//
+//        workManager.enqueue(workRequest)
+//
+//        _viewState.value = _viewState.value.copy(isLoading = false)
+//    }
 
     fun addHacker() {
         viewModelScope.launch {
             gameRepository.addNewHacker()
         }
-    }fun addBot() {
+    }
+
+    fun addBot() {
         viewModelScope.launch {
             gameRepository.addNewBotnet()
         }
-    }fun addMiner() {
+    }
+
+    fun addMiner() {
         viewModelScope.launch {
             gameRepository.addNewCryptoMiner()
+        }
+    }
+
+    //Test: Nur für tests
+    fun addBooster(lvl: Int) {
+        viewModelScope.launch {
+            when (lvl) {
+                1 -> {
+                    gameRepository.addLowBoost()
+                    gameRepository.activateLowBoost()
+                }
+
+                2 -> {
+                    gameRepository.addMediumBoost()
+                    gameRepository.activateMediumBoost()
+                }
+
+                3 -> {
+                    gameRepository.addHighBoost()
+                    gameRepository.activateHighBoost()
+                }
+            }
         }
     }
 }

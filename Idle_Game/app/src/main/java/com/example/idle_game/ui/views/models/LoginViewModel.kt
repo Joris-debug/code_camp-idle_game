@@ -33,7 +33,7 @@ class LoginViewModel @Inject constructor(
             gameRepository.createNewInventory()  // Ensure the inventory is created first
             var success = true;
             gameRepository.signUp(name, generateRandomString(10), {success = false})
-            gameRepository.login()
+            gameRepository.login({success = false})
             if(success) {
                 onLoginSuccess()
             }
