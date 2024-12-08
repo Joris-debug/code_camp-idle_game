@@ -13,7 +13,7 @@ import com.example.idle_game.ui.views.models.ScoreBoardViewModel
 @Composable
 fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
 
-    LazyColumn (modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+    LazyColumn (modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         item {
             Text(
                 text = "Scoreboard: "

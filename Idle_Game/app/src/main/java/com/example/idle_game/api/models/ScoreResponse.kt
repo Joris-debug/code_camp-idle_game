@@ -9,10 +9,26 @@ data class ScoreResponse(
     @Json(name = "username") val username: String,
     @Json(name = "score") val score: Long
 ) {
+
+    companion object {
+        const val MAX_USERNAME_SIZE = 20
+    }
+
     fun toScoreBoardData(): ScoreBoardData {
         return ScoreBoardData(
-            username = username,
+            username = formatName(username),
             score = score
         )
     }
+
+    private fun formatName(input: String): String {
+        val formattedString = input.replace("\n", " ")
+
+        return if (formattedString.length > MAX_USERNAME_SIZE) {
+            formattedString.substring(0, MAX_USERNAME_SIZE)
+        } else {
+            formattedString
+        }
+    }
+
 }

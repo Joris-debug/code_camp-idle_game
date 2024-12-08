@@ -18,6 +18,7 @@ class GameRepository(
     val playerDataFlow = gameDao.getPlayer()
     val inventoryDataFlow = gameDao.getInventory()
     val shopDataFlow = gameDao.getShop()
+    val scoreBoardDataFlow = gameDao.getScoreBoard()
 
     companion object {
         const val LOW_BOOST_ID = 1
