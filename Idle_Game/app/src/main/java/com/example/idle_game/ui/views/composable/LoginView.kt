@@ -19,14 +19,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.ui.views.models.LoginViewModel
 
 @Composable
-fun LoginView(viewModel: LoginViewModel = hiltViewModel(), onLoginSuccess: () -> Unit) {
-    viewModel.init { onLoginSuccess() }
-    Column (modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+fun LoginView(viewModel: LoginViewModel = hiltViewModel(), onSignUpSuccess: () -> Unit) {
+    viewModel.init { onSignUpSuccess() }
+    Column (modifier = Modifier.fillMaxSize().background(Color.White), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
         Text(
             text = "Bitte einen Benutzernamen eingeben: "
         )
         var input by remember { mutableStateOf("") }
         OutlinedTextField(value = input, onValueChange = {input = it}, label = { Text("Benutzername")})
-        OutlinedButton(onClick = {viewModel.buttonSubmit(input, {onLoginSuccess()})}, modifier = Modifier.background(Color.White) ) { Text("Submit") }
+        OutlinedButton(onClick = {viewModel.buttonSubmit(input, {onSignUpSuccess()})}, modifier = Modifier.background(Color.White) ) { Text("Submit") }
     }
 }
