@@ -5,7 +5,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -13,11 +12,11 @@ import com.example.idle_game.R
 
 class NotWorker(appContext: Context, workerParams: WorkerParameters) :
     Worker(appContext, workerParams) {
+
     override fun doWork(): Result {
         sendNotification()
         return Result.success()
     }
-
 
     @SuppressLint("NotificationPermission", "ObsoleteSdkInt")
     private fun sendNotification() {
