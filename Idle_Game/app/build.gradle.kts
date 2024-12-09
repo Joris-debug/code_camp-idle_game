@@ -65,7 +65,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.hilt.common)
-    //implementation(libs.androidx.hilt.work)
 
     // room
     implementation(libs.androidx.room.common)
@@ -94,18 +93,18 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.2.0")
     implementation("junit:junit:4.+")
 
-    // Testing Navigation
+    // Testing navigation
     androidTestImplementation("androidx.navigation:navigation-testing:$navVersion")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
     implementation ("androidx.work:work-runtime-ktx:2.8.1")
-    //Moshi
+
+    // Moshi
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
     implementation("com.squareup.moshi:moshi:1.13.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.13.0")
-
 }
 
 // Allow references to generated code
