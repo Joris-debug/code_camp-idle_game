@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.idle_game.ui.views.composable.Idle_GameLauncher
+import com.example.idle_game.ui.views.composable.LoadingScreenView
 import com.example.idle_game.ui.views.composable.LoginView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -18,15 +19,20 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
 
-            val isLoggedIn = remember { mutableStateOf(false) }
+            var isLoggedIn = remember { mutableStateOf<Boolean?>(null) } //true if logged in to an existing (in db) account
+            var isWifiOK = remember { mutableStateOf(false) }
+            val isSignedUp = remember { mutableStateOf(false) }  //ture if signed-up and logged-in
 
-            if (isLoggedIn.value) {
-                Idle_GameLauncher(navController = navController, isLoggedIn = isLoggedIn)
+            if (isSignedUp.value || isLoggedIn.value == true) {
+                Idle_GameLauncher(navController = navController)
             } else {
-                // Andernfalls zeigen wir das LoginView an
-                LoginView(viewModel = hiltViewModel(), onLoginSuccess = {
-                    isLoggedIn.value = true
-                })
+                LoadingScreenView(viewModel = hiltViewModel(), onLoginSuccess = {isLoggedIn.value = true}, context = this, onWifiOK = {isWifiOK.value = true})
+                if(isLoggedIn.value == false && isWifiOK.value){
+                    LoginView(viewModel = hiltViewModel(), onSignUpSuccess = { //sign-up function is also calling login
+                        isSignedUp.value = true
+                    })
+                }
+
             }
         }
     }
