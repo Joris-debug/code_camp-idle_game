@@ -21,7 +21,7 @@ class LoadingSceenViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(LoadingScreenViewState())
     val viewState: StateFlow<LoadingScreenViewState> get() = _viewState
 
-    fun init(onLoginSuccess: () -> Unit, context: Context, onWifiOK: () -> Unit) {
+    fun init(onLoginSuccess: () -> Unit, onLoginFailure: () -> Unit, context: Context, onWifiOK: () -> Unit) {
         var wifiOk = false
         viewModelScope.launch {
             while (!wifiOk) {
@@ -37,9 +37,11 @@ class LoadingSceenViewModel @Inject constructor(
                         connectionString = ""
                     )
                     onWifiOK()
-                    var tryLogin = true
-                    gameRepository.login { tryLogin = false }
-                    if (tryLogin) {
+                    var boolLoginFailed = false;
+                    gameRepository.login { boolLoginFailed = true }
+                    if(boolLoginFailed) {
+                        onLoginFailure()
+                    } else {
                         onLoginSuccess()
                     }
                 }
