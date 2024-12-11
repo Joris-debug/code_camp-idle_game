@@ -24,8 +24,6 @@ class StartViewModel @Inject constructor(
     private val gameRepository: GameRepository
 ) : ViewModel() {
 
-//    class StartViewModel : HiltViewModel() {
-
     private val _viewState = MutableStateFlow(StartViewState())
     val viewState: StateFlow<StartViewState> get() = _viewState
 

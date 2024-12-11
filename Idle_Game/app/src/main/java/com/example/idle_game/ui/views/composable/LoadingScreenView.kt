@@ -30,12 +30,13 @@ import com.example.idle_game.ui.views.models.LoadingSceenViewModel
 fun LoadingScreenView(
     viewModel: LoadingSceenViewModel = hiltViewModel(),
     onLoginSuccess: () -> Unit,
+    onLoginFailure: () -> Unit,
     context: Context,
     onWifiOK: () -> Unit
 ) {
     val viewState = viewModel.viewState.collectAsState()
 
-    viewModel.init({ onLoginSuccess() }, context, { onWifiOK() })
+    viewModel.init(onLoginSuccess = {onLoginSuccess()}, onLoginFailure = {onLoginFailure()}, context, { onWifiOK() })
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier
