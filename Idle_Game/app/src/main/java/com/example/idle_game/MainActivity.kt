@@ -19,18 +19,26 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
 
-            var isLoggedIn = remember { mutableStateOf<Boolean?>(null) } //true if logged in to an existing (in db) account
+            var isLoggedIn =
+                remember { mutableStateOf<Boolean?>(null) } //true if logged in to an existing (in db) account
             var isWifiOK = remember { mutableStateOf(false) }
             val isSignedUp = remember { mutableStateOf(false) }  //ture if signed-up and logged-in
 
             if (isSignedUp.value || isLoggedIn.value == true) {
                 Idle_GameLauncher(navController = navController)
             } else {
-                LoadingScreenView(viewModel = hiltViewModel(), onLoginSuccess = {isLoggedIn.value = true}, context = this, onWifiOK = {isWifiOK.value = true})
-                if(isLoggedIn.value == false && isWifiOK.value){
-                    LoginView(viewModel = hiltViewModel(), onSignUpSuccess = { //sign-up function is also calling login
-                        isSignedUp.value = true
-                    })
+                LoadingScreenView(
+                    viewModel = hiltViewModel(),
+                    onLoginSuccess = { isLoggedIn.value = true },
+                    onLoginFailure = { isLoggedIn.value = false },
+                    context = this,
+                    onWifiOK = { isWifiOK.value = true })
+                if (isLoggedIn.value == false && isWifiOK.value) {
+                    LoginView(
+                        viewModel = hiltViewModel(),
+                        onSignUpSuccess = { //sign-up function is also calling login
+                            isSignedUp.value = true
+                        })
                 }
 
             }
