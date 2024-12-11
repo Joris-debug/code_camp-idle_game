@@ -112,7 +112,6 @@ class GameRepository(
             val resp = api.getScore(playerData.accessToken)
             for (player in resp) {
                 gameDao.insertScoreBoard(player.toScoreBoardData())
-                println(player)
             }
         } catch (e: HttpException) {
             onFailure()

@@ -1,7 +1,5 @@
 package com.example.idle_game.ui.views.models;
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.repositories.GameRepository
@@ -26,12 +24,19 @@ class ScoreBoardViewModel @Inject constructor(
         viewModelScope.launch {
             gameRepository.signIn()
             gameRepository.login()
-            gameRepository.fetchScoreBoard()
             gameRepository.updateBitcoins(-100)
-            gameRepository.updateScoreBoard()
         }
-        viewModelScope.launch{
+        viewModelScope.launch {
+            gameRepository.updateScoreBoard()
+            gameRepository.fetchScoreBoard()
             _uiStateFlow.value = _uiStateFlow.value.copy(scoreData = scoreData)
+        }
+    }
+
+    fun refreshScoreBoard() {
+        viewModelScope.launch {
+            gameRepository.updateScoreBoard()
+            gameRepository.fetchScoreBoard()
         }
     }
 
