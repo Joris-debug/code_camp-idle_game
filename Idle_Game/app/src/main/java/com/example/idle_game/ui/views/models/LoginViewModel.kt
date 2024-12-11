@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val gameRepository: GameRepository,
@@ -36,9 +37,9 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             gameRepository.createNewInventory()  // Ensure the inventory is created first
             var success = true;
-            gameRepository.signUp(name, generateRandomString(), {success = false})
+            gameRepository.signUp(name, generateRandomString(10), {success = false})
             gameRepository.login()
-            if (success) {
+            if(success) {
                 onLoginSuccess()
             }
         }
@@ -49,7 +50,7 @@ class LoginViewModel @Inject constructor(
             /* AUFRUF in init {}
         * if signdin
         *   login -> worker??
-        *   isLoggedIn = true (MainActivity)
+        *   isLoggedIn = true (MainAktivity)
         *
         *
         * */

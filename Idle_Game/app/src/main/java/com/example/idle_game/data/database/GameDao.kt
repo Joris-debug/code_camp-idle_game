@@ -3,7 +3,6 @@ package com.example.idle_game.data.database
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.example.idle_game.api.models.ScoreResponse
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
 import com.example.idle_game.data.database.models.ScoreBoardData
