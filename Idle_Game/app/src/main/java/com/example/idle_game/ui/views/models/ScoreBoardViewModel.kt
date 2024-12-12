@@ -19,6 +19,7 @@ class ScoreBoardViewModel @Inject constructor(
     val uiStateFlow: StateFlow<ScoreBoardViewState> = _uiStateFlow
 
     private val scoreData = gameRepository.scoreBoardDataFlow
+    private var isButtonEnabled = true
 
     init {
         viewModelScope.launch {
@@ -34,9 +35,14 @@ class ScoreBoardViewModel @Inject constructor(
     }
 
     fun refreshScoreBoard() {
+        if (!isButtonEnabled) {
+            return
+        }
+        isButtonEnabled = false
         viewModelScope.launch {
             gameRepository.updateScoreBoard()
             gameRepository.fetchScoreBoard()
+            isButtonEnabled = true
         }
     }
 

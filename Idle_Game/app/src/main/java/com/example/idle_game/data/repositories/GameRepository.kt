@@ -148,7 +148,7 @@ class GameRepository(
     }
 
     // TODO add error handing if no inventory exists (all functions)
-    suspend fun updateBitcoins(bitcoins: Int) {
+    suspend fun updateBitcoins(bitcoins: Long) {
         gameDao.updateBitcoins(bitcoins)
     }
 
