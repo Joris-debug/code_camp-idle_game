@@ -8,11 +8,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -23,9 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.idle_game.ui.theme.AppColors
 import com.example.idle_game.ui.views.models.ScoreBoardViewModel
-
 
 @Composable
 fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
@@ -36,9 +34,8 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(AppColors.tertiary)
+            .background(MaterialTheme.colorScheme.secondaryContainer)
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -67,10 +64,11 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
             }
             scoreList.forEachIndexed  { index, scoreEntity ->
                 val backgroundColor = if (index % 2 == 0) {
-                    AppColors.primary
+                    MaterialTheme.colorScheme.primaryContainer
                 } else {
-                    AppColors.secondary
+                    MaterialTheme.colorScheme.inversePrimary
                 }
+                println(backgroundColor)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -94,7 +92,6 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
 
         Button(
             colors = ButtonDefaults.buttonColors(
-                containerColor = AppColors.buttonColor
             ),
             onClick = { viewModel.refreshScoreBoard() },
             modifier = Modifier
