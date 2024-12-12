@@ -23,11 +23,6 @@ class ScoreBoardViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            gameRepository.signIn()
-            gameRepository.login()
-            gameRepository.updateBitcoins(-100)
-        }
-        viewModelScope.launch {
             gameRepository.updateScoreBoard()
             gameRepository.fetchScoreBoard()
             _uiStateFlow.value = _uiStateFlow.value.copy(scoreData = scoreData)
