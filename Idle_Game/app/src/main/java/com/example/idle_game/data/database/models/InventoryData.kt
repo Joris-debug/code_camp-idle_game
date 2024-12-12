@@ -9,7 +9,7 @@ import java.time.Instant
 data class InventoryData (
     @PrimaryKey(autoGenerate = false)
     val uid: Int = 1,
-    @ColumnInfo(name = "bitcoins") val bitcoins: Int = 0,
+    @ColumnInfo(name = "bitcoins") val bitcoins: Long = 0,
     @ColumnInfo(name = "hackers_lvl_1") val hackersLvl1: Int = 0,
     @ColumnInfo(name = "hackers_lvl_2") val hackersLvl2: Int = 0,
     @ColumnInfo(name = "hackers_lvl_3") val hackersLvl3: Int = 0,

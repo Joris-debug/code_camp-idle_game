@@ -28,7 +28,7 @@ interface GameDao {
     suspend fun insertInventory(inventory: InventoryData)
 
     @Query("UPDATE inventorydata SET bitcoins = :bitcoins")
-    suspend fun updateBitcoins(bitcoins: Int)
+    suspend fun updateBitcoins(bitcoins: Long)
 
     @Query("UPDATE inventorydata SET hackers_lvl_1 = hackers_lvl_1 + 1")
     suspend fun addNewHacker()
@@ -119,6 +119,9 @@ interface GameDao {
 
     @Query("SELECT * FROM scoreboarddata")
     fun getScoreBoard(): Flow<List<ScoreBoardData>>
+
+    @Upsert
+    suspend fun insertScoreBoard(player: ScoreBoardData)
 
     @Query("SELECT * FROM shopdata")
     fun getShop(): Flow<List<ShopData>>
