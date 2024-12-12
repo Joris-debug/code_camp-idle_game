@@ -13,6 +13,11 @@ class LoginViewModel @Inject constructor(
     private val gameRepository: GameRepository,
 ) : ViewModel() {
 
+    companion object {
+        const val PASSWORD_LENGTH = 10
+        const val PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    }
+
     fun init(onLoginSuccess: () -> Unit) {
         viewModelScope.launch {
             checkSignIn { onLoginSuccess() }
@@ -20,8 +25,8 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun generateRandomString(
-        length: Int,
-        allowedChars: String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        length: Int = PASSWORD_LENGTH,
+        allowedChars: String = PASSWORD_CHARS
     ): String {
         return (1..length)
             .map { allowedChars.random() }

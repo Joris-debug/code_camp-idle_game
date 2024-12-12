@@ -2,7 +2,8 @@ package com.example.idle_game.data.repositories
 
 import android.content.SharedPreferences
 import com.example.idle_game.api.GameApi
-import com.example.idle_game.api.models.SignUpRequest
+import com.example.idle_game.api.models.SetScoreRequest
+import com.example.idle_game.api.models.UserCredentialsRequest
 import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
@@ -17,6 +18,7 @@ class GameRepository(
     val playerDataFlow = gameDao.getPlayer()
     val inventoryDataFlow = gameDao.getInventory()
     val shopDataFlow = gameDao.getShop()
+    val scoreBoardDataFlow = gameDao.getScoreBoard()
 
     companion object {
         const val LOW_BOOST_ID = 1
@@ -25,14 +27,40 @@ class GameRepository(
     }
 
     suspend fun signUp(username: String, password: String, onFailure: () -> Unit = {}) {
-        val signUpRequest = SignUpRequest(username = username, password = password)
+        val userCredentialsRequest = UserCredentialsRequest(
+            username = username,
+            password = password
+        )
         try {
-            val resp = api.signUp(signUpRequest)
+            val resp = api.signUp(userCredentialsRequest)
             val refreshToken = sharedPreferences.getString("refresh_token", null)
             if (refreshToken != null) {
                 val playerData = PlayerData(
                     username = username,
                     password = password,
+                    refreshToken = refreshToken,
+                    accessToken = null
+                )
+                gameDao.insertPlayer(playerData)
+            }
+        } catch (e: HttpException) {
+            onFailure()
+        }
+    }
+
+    suspend fun signIn(onFailure: () -> Unit = {}) {
+        var playerData = playerDataFlow.first()
+        val userCredentialsRequest = UserCredentialsRequest(
+            username = playerData.username,
+            password = playerData.password
+        )
+        try {
+            val resp = api.signIn(userCredentialsRequest)
+            val refreshToken = sharedPreferences.getString("refresh_token", null)
+            if (refreshToken != null) {
+                playerData = PlayerData(
+                    username = playerData.username,
+                    password = playerData.password,
                     refreshToken = refreshToken,
                     accessToken = null
                 )
@@ -74,13 +102,53 @@ class GameRepository(
         }
     }
 
+    // Makes a server request and fills the score-board-data table
+    suspend fun fetchScoreBoard(onFailure: () -> Unit = {}) {
+        val playerData = playerDataFlow.first()
+        try {
+            if (playerData.accessToken == null) {
+                throw NullPointerException("accessToken can't be null")
+            }
+            val resp = api.getScore(playerData.accessToken)
+            for (player in resp) {
+                gameDao.insertScoreBoard(player.toScoreBoardData())
+            }
+        } catch (e: HttpException) {
+            onFailure()
+        }
+    }
+
+    // Makes a server request and puts the player score on the board
+    // Call fetchScoreBoard afterwards to have the ScoreBoard updated
+    suspend fun updateScoreBoard(onFailure: () -> Unit = {}) {
+        try {
+            val playerData = playerDataFlow.first()
+            if (playerData.accessToken == null) {
+                throw NullPointerException("accessToken can't be null")
+            }
+
+            val inventoryData = inventoryDataFlow.first()
+            val setScoreRequest = SetScoreRequest(
+                username = playerData.username,
+                inventoryData.bitcoins
+            )
+
+            val resp = api.postScore(
+                playerData.accessToken,
+                setScoreRequest = setScoreRequest
+            )
+        } catch (e: HttpException) {
+            onFailure()
+        }
+    }
+
     // Call this function before accessing the inventory for the first time
     suspend fun createNewInventory() {
         gameDao.insertInventory(InventoryData())
     }
 
     // TODO add error handing if no inventory exists (all functions)
-    suspend fun updateBitcoins(bitcoins: Int) {
+    suspend fun updateBitcoins(bitcoins: Long) {
         gameDao.updateBitcoins(bitcoins)
     }
 
