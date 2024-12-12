@@ -36,7 +36,11 @@ fun LoadingScreenView(
 ) {
     val viewState = viewModel.viewState.collectAsState()
 
-    viewModel.init(onLoginSuccess = {onLoginSuccess()}, onLoginFailure = {onLoginFailure()}, context, { onWifiOK() })
+    viewModel.init(
+        onLoginSuccess = { onLoginSuccess() },
+        onLoginFailure = { onLoginFailure() },
+        context,
+        { onWifiOK() })
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier
