@@ -8,7 +8,6 @@ import com.example.idle_game.data.database.models.PlayerData
 import com.example.idle_game.data.database.models.ScoreBoardData
 import com.example.idle_game.data.database.models.ShopData
 import kotlinx.coroutines.flow.Flow
-import java.time.Instant
 
 @Dao
 interface GameDao {
@@ -34,14 +33,16 @@ interface GameDao {
     @Query("UPDATE inventorydata SET hackers_lvl_1 = hackers_lvl_1 + 1")
     suspend fun addNewHacker()
 
-    @Query("""
+    @Query(
+        """
     UPDATE inventorydata 
     SET hackers_lvl_1 = :hackersLvL1, 
         hackers_lvl_2 = :hackersLvL2, 
         hackers_lvl_3 = :hackersLvL3, 
         hackers_lvl_4 = :hackersLvL4,
         hackers_lvl_5 = :hackersLvL5
-    """)
+    """
+    )
     suspend fun setHackers(
         hackersLvL1: Int,
         hackersLvL2: Int,
@@ -53,14 +54,16 @@ interface GameDao {
     @Query("UPDATE inventorydata SET crypto_miners_lvl_1 = crypto_miners_lvl_1 + 1")
     suspend fun addNewCryptoMiner()
 
-    @Query("""
+    @Query(
+        """
     UPDATE inventorydata 
     SET crypto_miners_lvl_1 = :cryptoMinersLvL1, 
         crypto_miners_lvl_2 = :cryptoMinersLvL2, 
         crypto_miners_lvl_3 = :cryptoMinersLvL3, 
         crypto_miners_lvl_4 = :cryptoMinersLvL4,
         crypto_miners_lvl_5 = :cryptoMinersLvL5
-    """)
+    """
+    )
     suspend fun setCryptoMiners(
         cryptoMinersLvL1: Int,
         cryptoMinersLvL2: Int,
@@ -72,14 +75,16 @@ interface GameDao {
     @Query("UPDATE inventorydata SET botnets_lvl_1 = botnets_lvl_1 + 1")
     suspend fun addNewBotnet()
 
-    @Query("""
+    @Query(
+        """
     UPDATE inventorydata 
     SET botnets_lvl_1 = :botnetsLvL1, 
         botnets_lvl_2 = :botnetsLvL2, 
         botnets_lvl_3 = :botnetsLvL3, 
         botnets_lvl_4 = :botnetsLvL4,
         botnets_lvl_5 = :botnetsLvL5
-    """)
+    """
+    )
     suspend fun setBotnets(
         botnetsLvL1: Int,
         botnetsLvL2: Int,
@@ -118,12 +123,33 @@ interface GameDao {
     @Query("SELECT * FROM shopdata")
     fun getShop(): Flow<List<ShopData>>
 
+    @Query("SELECT * FROM shopdata WHERE name = 'low passive'")
+    suspend fun getHackerData(): ShopData
+
+    @Query("SELECT * FROM shopdata WHERE name = 'medium passive'")
+    suspend fun getMinerData(): ShopData
+
+    @Query("SELECT * FROM shopdata WHERE name = 'high passive'")
+    suspend fun getBotnetData(): ShopData
+
+    @Query("SELECT * FROM shopdata WHERE name = 'low Boost'")
+    suspend fun getLowBoosterData(): ShopData
+
+    @Query("SELECT * FROM shopdata WHERE name = 'medium Boost'")
+    suspend fun getMediumBoosterData(): ShopData
+
+    @Query("SELECT * FROM shopdata WHERE name = 'high Boost'")
+    suspend fun getHighBoosterData(): ShopData
+
+    @Query("SELECT * FROM shopdata WHERE name = 'upgrade lvl ' || :level")
+    suspend fun getUpgradeData(level: Int): ShopData
+
     @Upsert
     suspend fun insertShop(item: ShopData)
 
-    @Query("SELECT last_timestamp FROM InventoryData")
-    suspend fun getLastTimestamp(): Long?
+    @Query("SELECT last_mining_timestamp FROM InventoryData")
+    suspend fun getLastMiningTimestamp(): Long?
 
-    @Query("UPDATE InventoryData SET last_timestamp = :timeStamp")
-    suspend fun setTimeStamp(timeStamp: Long)
+    @Query("UPDATE InventoryData SET last_mining_timestamp = :timeStamp")
+    suspend fun setMiningTimestamp(timeStamp: Long)
 }
