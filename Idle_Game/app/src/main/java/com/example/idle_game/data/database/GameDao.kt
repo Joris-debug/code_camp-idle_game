@@ -111,7 +111,7 @@ interface GameDao {
     @Query("UPDATE inventorydata SET upgrade_lvl_5 = :upgrades")
     suspend fun updateLvl5Upgrades(upgrades: Int)
 
-    @Query("SELECT * FROM scoreboarddata")
+    @Query("SELECT * FROM scoreboarddata ORDER BY score DESC")
     fun getScoreBoard(): Flow<List<ScoreBoardData>>
 
     @Upsert

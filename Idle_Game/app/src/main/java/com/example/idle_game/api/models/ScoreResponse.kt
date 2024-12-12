@@ -24,7 +24,7 @@ data class ScoreResponse(
     private fun formatName(input: String): String {
         val formattedString = input.replace("\n", " ")
         return if (formattedString.length > MAX_USERNAME_SIZE) {
-            formattedString.substring(0, MAX_USERNAME_SIZE)
+            formattedString.substring(0, MAX_USERNAME_SIZE) + "..."
         } else {
             formattedString
         }
