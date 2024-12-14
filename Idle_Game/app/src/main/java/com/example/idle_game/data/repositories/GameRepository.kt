@@ -37,7 +37,6 @@ class GameRepository(
             if (refreshToken != null) {
                 val playerData = PlayerData(
                     username = username,
-                    password = password,
                     refreshToken = refreshToken,
                     accessToken = null
                 )
@@ -48,19 +47,17 @@ class GameRepository(
         }
     }
 
-    suspend fun signIn(onFailure: () -> Unit = {}) {
-        var playerData = playerDataFlow.first()
+    suspend fun signIn(username: String, password: String, onFailure: () -> Unit = {}) {
         val userCredentialsRequest = UserCredentialsRequest(
-            username = playerData.username,
-            password = playerData.password
+            username = username,
+            password = password
         )
         try {
             val resp = api.signIn(userCredentialsRequest)
             val refreshToken = sharedPreferences.getString("refresh_token", null)
             if (refreshToken != null) {
-                playerData = PlayerData(
-                    username = playerData.username,
-                    password = playerData.password,
+                val playerData = PlayerData(
+                    username = username,
                     refreshToken = refreshToken,
                     accessToken = null
                 )

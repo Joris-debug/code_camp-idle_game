@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -27,12 +28,14 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.ui.views.models.ScoreBoardViewModel
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
 
     val viewState = viewModel.uiStateFlow.collectAsState().value
     val scoreList = viewState.scoreData.collectAsState(initial = emptyList()).value
+    val playerObject = viewState.playerData.collectAsState(initial = null).value
 
     Box(
         modifier = Modifier
@@ -66,12 +69,14 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
                 )
             }
             scoreList.forEachIndexed  { index, scoreEntity ->
-                val backgroundColor = if (index % 2 == 0) {
+                val backgroundColor = if (scoreEntity.username == playerObject?.username) {
+                    MaterialTheme.colorScheme.primary
+                } else if (index % 2 == 0) {
                     MaterialTheme.colorScheme.primaryContainer
                 } else {
                     MaterialTheme.colorScheme.inversePrimary
                 }
-                println(backgroundColor)
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -106,9 +111,12 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(16.dp)
-                .zIndex(1f)
+                .zIndex(1f),
         ) {
-            Text(text = "Reload Scoreboard")
+            Text(
+                text = "Neu laden",
+                style = TextStyle(fontSize = 20.sp)
+            )
         }
     }
 }
