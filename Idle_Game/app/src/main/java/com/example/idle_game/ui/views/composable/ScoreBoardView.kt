@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -31,7 +30,6 @@ import com.example.idle_game.ui.views.models.ScoreBoardViewModel
 
 @Composable
 fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
-
     val viewState = viewModel.uiStateFlow.collectAsState().value
     val scoreList = viewState.scoreData.collectAsState(initial = emptyList()).value
     val playerObject = viewState.playerData.collectAsState(initial = null).value
@@ -70,9 +68,15 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
                 val backgroundColor = if (scoreEntity.username == playerObject?.username) {
                     MaterialTheme.colorScheme.primary
                 } else if (index % 2 == 0) {
-                    MaterialTheme.colorScheme.primaryContainer
+                    MaterialTheme.colorScheme.surfaceContainerHigh
                 } else {
+                    MaterialTheme.colorScheme.surfaceContainer
+                }
+
+                val textColor = if (backgroundColor == MaterialTheme.colorScheme.primary) {
                     MaterialTheme.colorScheme.inversePrimary
+                } else {
+                    MaterialTheme.colorScheme.onSurface
                 }
 
                 Row(
@@ -86,7 +90,7 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
                         text = (index + 1).toString() + ". " + scoreEntity.username,
                         modifier = Modifier
                             .weight(1f),
-                        style = TextStyle(fontSize = 20.sp),
+                        style = TextStyle(fontSize = 20.sp, color = textColor),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -95,7 +99,7 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
                     Text(
                         text = "${scoreEntity.score}",
                         modifier = Modifier,
-                        style = TextStyle(fontSize = 20.sp),
+                        style = TextStyle(fontSize = 20.sp, color = textColor),
                         maxLines = 1
                     )
                 }

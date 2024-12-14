@@ -42,10 +42,7 @@ fun NavigationGraph(
 @Composable
 fun BottomBar(navController: NavController) {
 
-    BottomAppBar (
-        containerColor = Color.Gray,
-        contentColor = Color.White
-    ) {
+    BottomAppBar() {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
