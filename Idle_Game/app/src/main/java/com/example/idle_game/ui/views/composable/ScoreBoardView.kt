@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.ui.views.models.ScoreBoardViewModel
-import kotlinx.coroutines.flow.first
 
 @Composable
 fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
@@ -40,7 +39,6 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.secondaryContainer)
     ) {
         Column(
             modifier = Modifier

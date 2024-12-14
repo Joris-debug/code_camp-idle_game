@@ -7,19 +7,16 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.example.idle_game.ui.navigation.BottomBar
 import com.example.idle_game.ui.navigation.NavigationGraph
-import com.example.idle_game.ui.theme.AppTheme
 
 @Composable
 fun Idle_GameLauncher(navController: NavHostController) {
-        // Zeige das Spiel mit BottomBar und der Navigation an
-        AppTheme {
-            Scaffold(
-                bottomBar = { BottomBar(navController) }
-            ) { innerPadding ->
-                NavigationGraph(
-                    modifier = Modifier.padding(innerPadding),
-                    navController = navController
-                )
-            }
-        }
+    // Zeige das Spiel mit BottomBar und der Navigation an
+    Scaffold(
+        bottomBar = { BottomBar(navController) }
+    ) { innerPadding ->
+        NavigationGraph(
+            modifier = Modifier.padding(innerPadding),
+            navController = navController
+        )
+    }
 }
