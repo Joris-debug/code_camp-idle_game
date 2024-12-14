@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -19,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -52,7 +55,7 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Name:",
+                    text = "Nutzer:",
                     modifier = Modifier,
                     style = TextStyle(fontSize = 20.sp)
                 )
@@ -77,14 +80,20 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = scoreEntity.username,
-                        modifier = Modifier,
-                        style = TextStyle(fontSize = 20.sp)
+                        text = (index + 1).toString() + ". " + scoreEntity.username,
+                        modifier = Modifier
+                            .weight(1f),
+                        style = TextStyle(fontSize = 20.sp),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
+
                     Text(
                         text = "${scoreEntity.score}",
                         modifier = Modifier,
-                        style = TextStyle(fontSize = 20.sp)
+                        style = TextStyle(fontSize = 20.sp),
+                        maxLines = 1
                     )
                 }
             }
