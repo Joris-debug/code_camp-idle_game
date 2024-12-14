@@ -2,6 +2,9 @@ package com.example.idle_game.data.repositories
 
 import android.content.SharedPreferences
 import com.example.idle_game.api.GameApi
+import com.example.idle_game.api.models.ItemResponse
+import com.example.idle_game.api.models.ScoreResponse
+import com.example.idle_game.api.models.ServerResponse
 import com.example.idle_game.api.models.SetScoreRequest
 import com.example.idle_game.api.models.UserCredentialsRequest
 import com.example.idle_game.data.database.GameDao
@@ -72,13 +75,12 @@ class GameRepository(
     suspend fun login(onFailure: () -> Unit = {}) {
         val playerData = playerDataFlow.first()
         try {
-
             val resp = api.login(playerData.refreshToken)
             val accessToken = sharedPreferences.getString("access_token", null)
             if (accessToken != null) {
                 gameDao.updateAccessToken(accessToken)
             }
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             onFailure()
         }
     }
@@ -86,15 +88,24 @@ class GameRepository(
     // Makes a server request and fills the shop-data table
     suspend fun updateShop(onFailure: () -> Unit = {}) {
         val playerData = playerDataFlow.first()
+        var resp: List<ItemResponse> = emptyList()
         try {
             if (playerData.accessToken == null) {
                 throw NullPointerException("accessToken can't be null")
             }
-            val resp = api.getItems(playerData.accessToken)
+            try {
+                resp = api.getItems(playerData.accessToken)
+            } catch (e: HttpException) {
+                if (e.code() == 490) {
+                    // No valid access token
+                    login()
+                    resp = api.getItems(playerData.accessToken)
+                }
+            }
             for (item in resp) {
                 gameDao.insertShop(item.toShopData())
             }
-        } catch (e: HttpException) {
+        } catch (e: Exception) {
             onFailure()
         }
     }
@@ -102,15 +113,24 @@ class GameRepository(
     // Makes a server request and fills the score-board-data table
     suspend fun fetchScoreBoard(onFailure: () -> Unit = {}) {
         val playerData = playerDataFlow.first()
+        var resp: List<ScoreResponse> = emptyList()
         try {
             if (playerData.accessToken == null) {
                 throw NullPointerException("accessToken can't be null")
             }
-            val resp = api.getScore(playerData.accessToken)
+            try {
+                resp = api.getScore(playerData.accessToken)
+            } catch (e: HttpException) {
+                if (e.code() == 490) {
+                    // No valid access token
+                    login()
+                    resp = api.getScore(playerData.accessToken)
+                }
+            }
             for (player in resp) {
                 gameDao.insertScoreBoard(player.toScoreBoardData())
             }
-        } catch (e: HttpException) {
+        } catch (e: Exception) {
             onFailure()
         }
     }
@@ -129,12 +149,22 @@ class GameRepository(
                 username = playerData.username,
                 inventoryData.bitcoins
             )
-
-            val resp = api.postScore(
-                playerData.accessToken,
-                setScoreRequest = setScoreRequest
-            )
-        } catch (e: HttpException) {
+            try {
+                api.postScore(
+                    playerData.accessToken,
+                    setScoreRequest = setScoreRequest
+                )
+            } catch (e: HttpException) {
+                if (e.code() == 490) {
+                    // No valid access token
+                    login()
+                    api.postScore(
+                        playerData.accessToken,
+                        setScoreRequest = setScoreRequest
+                    )
+                }
+            }
+        } catch (e: Exception) {
             onFailure()
         }
     }
