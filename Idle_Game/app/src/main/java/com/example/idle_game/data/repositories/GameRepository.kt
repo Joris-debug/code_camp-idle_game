@@ -147,7 +147,7 @@ class GameRepository(
             val inventoryData = inventoryDataFlow.first()
             val setScoreRequest = SetScoreRequest(
                 username = playerData.username,
-                inventoryData.bitcoins
+                score = inventoryData.bitcoins + inventoryData.issuedBitcoins
             )
             try {
                 api.postScore(
@@ -175,8 +175,15 @@ class GameRepository(
     }
 
     // TODO add error handing if no inventory exists (all functions)
-    suspend fun updateBitcoins(bitcoins: Long) {
-        gameDao.updateBitcoins(bitcoins)
+    suspend fun addBitcoins(bitcoins: Long) {
+        gameDao.addBitcoins(bitcoins)
+    }
+
+    suspend fun issueBitcoins(bitcoins: Long) {
+        if (inventoryDataFlow.first().bitcoins < bitcoins) {
+            return
+        }
+        gameDao.issueBitcoins(bitcoins)
     }
 
     // Adds a new lvl 1 hacker to the inventory
