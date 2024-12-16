@@ -45,4 +45,8 @@ class InventoryViewModel @Inject constructor(
              }
          }
     }
+
+    fun useItem(item: ShopData){
+
+    }
 }
