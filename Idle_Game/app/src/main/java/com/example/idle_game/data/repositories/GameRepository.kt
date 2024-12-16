@@ -7,6 +7,7 @@ import com.example.idle_game.api.models.UserCredentialsRequest
 import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 

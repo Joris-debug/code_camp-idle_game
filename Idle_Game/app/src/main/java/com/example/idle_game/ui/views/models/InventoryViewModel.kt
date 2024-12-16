@@ -19,16 +19,30 @@ class InventoryViewModel @Inject constructor(
     val uiStateFlow: StateFlow<InventoryViewState> = _uiStateFlow
 
     private val shopData = gameRepository.shopDataFlow
+    private val inventoryData = gameRepository.inventoryDataFlow
 
     init {
         viewModelScope.launch {
             gameRepository.updateShop()
             _uiStateFlow.value = _uiStateFlow.value.copy(shopData = shopData)
+            _uiStateFlow.value = _uiStateFlow.value.copy(inventoryData = inventoryData)
         }
-
-
-
     }
 
-
+     fun buyItem(item: ShopData) {
+         viewModelScope.launch {
+             when (item.name) {
+                 "low Boost" -> gameRepository.addLowBoost()
+                 "medium Boost" -> gameRepository.addMediumBoost()
+                 "high Boost" -> gameRepository.addHighBoost()
+                 "low passive" -> gameRepository.addNewHacker()
+                 "medium passive" -> gameRepository.addNewCryptoMiner()
+                 "high passive" -> gameRepository.addNewBotnet()
+                 "upgrade lvl 2" -> gameRepository.addUpgradeLvl2()
+                 "upgrade lvl 3" -> gameRepository.addUpgradeLvl3()
+                 "upgrade lvl 4" -> gameRepository.addUpgradeLvl4()
+                 "upgrade lvl 5" -> gameRepository.addUpgradeLvl5()
+             }
+         }
+    }
 }
