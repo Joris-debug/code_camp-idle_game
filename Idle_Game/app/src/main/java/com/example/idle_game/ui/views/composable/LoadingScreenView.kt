@@ -48,11 +48,11 @@ fun LoadingScreenView(
         contentAlignment = Alignment.Center
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Image(modifier = Modifier.fillMaxWidth(0.8f),
+            Image(
+                modifier = Modifier.fillMaxWidth(0.8f),
                 painter = painterResource(id = R.drawable.bitcoin_img),
                 contentDescription = "Bitcoin",
                 contentScale = let {
@@ -61,7 +61,8 @@ fun LoadingScreenView(
                     } else {
                         ContentScale.FillHeight
                     }
-                })
+                }
+            )
         }
         Column(
             verticalArrangement = Arrangement.Bottom,

@@ -34,10 +34,7 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
     val scoreList = viewState.scoreData.collectAsState(initial = emptyList()).value
     val playerObject = viewState.playerData.collectAsState(initial = null).value
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -74,7 +71,7 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
                 }
 
                 val textColor = if (backgroundColor == MaterialTheme.colorScheme.primary) {
-                    MaterialTheme.colorScheme.inversePrimary
+                    MaterialTheme.colorScheme.onPrimary
                 } else {
                     MaterialTheme.colorScheme.onSurface
                 }
@@ -87,7 +84,7 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = (index + 1).toString() + ". " + scoreEntity.username,
+                        text = "${index + 1}. " + scoreEntity.username,
                         modifier = Modifier
                             .weight(1f),
                         style = TextStyle(fontSize = 20.sp, color = textColor),
@@ -95,7 +92,6 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-
                     Text(
                         text = "${scoreEntity.score}",
                         modifier = Modifier,
@@ -105,10 +101,8 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
                 }
             }
         }
-
         Button(
-            colors = ButtonDefaults.buttonColors(
-            ),
+            colors = ButtonDefaults.buttonColors(),
             onClick = { viewModel.refreshScoreBoard() },
             modifier = Modifier
                 .align(Alignment.BottomCenter)

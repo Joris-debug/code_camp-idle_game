@@ -41,9 +41,9 @@ class MainActivity : ComponentActivity() {
                             viewModel = hiltViewModel(),
                             onSignUpSuccess = { //sign-up function is also calling login
                                 isSignedUp.value = true
-                            })
+                            }
+                        )
                     }
-
                 }
             }
         }
