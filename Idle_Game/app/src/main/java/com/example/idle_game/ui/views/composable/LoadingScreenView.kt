@@ -48,8 +48,7 @@ fun LoadingScreenView(
             contentAlignment = Alignment.Center
         ) {
             Image(
-                modifier = Modifier
-                    .fillMaxSize(0.8f),
+                modifier = Modifier.fillMaxSize(0.8f),
                 painter = painterResource(id = R.drawable.bitcoin),
                 contentDescription = "Bitcoin",
                 contentScale = let {
