@@ -2,19 +2,19 @@ package com.example.idle_game.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.idle_game.R
 import com.example.idle_game.ui.views.composable.ScoreBoardView
 import com.example.idle_game.ui.views.composable.StartView
 
@@ -42,10 +42,7 @@ fun NavigationGraph(
 @Composable
 fun BottomBar(navController: NavController) {
 
-    BottomAppBar (
-        containerColor = Color.Gray,
-        contentColor = Color.White
-    ) {
+    BottomAppBar() {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
@@ -71,7 +68,10 @@ fun BottomBar(navController: NavController) {
                 }
                 launchSingleTop = true
                 restoreState = false }
-        }, icon = { Icon(Icons.Default.Star, contentDescription = "Scoreboard")})
+        }, icon = {
+            val scoreboardIcon = painterResource(id = R.drawable.ic_scoreboard)
+            Icon(scoreboardIcon, contentDescription = "Scoreboard")
+        })
 
     }
 }
