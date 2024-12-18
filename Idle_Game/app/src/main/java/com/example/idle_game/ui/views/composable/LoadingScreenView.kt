@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -40,11 +41,13 @@ fun LoadingScreenView(
         onLoginFailure = { onLoginFailure() },
         context,
         { onWifiOK() })
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
+    ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Color.White),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Image(
@@ -57,7 +60,8 @@ fun LoadingScreenView(
                     } else {
                         ContentScale.FillHeight
                     }
-                })
+                }
+            )
         }
         Column(
             verticalArrangement = Arrangement.Bottom,

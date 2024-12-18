@@ -19,6 +19,7 @@ class ScoreBoardViewModel @Inject constructor(
     val uiStateFlow: StateFlow<ScoreBoardViewState> = _uiStateFlow
 
     private val scoreData = gameRepository.scoreBoardDataFlow
+    private val playerData = gameRepository.playerDataFlow
     private var isButtonEnabled = true
 
     init {
@@ -26,6 +27,7 @@ class ScoreBoardViewModel @Inject constructor(
             gameRepository.updateScoreBoard()
             gameRepository.fetchScoreBoard()
             _uiStateFlow.value = _uiStateFlow.value.copy(scoreData = scoreData)
+            _uiStateFlow.value = _uiStateFlow.value.copy(playerData = playerData)
         }
     }
 
