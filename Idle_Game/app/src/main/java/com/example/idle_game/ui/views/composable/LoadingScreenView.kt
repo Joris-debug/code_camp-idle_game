@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -24,11 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.R
-import com.example.idle_game.ui.views.models.LoadingSceenViewModel
+import com.example.idle_game.ui.views.models.LoadingScreenViewModel
 
 @Composable
 fun LoadingScreenView(
-    viewModel: LoadingSceenViewModel = hiltViewModel(),
+    viewModel: LoadingScreenViewModel = hiltViewModel(),
     onLoginSuccess: () -> Unit,
     onLoginFailure: () -> Unit,
     context: Context,

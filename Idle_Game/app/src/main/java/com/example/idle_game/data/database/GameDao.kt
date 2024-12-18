@@ -106,6 +106,9 @@ interface GameDao {
     @Query("UPDATE inventorydata SET active_boost_type = :type, boost_active_until = :until")
     suspend fun updateBoostActivation(type: Int, until: Long)
 
+    @Query("SELECT boost_active_until FROM inventorydata")
+    suspend fun getBoostActiveUntil(): Long
+
     @Query("UPDATE inventorydata SET upgrade_lvl_2 = :upgrades")
     suspend fun updateLvl2Upgrades(upgrades: Int)
 
@@ -127,7 +130,33 @@ interface GameDao {
     @Query("SELECT * FROM shopdata")
     fun getShop(): Flow<List<ShopData>>
 
+    @Query("SELECT * FROM shopdata WHERE name = 'low passive'")
+    suspend fun getHackerData(): ShopData
+
+    @Query("SELECT * FROM shopdata WHERE name = 'medium passive'")
+    suspend fun getMinerData(): ShopData
+
+    @Query("SELECT * FROM shopdata WHERE name = 'high passive'")
+    suspend fun getBotnetData(): ShopData
+
+    @Query("SELECT * FROM shopdata WHERE name = 'low Boost'")
+    suspend fun getLowBoosterData(): ShopData
+
+    @Query("SELECT * FROM shopdata WHERE name = 'medium Boost'")
+    suspend fun getMediumBoosterData(): ShopData
+
+    @Query("SELECT * FROM shopdata WHERE name = 'high Boost'")
+    suspend fun getHighBoosterData(): ShopData
+
+    @Query("SELECT * FROM shopdata WHERE name = 'upgrade lvl ' || :level")
+    suspend fun getUpgradeData(level: Int): ShopData
+
     @Upsert
     suspend fun insertShop(item: ShopData)
 
+    @Query("SELECT last_mining_timestamp FROM InventoryData")
+    suspend fun getLastMiningTimestamp(): Long?
+
+    @Query("UPDATE InventoryData SET last_mining_timestamp = :timeStamp")
+    suspend fun setMiningTimestamp(timeStamp: Long)
 }
