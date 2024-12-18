@@ -6,19 +6,16 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.example.idle_game.data.database.models.InventoryData
-import com.example.idle_game.data.database.models.ShopData
 import com.example.idle_game.data.repositories.GameRepository
 import com.example.idle_game.data.workers.NotWorker
 import com.example.idle_game.ui.views.states.StartViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hilt_aggregated_deps._dagger_hilt_android_internal_lifecycle_DefaultViewModelFactories_ActivityEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -117,6 +114,10 @@ class StartViewModel @Inject constructor(
         }
     }
 
+
+    //TODO: Remove debug code before merge to main
+
+    /*   Debug code start ------------------------------------------------------------------------------------------------*/
     fun addHacker() {
         viewModelScope.launch {
             gameRepository.addNewHacker()
@@ -135,7 +136,6 @@ class StartViewModel @Inject constructor(
         }
     }
 
-    //Test: Nur für tests
     fun addBooster(lvl: Int) {
         viewModelScope.launch {
             when (lvl) {
@@ -156,4 +156,7 @@ class StartViewModel @Inject constructor(
             }
         }
     }
+
+    /*   Debug code end   ------------------------------------------------------------------------------------------------*/
+
 }

@@ -46,13 +46,17 @@ fun StartView(
         Button(onClick = { viewModel.coinClick() }) {
             Text("Klick for Bitcoins")
         }
-        Spacer(modifier = Modifier.padding(horizontal = 20.dp))
+
+        /*   Debug code start ------------------------------------------------------------------------------------------------*/
+
         Button(onClick = {viewModel.addHacker()}) { Text("Add new Hacker") }
         Button(onClick = {viewModel.addBot()}) { Text("Add new Bot") }
         Button(onClick = {viewModel.addMiner()}) { Text("Add new Miner") }
         Button(onClick = {viewModel.addBooster(1)}) { Text("Add new Booster lvl 1") }
         Button(onClick = {viewModel.addBooster(2)}) { Text("Add new Booster lvl 2") }
         Button(onClick = {viewModel.addBooster(3)}) { Text("Add new Booster lvl 3") }
+        /*   Debug code end   ------------------------------------------------------------------------------------------------*/
+
     }
 
 }
