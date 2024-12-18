@@ -30,11 +30,13 @@ interface GameDao {
     @Query("UPDATE inventorydata SET bitcoins = bitcoins + :bitcoins")
     suspend fun addBitcoins(bitcoins: Long)
 
-    @Query("""
+    @Query(
+        """
     UPDATE inventorydata
     SET bitcoins = bitcoins - :bitcoins,
         issued_bitcoins = issued_bitcoins + bitcoins
-    """)
+    """
+    )
     suspend fun issueBitcoins(bitcoins: Long)
 
     @Query("UPDATE inventorydata SET hackers_lvl_1 = hackers_lvl_1 + 1")
@@ -111,6 +113,9 @@ interface GameDao {
 
     @Query("UPDATE inventorydata SET active_boost_type = :type, boost_active_until = :until")
     suspend fun updateBoostActivation(type: Int, until: Long)
+
+    @Query("SELECT boost_active_until FROM inventorydata")
+    suspend fun getBoostActiveUntil(): Long
 
     @Query("UPDATE inventorydata SET upgrade_lvl_2 = :upgrades")
     suspend fun updateLvl2Upgrades(upgrades: Int)

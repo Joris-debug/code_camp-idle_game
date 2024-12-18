@@ -47,13 +47,6 @@ class LoginViewModel @Inject constructor(
 
     fun checkSignIn(onLoginSuccess: () -> Unit) {
         viewModelScope.launch {
-            /* AUFRUF in init {}
-        * if signdin
-        *   login -> worker??
-        *   isLoggedIn = true (MainAktivity)
-        *
-        *
-        * */
             var isSup = true
             gameRepository.login({isSup = false})
             if (isSup) {

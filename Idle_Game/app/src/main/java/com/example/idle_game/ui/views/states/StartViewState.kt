@@ -7,6 +7,6 @@ data class StartViewState(
     val hackers: Int = 0,
     val bots: Int = 0,
     val miners: Int = 0,
-    val coinsPerSec: Int = 0,
+    val coinsPerSec: Long = 0,
     val activeBoost: Int = 0
 )

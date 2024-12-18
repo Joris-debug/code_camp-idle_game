@@ -25,7 +25,8 @@ class MainActivity : ComponentActivity() {
                 var isLoggedIn =
                     remember { mutableStateOf<Boolean?>(null) } //true if logged in to an existing (in db) account
                 var isWifiOK = remember { mutableStateOf(false) }
-                val isSignedUp = remember { mutableStateOf(false) }  //ture if signed-up and logged-in
+                val isSignedUp =
+                    remember { mutableStateOf(false) }  //ture if signed-up and logged-in
 
                 if (isSignedUp.value || isLoggedIn.value == true) {
                     Idle_GameLauncher(navController = navController)

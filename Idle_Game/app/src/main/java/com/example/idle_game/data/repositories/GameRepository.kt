@@ -343,12 +343,14 @@ class GameRepository(
                     gameDao.setBotnets(bLvl1 - 1, bLvl2 + 1, bLvl3, bLvl4, bLvl5)
                 }
             }
+
             2 -> {
                 val upgrades = inventory.upgradeLvl3
                 if (bLvl2 > 0 && upgrades > 0) {
                     gameDao.setBotnets(bLvl1, bLvl2 - 1, bLvl3 + 1, bLvl4, bLvl5)
                 }
             }
+
             3 -> {
                 val upgrades = inventory.upgradeLvl4
                 if (bLvl3 > 0 && upgrades > 0) {
@@ -444,7 +446,13 @@ class GameRepository(
 
         if (boosts > 0) {
             //TODO add real boost duration (read out of db)
-            val activeUntil = System.currentTimeMillis() + 100_000
+            val activeUntil = System.currentTimeMillis() +
+                    when (boostId) {
+                        LOW_BOOST_ID -> gameDao.getLowBoosterData().duration
+                        MEDIUM_BOOST_ID -> gameDao.getMediumBoosterData().duration
+                        HIGH_BOOST_ID -> gameDao.getHighBoosterData().duration
+                        else -> 0
+                    }!! * 60 * 1000 // From Min -> ms
             gameDao.updateBoostActivation(boostId, activeUntil)
 
             when (boostId) {
@@ -461,6 +469,29 @@ class GameRepository(
                 }
             }
         }
+    }
+
+    suspend fun isBoostActive(): Boolean {
+        val inventory = inventoryDataFlow.first()
+        if (inventory.activeBoostType > 0) {
+            val now = System.currentTimeMillis()
+            if (gameDao.getBoostActiveUntil() <= now) {
+                gameDao.updateBoostActivation(0, 0)
+                return false
+            }
+            return true
+        }
+        return false
+    }
+
+    suspend fun getBoostFactor(): Int {
+        val inventory = inventoryDataFlow.first()
+        return when (inventory.activeBoostType) {
+            LOW_BOOST_ID -> gameDao.getLowBoosterData().boostFactor
+            MEDIUM_BOOST_ID -> gameDao.getMediumBoosterData().boostFactor
+            HIGH_BOOST_ID -> gameDao.getHighBoosterData().boostFactor
+            else -> 1
+        }!!
     }
 
 }
