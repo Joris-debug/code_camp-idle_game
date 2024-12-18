@@ -444,7 +444,6 @@ class GameRepository(
         }
 
         if (boosts > 0) {
-            //TODO add real boost duration (read out of db)
             val activeUntil = System.currentTimeMillis() +
                     when (boostId) {
                         LOW_BOOST_ID -> gameDao.getLowBoosterData().duration

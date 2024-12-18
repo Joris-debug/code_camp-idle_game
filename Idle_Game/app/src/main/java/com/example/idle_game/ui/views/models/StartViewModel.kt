@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -114,6 +115,13 @@ class StartViewModel @Inject constructor(
         }
     }
 
+    private fun scheduleNotWorker(delayMinutes: Long, workManager: WorkManager) {
+        val workRequest: WorkRequest = OneTimeWorkRequest.Builder(NotWorker::class.java)
+            .setInitialDelay(delayMinutes, TimeUnit.MINUTES)
+            .build()
+
+        workManager.enqueue(workRequest)
+    }
 
     //TODO: Remove debug code before merge to main
 
