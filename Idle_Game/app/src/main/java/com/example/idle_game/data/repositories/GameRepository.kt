@@ -1,6 +1,7 @@
 package com.example.idle_game.data.repositories
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.api.models.SetScoreRequest
 import com.example.idle_game.api.models.UserCredentialsRequest
@@ -169,27 +170,31 @@ class GameRepository(
 
         when (upgradeLvl) {
             1 -> {
-                val upgrades = inventory.upgradeLvl2
+                var upgrades = inventory.upgradeLvl2
                 if (hLvl1 > 0 && upgrades > 0) {
                     gameDao.setHackers(hLvl1 - 1, hLvl2 + 1, hLvl3, hLvl4, hLvl5)
+                    gameDao.updateLvl2Upgrades(--upgrades)
                 }
             }
             2 -> {
-                val upgrades = inventory.upgradeLvl3
+                var upgrades = inventory.upgradeLvl3
                 if (hLvl2 > 0 && upgrades > 0) {
                     gameDao.setHackers(hLvl1, hLvl2 - 1, hLvl3 + 1, hLvl4, hLvl5)
+                    gameDao.updateLvl3Upgrades(--upgrades)
                 }
             }
             3 -> {
-                val upgrades = inventory.upgradeLvl4
+                var upgrades = inventory.upgradeLvl4
                 if (hLvl3 > 0 && upgrades > 0) {
                     gameDao.setHackers(hLvl1, hLvl2, hLvl3 - 1, hLvl4 + 1, hLvl5)
+                    gameDao.updateLvl4Upgrades(--upgrades)
                 }
             }
             4 -> {
-                val upgrades = inventory.upgradeLvl5
+                var upgrades = inventory.upgradeLvl5
                 if (hLvl4 > 0 && upgrades > 0) {
                     gameDao.setHackers(hLvl1, hLvl2, hLvl3, hLvl4 - 1, hLvl5 + 1)
+                    gameDao.updateLvl5Upgrades(--upgrades)
                 }
             }
             else -> {
@@ -209,27 +214,31 @@ class GameRepository(
 
         when (upgradeLvl) {
             1 -> {
-                val upgrades = inventory.upgradeLvl2
+                var upgrades = inventory.upgradeLvl2
                 if (cmLvl1 > 0 && upgrades > 0) {
                     gameDao.setCryptoMiners(cmLvl1 - 1, cmLvl2 + 1, cmLvl3, cmLvl4, cmLvl5)
+                    gameDao.updateLvl2Upgrades(--upgrades)
                 }
             }
             2 -> {
-                val upgrades = inventory.upgradeLvl3
+                var upgrades = inventory.upgradeLvl3
                 if (cmLvl2 > 0 && upgrades > 0) {
                     gameDao.setCryptoMiners(cmLvl1, cmLvl2 - 1, cmLvl3 + 1, cmLvl4, cmLvl5)
+                    gameDao.updateLvl3Upgrades(--upgrades)
                 }
             }
             3 -> {
-                val upgrades = inventory.upgradeLvl4
+                var upgrades = inventory.upgradeLvl4
                 if (cmLvl3 > 0 && upgrades > 0) {
                     gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3 - 1, cmLvl4 + 1, cmLvl5)
+                    gameDao.updateLvl4Upgrades(--upgrades)
                 }
             }
             4 -> {
-                val upgrades = inventory.upgradeLvl5
+                var upgrades = inventory.upgradeLvl5
                 if (cmLvl4 > 0 && upgrades > 0) {
                     gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3, cmLvl4 - 1, cmLvl5 + 1)
+                    gameDao.updateLvl5Upgrades(--upgrades)
                 }
             }
             else -> {
@@ -249,27 +258,31 @@ class GameRepository(
 
         when (upgradeLvl) {
             1 -> {
-                val upgrades = inventory.upgradeLvl2
+                var upgrades = inventory.upgradeLvl2
                 if (bLvl1 > 0 && upgrades > 0) {
                     gameDao.setBotnets(bLvl1 - 1, bLvl2 + 1, bLvl3, bLvl4, bLvl5)
+                    gameDao.updateLvl2Upgrades(--upgrades)
                 }
             }
             2 -> {
-                val upgrades = inventory.upgradeLvl3
+                var upgrades = inventory.upgradeLvl3
                 if (bLvl2 > 0 && upgrades > 0) {
                     gameDao.setBotnets(bLvl1, bLvl2 - 1, bLvl3 + 1, bLvl4, bLvl5)
+                    gameDao.updateLvl3Upgrades(--upgrades)
                 }
             }
             3 -> {
-                val upgrades = inventory.upgradeLvl4
+                var upgrades = inventory.upgradeLvl4
                 if (bLvl3 > 0 && upgrades > 0) {
                     gameDao.setBotnets(bLvl1, bLvl2, bLvl3 - 1, bLvl4 + 1, bLvl5)
+                    gameDao.updateLvl4Upgrades(--upgrades)
                 }
             }
             4 -> {
-                val upgrades = inventory.upgradeLvl5
+                var upgrades = inventory.upgradeLvl5
                 if (bLvl4 > 0 && upgrades > 0) {
                     gameDao.setBotnets(bLvl1, bLvl2, bLvl3, bLvl4 - 1, bLvl5 + 1)
+                    gameDao.updateLvl5Upgrades(--upgrades)
                 }
             }
             else -> {
@@ -370,6 +383,19 @@ class GameRepository(
                 }
             }
         }
+    }
+
+    suspend fun isBoostActive(): Boolean {
+        val inventory = inventoryDataFlow.first()
+        if (inventory.activeBoostType > 0) {
+            val now = System.currentTimeMillis()
+            if (gameDao.getBoostActiveUntil() <= now) {
+                gameDao.updateBoostActivation(0, 0)
+                return false
+            }
+            return true
+        }
+        return false
     }
 
 }

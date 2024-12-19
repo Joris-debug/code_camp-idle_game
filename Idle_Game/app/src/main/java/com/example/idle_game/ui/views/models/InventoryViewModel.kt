@@ -46,7 +46,45 @@ class InventoryViewModel @Inject constructor(
          }
     }
 
-    fun useItem(item: ShopData){
-
+    fun useItem(item: ShopData, useOn: String){
+        viewModelScope.launch {
+            if (!gameRepository.isBoostActive()){
+                when(item.name){
+                    "low Boost" -> gameRepository.activateLowBoost()
+                    "medium Boost" -> gameRepository.activateMediumBoost()
+                    "high Boost" -> gameRepository.activateHighBoost()
+                }
+            }
+            when(item.name){
+                "upgrade lvl 2" -> {
+                    when (useOn){
+                        "Hacker" -> gameRepository.upgradeHacker(1)
+                        "Miner" -> gameRepository.upgradeCryptoMiner(1)
+                        "BotNet" -> gameRepository.upgradeBotnet(1)
+                    }
+                }
+                "upgrade lvl 3" -> {
+                    when (useOn){
+                        "Hacker" -> gameRepository.upgradeHacker(2)
+                        "Miner" -> gameRepository.upgradeCryptoMiner(2)
+                        "BotNet" -> gameRepository.upgradeBotnet(2)
+                    }
+                }
+                "upgrade lvl 4" -> {
+                    when (useOn){
+                        "Hacker" -> gameRepository.upgradeHacker(3)
+                        "Miner" -> gameRepository.upgradeCryptoMiner(3)
+                        "BotNet" -> gameRepository.upgradeBotnet(3)
+                    }
+                }
+                "upgrade lvl 5" -> {
+                    when (useOn){
+                        "Hacker" -> gameRepository.upgradeHacker(4)
+                        "Miner" -> gameRepository.upgradeCryptoMiner(4)
+                        "BotNet" -> gameRepository.upgradeBotnet(4)
+                    }
+                }
+            }
+        }
     }
 }
