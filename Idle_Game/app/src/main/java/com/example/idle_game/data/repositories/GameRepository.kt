@@ -1,14 +1,13 @@
 package com.example.idle_game.data.repositories
 
 import android.content.SharedPreferences
-import android.util.Log
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.api.models.SetScoreRequest
 import com.example.idle_game.api.models.UserCredentialsRequest
 import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
-import kotlinx.coroutines.flow.Flow
+import com.example.idle_game.data.database.models.ShopData
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 
@@ -155,8 +154,8 @@ class GameRepository(
     }
 
     // Adds a new lvl 1 hacker to the inventory
-    suspend fun addNewHacker() {
-        gameDao.addNewHacker()
+    suspend fun addNewHacker(amount: Int) {
+        gameDao.addNewHacker(amount = amount)
     }
 
     // Uses a level k upgrade on a level k-1 hacker, if both exist
@@ -176,6 +175,7 @@ class GameRepository(
                     gameDao.updateLvl2Upgrades(--upgrades)
                 }
             }
+
             2 -> {
                 var upgrades = inventory.upgradeLvl3
                 if (hLvl2 > 0 && upgrades > 0) {
@@ -183,6 +183,7 @@ class GameRepository(
                     gameDao.updateLvl3Upgrades(--upgrades)
                 }
             }
+
             3 -> {
                 var upgrades = inventory.upgradeLvl4
                 if (hLvl3 > 0 && upgrades > 0) {
@@ -190,6 +191,7 @@ class GameRepository(
                     gameDao.updateLvl4Upgrades(--upgrades)
                 }
             }
+
             4 -> {
                 var upgrades = inventory.upgradeLvl5
                 if (hLvl4 > 0 && upgrades > 0) {
@@ -197,6 +199,7 @@ class GameRepository(
                     gameDao.updateLvl5Upgrades(--upgrades)
                 }
             }
+
             else -> {
                 println("Invalid upgrade level: $upgradeLvl")
             }
@@ -220,6 +223,7 @@ class GameRepository(
                     gameDao.updateLvl2Upgrades(--upgrades)
                 }
             }
+
             2 -> {
                 var upgrades = inventory.upgradeLvl3
                 if (cmLvl2 > 0 && upgrades > 0) {
@@ -227,6 +231,7 @@ class GameRepository(
                     gameDao.updateLvl3Upgrades(--upgrades)
                 }
             }
+
             3 -> {
                 var upgrades = inventory.upgradeLvl4
                 if (cmLvl3 > 0 && upgrades > 0) {
@@ -234,6 +239,7 @@ class GameRepository(
                     gameDao.updateLvl4Upgrades(--upgrades)
                 }
             }
+
             4 -> {
                 var upgrades = inventory.upgradeLvl5
                 if (cmLvl4 > 0 && upgrades > 0) {
@@ -241,6 +247,7 @@ class GameRepository(
                     gameDao.updateLvl5Upgrades(--upgrades)
                 }
             }
+
             else -> {
                 println("Invalid upgrade level: $upgradeLvl")
             }
@@ -264,6 +271,7 @@ class GameRepository(
                     gameDao.updateLvl2Upgrades(--upgrades)
                 }
             }
+
             2 -> {
                 var upgrades = inventory.upgradeLvl3
                 if (bLvl2 > 0 && upgrades > 0) {
@@ -271,6 +279,7 @@ class GameRepository(
                     gameDao.updateLvl3Upgrades(--upgrades)
                 }
             }
+
             3 -> {
                 var upgrades = inventory.upgradeLvl4
                 if (bLvl3 > 0 && upgrades > 0) {
@@ -278,6 +287,7 @@ class GameRepository(
                     gameDao.updateLvl4Upgrades(--upgrades)
                 }
             }
+
             4 -> {
                 var upgrades = inventory.upgradeLvl5
                 if (bLvl4 > 0 && upgrades > 0) {
@@ -285,6 +295,7 @@ class GameRepository(
                     gameDao.updateLvl5Upgrades(--upgrades)
                 }
             }
+
             else -> {
                 println("Invalid upgrade level: $upgradeLvl")
             }
@@ -292,51 +303,51 @@ class GameRepository(
     }
 
     // Adds a new lvl 1 crypto miner to the inventory
-    suspend fun addNewCryptoMiner() {
-        gameDao.addNewCryptoMiner()
+    suspend fun addNewCryptoMiner(amount: Int) {
+        gameDao.addNewCryptoMiner(amount = amount)
     }
 
     // Adds a new lvl 1 botnet to the inventory
-    suspend fun addNewBotnet() {
-        gameDao.addNewBotnet()
+    suspend fun addNewBotnet(amount: Int) {
+        gameDao.addNewBotnet(amount = amount)
     }
 
-    suspend fun addUpgradeLvl2() {
+    suspend fun addUpgradeLvl2(amount: Int) {
         var upgrades = gameDao.getInventory().first().upgradeLvl2
-        gameDao.updateLvl2Upgrades(++upgrades)
+        gameDao.updateLvl2Upgrades(upgrades + amount)
     }
 
-    suspend fun addUpgradeLvl3() {
+    suspend fun addUpgradeLvl3(amount: Int) {
         var upgrades = gameDao.getInventory().first().upgradeLvl3
-        gameDao.updateLvl3Upgrades(++upgrades)
+        gameDao.updateLvl3Upgrades(upgrades + amount)
     }
 
-    suspend fun addUpgradeLvl4() {
+    suspend fun addUpgradeLvl4(amount: Int) {
         var upgrades = gameDao.getInventory().first().upgradeLvl4
-        gameDao.updateLvl4Upgrades(++upgrades)
+        gameDao.updateLvl4Upgrades(upgrades + amount)
     }
 
-    suspend fun addUpgradeLvl5() {
+    suspend fun addUpgradeLvl5(amount: Int) {
         var upgrades = gameDao.getInventory().first().upgradeLvl5
-        gameDao.updateLvl5Upgrades(++upgrades)
+        gameDao.updateLvl5Upgrades(upgrades + amount)
     }
 
     // Adds a new low boost to the inventory
-    suspend fun addLowBoost() {
+    suspend fun addLowBoost(amount: Int) {
         var boosts = gameDao.getInventory().first().lowBoosts
-        gameDao.updateLowBoosts(++boosts)
+        gameDao.updateLowBoosts(boosts + amount)
     }
 
     // Adds a new medium boost to the inventory
-    suspend fun addMediumBoost() {
+    suspend fun addMediumBoost(amount: Int) {
         var boosts = gameDao.getInventory().first().mediumBoosts
-        gameDao.updateMediumBoosts(++boosts)
+        gameDao.updateMediumBoosts(boosts + amount)
     }
 
     // Adds a new high boost to the inventory
-    suspend fun addHighBoost() {
+    suspend fun addHighBoost(amount: Int) {
         var boosts = gameDao.getInventory().first().highBoosts
-        gameDao.updateHighBoosts(++boosts)
+        gameDao.updateHighBoosts(boosts + amount)
     }
 
     // Activates a single low boost
@@ -398,4 +409,80 @@ class GameRepository(
         return false
     }
 
+    fun getAmountOfItems(item: ShopData, inventoryData: InventoryData): Int {
+        return when (item.name) {
+            "low Boost" -> inventoryData.lowBoosts
+            "medium Boost" -> inventoryData.mediumBoosts
+            "high Boost" -> inventoryData.highBoosts
+            "low passive" -> inventoryData.hackersLvl1 + inventoryData.hackersLvl2 + inventoryData.hackersLvl3 + inventoryData.hackersLvl4 + inventoryData.hackersLvl5
+            "medium passive" -> inventoryData.cryptoMinersLvl1 + inventoryData.cryptoMinersLvl2 + inventoryData.cryptoMinersLvl3 + inventoryData.cryptoMinersLvl4 + inventoryData.cryptoMinersLvl5
+            "high passive" -> inventoryData.botnetsLvl1 + inventoryData.botnetsLvl2 + inventoryData.botnetsLvl3 + inventoryData.botnetsLvl4 + inventoryData.botnetsLvl5
+            "upgrade lvl 2" -> inventoryData.upgradeLvl2
+            "upgrade lvl 3" -> inventoryData.upgradeLvl3
+            "upgrade lvl 4" -> inventoryData.upgradeLvl4
+            "upgrade lvl 5" -> inventoryData.upgradeLvl5
+            else -> 0
+        }
+    }
+
+    suspend fun buyItem(item: ShopData, amount: Int) {
+        when (item.name) {
+            "low Boost" -> addLowBoost(amount = amount)
+            "medium Boost" -> addMediumBoost(amount = amount)
+            "high Boost" -> addHighBoost(amount = amount)
+            "low passive" -> addNewHacker(amount = amount)
+            "medium passive" -> addNewCryptoMiner(amount = amount)
+            "high passive" -> addNewBotnet(amount = amount)
+            "upgrade lvl 2" -> addUpgradeLvl2(amount = amount)
+            "upgrade lvl 3" -> addUpgradeLvl3(amount = amount)
+            "upgrade lvl 4" -> addUpgradeLvl4(amount = amount)
+            "upgrade lvl 5" -> addUpgradeLvl5(amount = amount)
+        }
+    }
+
+
+    suspend fun useItem(item: ShopData, useOn: String) {
+        if (!isBoostActive()) {
+            when (item.name) {
+                "low Boost" -> activateLowBoost()
+                "medium Boost" -> activateMediumBoost()
+                "high Boost" -> activateHighBoost()
+            }
+        }
+        when (item.name) {
+            "upgrade lvl 2" -> {
+                when (useOn) {
+                    "Hacker" -> upgradeHacker(1)
+                    "Miner" -> upgradeCryptoMiner(1)
+                    "BotNet" -> upgradeBotnet(1)
+                }
+            }
+
+            "upgrade lvl 3" -> {
+                when (useOn) {
+                    "Hacker" -> upgradeHacker(2)
+                    "Miner" -> upgradeCryptoMiner(2)
+                    "BotNet" -> upgradeBotnet(2)
+                }
+            }
+
+            "upgrade lvl 4" -> {
+                when (useOn) {
+                    "Hacker" -> upgradeHacker(3)
+                    "Miner" -> upgradeCryptoMiner(3)
+                    "BotNet" -> upgradeBotnet(3)
+                }
+            }
+
+            "upgrade lvl 5" -> {
+                when (useOn) {
+                    "Hacker" -> upgradeHacker(4)
+                    "Miner" -> upgradeCryptoMiner(4)
+                    "BotNet" -> upgradeBotnet(4)
+                }
+            }
+        }
+    }
 }
+
+
