@@ -1,7 +1,6 @@
 package com.example.idle_game.ui.views.models
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.idle_game.data.database.models.ShopData
 import com.example.idle_game.data.repositories.GameRepository
 import com.example.idle_game.ui.views.states.InventoryViewState
 import kotlinx.coroutines.flow.MutableStateFlow

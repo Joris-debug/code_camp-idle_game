@@ -19,9 +19,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -145,7 +148,10 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
             viewModel.gameRepository.buyItem(itemToBuy!!, amount)
             setShowDialog(false)
         } },
-        onDismiss = { setShowDialog(false)}
+        onDismiss = { setShowDialog(false)},
+        viewModel = viewModel,
+        inventoryData = inventoryData
+
     )
 }
 
@@ -159,7 +165,9 @@ fun ShowDialog(
     onQuantityChange: (String) -> Unit,
     onUseItem: (String) -> Unit,
     onBuyItem: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    viewModel: InventoryViewModel,
+    inventoryData: InventoryData
 ) {
     if (showDialog && itemToBuy != null) {
         when (dialogTitle) {
@@ -170,14 +178,17 @@ fun ShowDialog(
                         onHackerClick = { onUseItem("Hacker") },
                         onBotNetClick = { onUseItem("BotNet") },
                         onMinerClick = { onUseItem("Miner") },
-                        onDismiss = onDismiss
+                        onDismiss = onDismiss,
+                        inventoryData = inventoryData,
+                        itemToBuy = itemToBuy
                     )
                 } else {
                     ApplyDialog(
                         message = dialogMessage,
                         title = dialogTitle,
                         onConfirm = { onUseItem("") },
-                        onDismiss = onDismiss
+                        onDismiss = onDismiss,
+                        viewModel = viewModel,
                     )
                 }
             }
@@ -202,21 +213,50 @@ fun ApplyOnDialog(
     onHackerClick: () -> Unit,
     onBotNetClick: () -> Unit,
     onMinerClick: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    inventoryData: InventoryData,
+    itemToBuy: ShopData?
 ) {
+    var enoughHacker = false
+    var enoughMiner = false
+    var enoughBotNets = false
+
+    when(itemToBuy?.name) {
+        "upgrade lvl 2" -> {
+            enoughHacker = inventoryData.hackersLvl1 > 0
+            enoughMiner = inventoryData.cryptoMinersLvl1 > 0
+            enoughBotNets = inventoryData.botnetsLvl1 > 0
+        }
+        "upgrade lvl 3" -> {
+            enoughHacker = inventoryData.hackersLvl2 > 0
+            enoughMiner = inventoryData.cryptoMinersLvl2 > 0
+            enoughBotNets = inventoryData.botnetsLvl2 > 0
+        }
+        "upgrade lvl 4" -> {
+            enoughHacker = inventoryData.hackersLvl3 > 0
+            enoughMiner = inventoryData.cryptoMinersLvl3 > 0
+            enoughBotNets = inventoryData.botnetsLvl3 > 0
+        }
+        "upgrade lvl 5" -> {
+            enoughHacker = inventoryData.hackersLvl4 > 0
+            enoughMiner = inventoryData.cryptoMinersLvl4 > 0
+            enoughBotNets = inventoryData.botnetsLvl4 > 0
+        }
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = title) },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Button(onClick = onHackerClick, modifier = Modifier.padding(vertical = 4.dp)) {
+                Button(onClick = onHackerClick, modifier = Modifier.padding(vertical = 4.dp), enabled = enoughHacker) {
                     Text(text = "Hacker")
                 }
-                Button(onClick = onBotNetClick, modifier = Modifier.padding(vertical = 4.dp)) {
-                    Text(text = "BotNet")
-                }
-                Button(onClick = onMinerClick, modifier = Modifier.padding(vertical = 4.dp)) {
+                Button(onClick = onMinerClick, modifier = Modifier.padding(vertical = 4.dp), enabled = enoughMiner) {
                     Text(text = "Miner")
+                }
+                Button(onClick = onBotNetClick, modifier = Modifier.padding(vertical = 4.dp), enabled = enoughBotNets) {
+                    Text(text = "BotNet")
                 }
             }
         },
@@ -239,7 +279,6 @@ fun ShopItemButtons(item: ShopData,
     val buyBackgroundColor = if (isSelected) AppColors.primary else AppColors.secondary
     val applyBackgroundColor = if (isSelected) AppColors.primary else AppColors.secondary
 
-    // Überprüfen, ob der Item-Name zu den "special items" gehört
     val isSpecialItem = item.name.contains("low passive", ignoreCase = true) ||
             item.name.contains("medium passive", ignoreCase = true) ||
             item.name.contains("high passive", ignoreCase = true)
@@ -251,7 +290,6 @@ fun ShopItemButtons(item: ShopData,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
-        // Button für Kaufen
         Button(
             onClick = onBuyClick,
             colors = ButtonDefaults.buttonColors(containerColor = buyBackgroundColor),
@@ -271,7 +309,6 @@ fun ShopItemButtons(item: ShopData,
             }
         }
 
-        // Button für Anwenden
         if (!isSpecialItem) {
             Button(
                 onClick = onApplyClick,
@@ -331,23 +368,37 @@ fun QuantityDialog(
 
 //Dialog when you want to use an item that is not an upgrade
 @Composable
-fun ApplyDialog(message: String, title: String, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+fun ApplyDialog(message: String, title: String, onConfirm: () -> Unit, onDismiss: () -> Unit, viewModel: InventoryViewModel) {
+
+    var isBoostActive by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        isBoostActive = viewModel.gameRepository.isBoostActive()
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = title)
+            Text(text = if (!isBoostActive) title else "Achtung")
         },
         text = {
-            Text(text = message)
+            Text(text = if (!isBoostActive) message else "Warte bis dein anderer Boost abgelaufen ist.")
         },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text("Yes")
+            if(!isBoostActive) {
+                TextButton(onClick = onConfirm) {
+                    Text("Yes")
+                }
+            } else {
+                TextButton(onClick = onConfirm) {
+                    Text("Back")
+                }
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("No")
+            if(!isBoostActive) {
+                TextButton(onClick = onDismiss) {
+                    Text("No")
+                }
             }
         }
     )
