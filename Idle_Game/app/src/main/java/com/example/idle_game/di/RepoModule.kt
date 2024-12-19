@@ -72,6 +72,6 @@ class RepoModule {
     fun providesDatabase(@ApplicationContext context: Context): GameDatabase {
         return Room.databaseBuilder(
             context, GameDatabase::class.java, "gamedatabase"
-        ).fallbackToDestructiveMigration().build()
+        ).build()
     }
 }
