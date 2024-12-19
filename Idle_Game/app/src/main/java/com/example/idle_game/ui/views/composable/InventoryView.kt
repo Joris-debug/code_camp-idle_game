@@ -220,27 +220,47 @@ fun ApplyOnDialog(
     var enoughHacker = false
     var enoughMiner = false
     var enoughBotNets = false
+    var availableHackers = 0
+    var availableMiner = 0
+    var availableBotNets = 0
+
 
     when(itemToBuy?.name) {
         "upgrade lvl 2" -> {
-            enoughHacker = inventoryData.hackersLvl1 > 0
-            enoughMiner = inventoryData.cryptoMinersLvl1 > 0
-            enoughBotNets = inventoryData.botnetsLvl1 > 0
+            availableHackers = inventoryData.hackersLvl1
+            availableMiner = inventoryData.cryptoMinersLvl1
+            availableBotNets = inventoryData.botnetsLvl1
+
+            enoughHacker = availableHackers > 0
+            enoughMiner = availableMiner > 0
+            enoughBotNets = availableBotNets > 0
         }
         "upgrade lvl 3" -> {
-            enoughHacker = inventoryData.hackersLvl2 > 0
-            enoughMiner = inventoryData.cryptoMinersLvl2 > 0
-            enoughBotNets = inventoryData.botnetsLvl2 > 0
+            availableHackers = inventoryData.hackersLvl2
+            availableMiner = inventoryData.cryptoMinersLvl2
+            availableBotNets = inventoryData.botnetsLvl2
+
+            enoughHacker = availableHackers > 0
+            enoughMiner = availableMiner > 0
+            enoughBotNets = availableBotNets > 0
         }
         "upgrade lvl 4" -> {
-            enoughHacker = inventoryData.hackersLvl3 > 0
-            enoughMiner = inventoryData.cryptoMinersLvl3 > 0
-            enoughBotNets = inventoryData.botnetsLvl3 > 0
+            availableHackers = inventoryData.hackersLvl3
+            availableMiner = inventoryData.cryptoMinersLvl3
+            availableBotNets = inventoryData.botnetsLvl3
+
+            enoughHacker = availableHackers > 0
+            enoughMiner = availableMiner > 0
+            enoughBotNets = availableBotNets > 0
         }
         "upgrade lvl 5" -> {
-            enoughHacker = inventoryData.hackersLvl4 > 0
-            enoughMiner = inventoryData.cryptoMinersLvl4 > 0
-            enoughBotNets = inventoryData.botnetsLvl4 > 0
+            availableHackers = inventoryData.hackersLvl4
+            availableMiner = inventoryData.cryptoMinersLvl4
+            availableBotNets = inventoryData.botnetsLvl4
+
+            enoughHacker = availableHackers > 0
+            enoughMiner = availableMiner > 0
+            enoughBotNets = availableBotNets > 0
         }
     }
 
@@ -250,13 +270,13 @@ fun ApplyOnDialog(
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Button(onClick = onHackerClick, modifier = Modifier.padding(vertical = 4.dp), enabled = enoughHacker) {
-                    Text(text = "Hacker")
+                    Text(text = "Hacker, Verfügbar: $availableHackers")
                 }
                 Button(onClick = onMinerClick, modifier = Modifier.padding(vertical = 4.dp), enabled = enoughMiner) {
-                    Text(text = "Miner")
+                    Text(text = "Miner, Verfügbar: $availableMiner")
                 }
                 Button(onClick = onBotNetClick, modifier = Modifier.padding(vertical = 4.dp), enabled = enoughBotNets) {
-                    Text(text = "BotNet")
+                    Text(text = "BotNet, Verfügbar: $availableBotNets")
                 }
             }
         },
