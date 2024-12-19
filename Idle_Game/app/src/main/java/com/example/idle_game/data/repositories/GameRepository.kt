@@ -396,6 +396,7 @@ class GameRepository(
         }
     }
 
+    //Use to check if one boost ist already activated
     suspend fun isBoostActive(): Boolean {
         val inventory = inventoryDataFlow.first()
         if (inventory.activeBoostType > 0) {
@@ -409,6 +410,7 @@ class GameRepository(
         return false
     }
 
+    //Get amount of certain items
     fun getAmountOfItems(item: ShopData, inventoryData: InventoryData): Int {
         return when (item.name) {
             "low Boost" -> inventoryData.lowBoosts
@@ -425,6 +427,7 @@ class GameRepository(
         }
     }
 
+    //Updating the database after buying items
     suspend fun buyItem(item: ShopData, amount: Int) {
         when (item.name) {
             "low Boost" -> addLowBoost(amount = amount)
@@ -440,7 +443,7 @@ class GameRepository(
         }
     }
 
-
+    //Updating database after using items
     suspend fun useItem(item: ShopData, useOn: String) {
         if (!isBoostActive()) {
             when (item.name) {

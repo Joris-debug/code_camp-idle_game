@@ -44,12 +44,13 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
     val inventoryData = viewState.inventoryData.collectAsState(initial = InventoryData()).value
     val selectedItem = viewState.selectedItem
 
-    // State for showing the confirmation dialog
+    //State for showing the confirmation dialog
     val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
     val (itemToBuy, setItemToBuy) = remember { mutableStateOf<ShopData?>(null) }
     val (dialogMessage, setDialogMessage) = remember { mutableStateOf("") }
     val (dialogTitle, setDialogTitle) = remember { mutableStateOf("") }
 
+    //State for quantity input
     val (quantity, setQuantity) = remember { mutableStateOf("1") }
 
     val (specialItems, otherItems) = shopDataList.partition {
@@ -74,7 +75,6 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Box für den "Kaufen"-Text, der auf der linken Seite zentriert ist (ca. 3/5)
             Box(
                 modifier = Modifier
                     .weight(3f)
@@ -87,8 +87,6 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
                     color = Color.White
                 )
             }
-
-            // Box für den "Anwenden"-Text, der auf der rechten Seite zentriert ist (ca. 2/5)
             Box(
                 modifier = Modifier
                     .weight(2f)
@@ -103,6 +101,7 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
             }
         }
 
+        //Creating buttons for buying and using items
         sortedShopDataList.forEach { item ->
             val isSelected = item == selectedItem
             val itemAmount = viewModel.gameRepository.getAmountOfItems(item = item, inventoryData = inventoryData)
@@ -126,6 +125,7 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
         }
     }
 
+    //Dialog that pops up when you want to buy or use an item
     ShowDialog(
         showDialog = showDialog,
         dialogTitle = dialogTitle,
@@ -137,6 +137,9 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
             viewModel.gameRepository.useItem(itemToBuy!!, it)
             setShowDialog(false)
         } },
+        //TODO: Kaufen nur möglich wenn genügend BTC vorhanden ist.
+        //TODO: Wenn nicht genug BTC vorhanden ist, soll der Button ausgegraut werden und nicht klickbar sein.
+        //TODO: Nach erfolgreichem Kauf BTC Stand aktualisieren.
         onBuyItem = { viewModel.viewModelScope.launch {
             val amount = quantity.toIntOrNull() ?: 1
             viewModel.gameRepository.buyItem(itemToBuy!!, amount)
@@ -192,7 +195,7 @@ fun ShowDialog(
     }
 }
 
-
+//Dialog when u want to use an upgrade
 @Composable
 fun ApplyOnDialog(
     title: String,
@@ -288,6 +291,7 @@ fun ShopItemButtons(item: ShopData,
     }
 }
 
+//Dialog for input text field
 @Composable
 fun QuantityDialog(
     message: String,
@@ -325,6 +329,7 @@ fun QuantityDialog(
     )
 }
 
+//Dialog when you want to use an item that is not an upgrade
 @Composable
 fun ApplyDialog(message: String, title: String, onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
@@ -348,10 +353,6 @@ fun ApplyDialog(message: String, title: String, onConfirm: () -> Unit, onDismiss
     )
 }
 
-//TODO: Randfälle abdecken (Kaufen)
-//TODO: Geldmenge überprüfen & Geldmenge aktualisieren
-//TODO: Falls nicht genug Geld, einfach ausblenden
-//TODO: Beliebige Menge kaufen.
 
 
 
