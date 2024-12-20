@@ -135,18 +135,18 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
         itemToBuy = itemToBuy,
         quantity = quantity,
         onQuantityChange = setQuantity,
-        onUseItem = { viewModel.viewModelScope.launch {
-            viewModel.gameRepository.useItem(itemToBuy!!, it)
+        onUseItem = {
+            viewModel.useItem(itemToBuy!!, it)
             setShowDialog(false)
-        } },
+        },
         //TODO: Kaufen nur möglich wenn genügend BTC vorhanden ist.
         //TODO: Wenn nicht genug BTC vorhanden ist, soll der Button ausgegraut werden und nicht klickbar sein.
         //TODO: Nach erfolgreichem Kauf BTC Stand aktualisieren.
-        onBuyItem = { viewModel.viewModelScope.launch {
+        onBuyItem = {
             val amount = quantity.toIntOrNull() ?: 1
-            viewModel.gameRepository.buyItem(itemToBuy!!, amount)
+            viewModel.buyItem(itemToBuy!!, amount)
             setShowDialog(false)
-        } },
+        },
         onDismiss = { setShowDialog(false)},
         viewModel = viewModel,
         inventoryData = inventoryData

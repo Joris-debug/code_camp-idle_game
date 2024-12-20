@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
 
 @HiltViewModel
 class InventoryViewModel @Inject constructor(
@@ -45,6 +44,18 @@ class InventoryViewModel @Inject constructor(
             "upgrade lvl 4" -> inventoryData.upgradeLvl4
             "upgrade lvl 5" -> inventoryData.upgradeLvl5
             else -> 0
+        }
+    }
+
+    fun buyItem(itemToBuy: ShopData, amount: Int) {
+        viewModelScope.launch {
+            gameRepository.buyItem(itemToBuy, amount)
+        }
+    }
+
+    fun useItem(itemToBuy: ShopData, it: String) {
+        viewModelScope.launch {
+            gameRepository.useItem(itemToBuy, it)
         }
     }
 }
