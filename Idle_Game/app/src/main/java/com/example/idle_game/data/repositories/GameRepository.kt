@@ -10,6 +10,7 @@ import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
 import com.example.idle_game.data.database.models.ShopData
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 import java.time.Instant
@@ -171,22 +172,22 @@ class GameRepository(
     }
 
     suspend fun getHackerShopData(): ShopData {
-        return gameDao.getHackerShopData()
+        return gameDao.getHackerShopData().first()
     }
 
     suspend fun getMinerShopData(): ShopData {
-        return gameDao.getMinerShopData()
+        return gameDao.getMinerShopData().first()
     }
 
     suspend fun getBotnetShopData(): ShopData {
-        return gameDao.getBotnetShopData()
+        return gameDao.getBotnetShopData().first()
     }
 
     suspend fun getUpgradeData(level: Int): ShopData? {
         if (level < 2 || level > 5) {
             return null
         }
-        return gameDao.getUpgradeData(level)
+        return gameDao.getUpgradeData(level).first()
     }
 
     // Call this function before accessing the inventory for the first time
@@ -430,9 +431,9 @@ class GameRepository(
         if (boosts > 0) {
             val activeUntil = System.currentTimeMillis() +
                     when (boostId) {
-                        LOW_BOOST_ID -> gameDao.getLowBoosterData().duration
-                        MEDIUM_BOOST_ID -> gameDao.getMediumBoosterData().duration
-                        HIGH_BOOST_ID -> gameDao.getHighBoosterData().duration
+                        LOW_BOOST_ID -> gameDao.getLowBoosterData().first().duration
+                        MEDIUM_BOOST_ID -> gameDao.getMediumBoosterData().first().duration
+                        HIGH_BOOST_ID -> gameDao.getHighBoosterData().first().duration
                         else -> 0
                     }!! * 60 * 1000 // From Min -> ms
             gameDao.updateBoostActivation(boostId, activeUntil)
@@ -469,9 +470,9 @@ class GameRepository(
     suspend fun getBoostFactor(): Int {
         val inventory = inventoryDataFlow.first()
         return when (inventory.activeBoostType) {
-            LOW_BOOST_ID -> gameDao.getLowBoosterData().boostFactor
-            MEDIUM_BOOST_ID -> gameDao.getMediumBoosterData().boostFactor
-            HIGH_BOOST_ID -> gameDao.getHighBoosterData().boostFactor
+            LOW_BOOST_ID -> gameDao.getLowBoosterData().first().boostFactor
+            MEDIUM_BOOST_ID -> gameDao.getMediumBoosterData().first().boostFactor
+            HIGH_BOOST_ID -> gameDao.getHighBoosterData().first().boostFactor
             else -> 1
         }!!
     }

@@ -128,25 +128,25 @@ interface GameDao {
     fun getShop(): Flow<List<ShopData>>
 
     @Query("SELECT * FROM shopdata WHERE name = 'low passive'")
-    suspend fun getHackerShopData(): ShopData
+    fun getHackerShopData(): Flow<ShopData>
 
     @Query("SELECT * FROM shopdata WHERE name = 'medium passive'")
-    suspend fun getMinerShopData(): ShopData
+    fun getMinerShopData(): Flow<ShopData>
 
     @Query("SELECT * FROM shopdata WHERE name = 'high passive'")
-    suspend fun getBotnetShopData(): ShopData
+    fun getBotnetShopData(): Flow<ShopData>
 
     @Query("SELECT * FROM shopdata WHERE name = 'low Boost'")
-    suspend fun getLowBoosterData(): ShopData
+    fun getLowBoosterData(): Flow<ShopData>
 
     @Query("SELECT * FROM shopdata WHERE name = 'medium Boost'")
-    suspend fun getMediumBoosterData(): ShopData
+    fun getMediumBoosterData(): Flow<ShopData>
 
     @Query("SELECT * FROM shopdata WHERE name = 'high Boost'")
-    suspend fun getHighBoosterData(): ShopData
+    fun getHighBoosterData(): Flow<ShopData>
 
     @Query("SELECT * FROM shopdata WHERE name = 'upgrade lvl ' || :level")
-    suspend fun getUpgradeData(level: Int): ShopData
+    fun getUpgradeData(level: Int): Flow<ShopData>
 
     @Upsert
     suspend fun insertShop(item: ShopData)
