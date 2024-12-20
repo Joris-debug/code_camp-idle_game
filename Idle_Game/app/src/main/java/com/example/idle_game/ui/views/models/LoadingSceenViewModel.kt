@@ -1,6 +1,7 @@
 package com.example.idle_game.ui.views.models
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.repositories.GameRepository
@@ -37,26 +38,19 @@ class LoadingSceenViewModel @Inject constructor(
                         connectionString = ""
                     )
                     onWifiOK()
-                    var boolLoginFailed = false;
+                    var boolLoginFailed = false
+                    Log.d("DEBUG", "Vor Login")
                     gameRepository.login { boolLoginFailed = true }
+                    Log.d("DEBUG", "Nach Login: $boolLoginFailed")
                     if(boolLoginFailed) {
                         onLoginFailure()
+
                     } else {
                         onLoginSuccess()
                     }
                 }
             }
 
-        }
-    }
-
-    fun checkFirstLogin(onLoginSuccess: () -> Unit) {
-        viewModelScope.launch {
-            var isSup = true
-            gameRepository.login({ isSup = false })
-            if (isSup) {
-                onLoginSuccess()
-            }
         }
     }
 }

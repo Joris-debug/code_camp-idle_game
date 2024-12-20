@@ -21,6 +21,9 @@ interface GameDao {
     @Query("UPDATE playerdata SET access_token = :accessToken")
     suspend fun updateAccessToken(accessToken: String)
 
+    @Query("UPDATE playerdata SET refresh_token = :refreshToken")
+    suspend fun updateRefreshToken(refreshToken: String)
+
     @Query("SELECT * FROM inventorydata WHERE uid = 1")
     fun getInventory(): Flow<InventoryData>
 

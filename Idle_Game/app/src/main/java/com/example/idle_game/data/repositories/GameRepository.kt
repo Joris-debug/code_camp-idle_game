@@ -1,7 +1,9 @@
 package com.example.idle_game.data.repositories
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.idle_game.api.GameApi
+import com.example.idle_game.api.models.SignInRequest
 import com.example.idle_game.api.models.SignUpRequest
 import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
@@ -32,7 +34,24 @@ class GameRepository(
             if (refreshToken != null) {
                 val playerData = PlayerData(
                     username = username,
-                    password = password,
+                    refreshToken = refreshToken,
+                    accessToken = null
+                )
+                gameDao.insertPlayer(playerData)
+            }
+        } catch (e: HttpException) {
+            onFailure()
+        }
+    }
+
+    suspend fun signIn(username: String, password: String, onFailure: () -> Unit = {}) {
+        val signInRequest = SignInRequest(username = username, password = password)
+        try {
+            val resp = api.signIn(signInRequest)
+            val refreshToken = sharedPreferences.getString("refresh_token", null)
+            if (refreshToken != null) {
+                val playerData = PlayerData(
+                    username = username,
                     refreshToken = refreshToken,
                     accessToken = null
                 )
@@ -47,7 +66,6 @@ class GameRepository(
     suspend fun login(onFailure: () -> Unit = {}) {
         val playerData = playerDataFlow.first()
         try {
-
             val resp = api.login(playerData.refreshToken)
             val accessToken = sharedPreferences.getString("access_token", null)
             if (accessToken != null) {
@@ -105,24 +123,28 @@ class GameRepository(
                     gameDao.setHackers(hLvl1 - 1, hLvl2 + 1, hLvl3, hLvl4, hLvl5)
                 }
             }
+
             2 -> {
                 val upgrades = inventory.upgradeLvl3
                 if (hLvl2 > 0 && upgrades > 0) {
                     gameDao.setHackers(hLvl1, hLvl2 - 1, hLvl3 + 1, hLvl4, hLvl5)
                 }
             }
+
             3 -> {
                 val upgrades = inventory.upgradeLvl4
                 if (hLvl3 > 0 && upgrades > 0) {
                     gameDao.setHackers(hLvl1, hLvl2, hLvl3 - 1, hLvl4 + 1, hLvl5)
                 }
             }
+
             4 -> {
                 val upgrades = inventory.upgradeLvl5
                 if (hLvl4 > 0 && upgrades > 0) {
                     gameDao.setHackers(hLvl1, hLvl2, hLvl3, hLvl4 - 1, hLvl5 + 1)
                 }
             }
+
             else -> {
                 println("Invalid upgrade level: $upgradeLvl")
             }
@@ -145,24 +167,28 @@ class GameRepository(
                     gameDao.setCryptoMiners(cmLvl1 - 1, cmLvl2 + 1, cmLvl3, cmLvl4, cmLvl5)
                 }
             }
+
             2 -> {
                 val upgrades = inventory.upgradeLvl3
                 if (cmLvl2 > 0 && upgrades > 0) {
                     gameDao.setCryptoMiners(cmLvl1, cmLvl2 - 1, cmLvl3 + 1, cmLvl4, cmLvl5)
                 }
             }
+
             3 -> {
                 val upgrades = inventory.upgradeLvl4
                 if (cmLvl3 > 0 && upgrades > 0) {
                     gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3 - 1, cmLvl4 + 1, cmLvl5)
                 }
             }
+
             4 -> {
                 val upgrades = inventory.upgradeLvl5
                 if (cmLvl4 > 0 && upgrades > 0) {
                     gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3, cmLvl4 - 1, cmLvl5 + 1)
                 }
             }
+
             else -> {
                 println("Invalid upgrade level: $upgradeLvl")
             }
@@ -185,24 +211,28 @@ class GameRepository(
                     gameDao.setBotnets(bLvl1 - 1, bLvl2 + 1, bLvl3, bLvl4, bLvl5)
                 }
             }
+
             2 -> {
                 val upgrades = inventory.upgradeLvl3
                 if (bLvl2 > 0 && upgrades > 0) {
                     gameDao.setBotnets(bLvl1, bLvl2 - 1, bLvl3 + 1, bLvl4, bLvl5)
                 }
             }
+
             3 -> {
                 val upgrades = inventory.upgradeLvl4
                 if (bLvl3 > 0 && upgrades > 0) {
                     gameDao.setBotnets(bLvl1, bLvl2, bLvl3 - 1, bLvl4 + 1, bLvl5)
                 }
             }
+
             4 -> {
                 val upgrades = inventory.upgradeLvl5
                 if (bLvl4 > 0 && upgrades > 0) {
                     gameDao.setBotnets(bLvl1, bLvl2, bLvl3, bLvl4 - 1, bLvl5 + 1)
                 }
             }
+
             else -> {
                 println("Invalid upgrade level: $upgradeLvl")
             }

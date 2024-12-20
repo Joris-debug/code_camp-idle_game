@@ -3,6 +3,7 @@ package com.example.idle_game.api
 import com.example.idle_game.api.models.ItemResponse
 import com.example.idle_game.api.models.SignUpRequest
 import com.example.idle_game.api.models.ServerResponse
+import com.example.idle_game.api.models.SignInRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -18,6 +19,10 @@ interface GameApi {
     @POST("/sign-up")
     @Headers("Content-Type: application/json")
     suspend fun signUp(@Body signUpRequest: SignUpRequest): ServerResponse
+
+    @POST("/sign-in")
+    @Headers("Content-Type: application/json")
+    suspend fun signIn(@Body signInRequest: SignInRequest): ServerResponse
 
     @GET("/login")
     @Headers("Content-Type: application/json")
