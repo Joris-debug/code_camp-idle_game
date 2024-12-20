@@ -3,7 +3,6 @@ package com.example.idle_game.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem

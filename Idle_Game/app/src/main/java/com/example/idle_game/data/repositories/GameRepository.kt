@@ -447,23 +447,6 @@ class GameRepository(
         return false
     }
 
-    //Get amount of certain items
-    fun getAmountOfItems(item: ShopData, inventoryData: InventoryData): Int {
-        return when (item.name) {
-            "low Boost" -> inventoryData.lowBoosts
-            "medium Boost" -> inventoryData.mediumBoosts
-            "high Boost" -> inventoryData.highBoosts
-            "low passive" -> inventoryData.hackersLvl1 + inventoryData.hackersLvl2 + inventoryData.hackersLvl3 + inventoryData.hackersLvl4 + inventoryData.hackersLvl5
-            "medium passive" -> inventoryData.cryptoMinersLvl1 + inventoryData.cryptoMinersLvl2 + inventoryData.cryptoMinersLvl3 + inventoryData.cryptoMinersLvl4 + inventoryData.cryptoMinersLvl5
-            "high passive" -> inventoryData.botnetsLvl1 + inventoryData.botnetsLvl2 + inventoryData.botnetsLvl3 + inventoryData.botnetsLvl4 + inventoryData.botnetsLvl5
-            "upgrade lvl 2" -> inventoryData.upgradeLvl2
-            "upgrade lvl 3" -> inventoryData.upgradeLvl3
-            "upgrade lvl 4" -> inventoryData.upgradeLvl4
-            "upgrade lvl 5" -> inventoryData.upgradeLvl5
-            else -> 0
-        }
-    }
-
     //Updating the database after buying items
     suspend fun buyItem(item: ShopData, amount: Int) {
         when (item.name) {

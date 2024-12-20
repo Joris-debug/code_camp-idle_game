@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,9 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.ShopData
-import com.example.idle_game.ui.theme.AppColors
 import com.example.idle_game.ui.views.models.InventoryViewModel
-import com.example.idle_game.ui.theme.bitcoinBackground
 import kotlinx.coroutines.launch
 
 @Composable
@@ -67,7 +66,7 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(bitcoinBackground)
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -107,7 +106,7 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
         //Creating buttons for buying and using items
         sortedShopDataList.forEach { item ->
             val isSelected = item == selectedItem
-            val itemAmount = viewModel.gameRepository.getAmountOfItems(item = item, inventoryData = inventoryData)
+            val itemAmount = viewModel.getAmountOfItems(item, inventoryData)
             ShopItemButtons(
                 item = item,
                 isSelected = isSelected,
@@ -296,8 +295,7 @@ fun ShopItemButtons(item: ShopData,
                     itemAmount: Int, onBuyClick: () -> Unit,
                     onApplyClick: () -> Unit) {
 
-    val buyBackgroundColor = if (isSelected) AppColors.primary else AppColors.secondary
-    val applyBackgroundColor = if (isSelected) AppColors.primary else AppColors.secondary
+    val buttonBackground = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
 
     val isSpecialItem = item.name.contains("low passive", ignoreCase = true) ||
             item.name.contains("medium passive", ignoreCase = true) ||
@@ -312,7 +310,7 @@ fun ShopItemButtons(item: ShopData,
 
         Button(
             onClick = onBuyClick,
-            colors = ButtonDefaults.buttonColors(containerColor = buyBackgroundColor),
+            colors = ButtonDefaults.buttonColors(containerColor = buttonBackground),
             modifier = Modifier
                 .weight(2f)
         ) {
@@ -333,7 +331,7 @@ fun ShopItemButtons(item: ShopData,
             Button(
                 onClick = onApplyClick,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (itemAmount > 0) applyBackgroundColor else Color.Gray
+                    containerColor = if (itemAmount > 0) buttonBackground else Color.Gray
                 ),
                 modifier = Modifier
                     .weight(1f),
