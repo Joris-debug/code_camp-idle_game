@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val gameRepository: GameRepository,
+    private val gameRepository: GameRepository
 ) : ViewModel() {
 
     companion object {
@@ -38,7 +38,7 @@ class LoginViewModel @Inject constructor(
             gameRepository.createNewInventory()  // Ensure the inventory is created first
             var success = true;
             gameRepository.signUp(name, generateRandomString(10), {success = false})
-            gameRepository.login()
+            gameRepository.login({success = false})
             if(success) {
                 onLoginSuccess()
             }
@@ -47,13 +47,6 @@ class LoginViewModel @Inject constructor(
 
     fun checkSignIn(onLoginSuccess: () -> Unit) {
         viewModelScope.launch {
-            /* AUFRUF in init {}
-        * if signdin
-        *   login -> worker??
-        *   isLoggedIn = true (MainAktivity)
-        *
-        *
-        * */
             var isSup = true
             gameRepository.login({isSup = false})
             if (isSup) {

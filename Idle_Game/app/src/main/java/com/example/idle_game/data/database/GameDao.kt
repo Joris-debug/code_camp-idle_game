@@ -127,7 +127,33 @@ interface GameDao {
     @Query("SELECT * FROM shopdata")
     fun getShop(): Flow<List<ShopData>>
 
+    @Query("SELECT * FROM shopdata WHERE name = 'low passive'")
+    fun getHackerShopData(): Flow<ShopData>
+
+    @Query("SELECT * FROM shopdata WHERE name = 'medium passive'")
+    fun getMinerShopData(): Flow<ShopData>
+
+    @Query("SELECT * FROM shopdata WHERE name = 'high passive'")
+    fun getBotnetShopData(): Flow<ShopData>
+
+    @Query("SELECT * FROM shopdata WHERE name = 'low Boost'")
+    fun getLowBoosterData(): Flow<ShopData>
+
+    @Query("SELECT * FROM shopdata WHERE name = 'medium Boost'")
+    fun getMediumBoosterData(): Flow<ShopData>
+
+    @Query("SELECT * FROM shopdata WHERE name = 'high Boost'")
+    fun getHighBoosterData(): Flow<ShopData>
+
+    @Query("SELECT * FROM shopdata WHERE name = 'upgrade lvl ' || :level")
+    fun getUpgradeData(level: Int): Flow<ShopData>
+
     @Upsert
     suspend fun insertShop(item: ShopData)
 
+    @Query("SELECT last_mining_timestamp FROM InventoryData")
+    suspend fun getLastMiningTimestamp(): Long?
+
+    @Query("UPDATE InventoryData SET last_mining_timestamp = :timeStamp")
+    suspend fun setMiningTimestamp(timeStamp: Long)
 }

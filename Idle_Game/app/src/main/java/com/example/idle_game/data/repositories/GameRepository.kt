@@ -4,14 +4,16 @@ import android.content.SharedPreferences
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.api.models.ItemResponse
 import com.example.idle_game.api.models.ScoreResponse
-import com.example.idle_game.api.models.ServerResponse
 import com.example.idle_game.api.models.SetScoreRequest
 import com.example.idle_game.api.models.UserCredentialsRequest
 import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
+import com.example.idle_game.data.database.models.ShopData
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
+import java.time.Instant
 
 class GameRepository(
     private val api: GameApi,
@@ -169,6 +171,25 @@ class GameRepository(
         }
     }
 
+    suspend fun getHackerShopData(): ShopData {
+        return gameDao.getHackerShopData().first()
+    }
+
+    suspend fun getMinerShopData(): ShopData {
+        return gameDao.getMinerShopData().first()
+    }
+
+    suspend fun getBotnetShopData(): ShopData {
+        return gameDao.getBotnetShopData().first()
+    }
+
+    suspend fun getUpgradeData(level: Int): ShopData? {
+        if (level < 2 || level > 5) {
+            return null
+        }
+        return gameDao.getUpgradeData(level).first()
+    }
+
     // Call this function before accessing the inventory for the first time
     suspend fun createNewInventory() {
         gameDao.insertInventory(InventoryData())
@@ -187,6 +208,14 @@ class GameRepository(
             return
         }
         gameDao.issueBitcoins(bitcoins)
+    }
+
+    suspend fun getLastMiningTimestamp(): Instant? {
+        return gameDao.getLastMiningTimestamp()?.let { Instant.ofEpochMilli(it) }
+    }
+
+    suspend fun setMiningTimestamp(timestamp: Instant) {
+        gameDao.setMiningTimestamp(timestamp.toEpochMilli())
     }
 
     // Adds a new lvl 1 hacker to the inventory
@@ -210,24 +239,28 @@ class GameRepository(
                     gameDao.setHackers(hLvl1 - 1, hLvl2 + 1, hLvl3, hLvl4, hLvl5)
                 }
             }
+
             2 -> {
                 val upgrades = inventory.upgradeLvl3
                 if (hLvl2 > 0 && upgrades > 0) {
                     gameDao.setHackers(hLvl1, hLvl2 - 1, hLvl3 + 1, hLvl4, hLvl5)
                 }
             }
+
             3 -> {
                 val upgrades = inventory.upgradeLvl4
                 if (hLvl3 > 0 && upgrades > 0) {
                     gameDao.setHackers(hLvl1, hLvl2, hLvl3 - 1, hLvl4 + 1, hLvl5)
                 }
             }
+
             4 -> {
                 val upgrades = inventory.upgradeLvl5
                 if (hLvl4 > 0 && upgrades > 0) {
                     gameDao.setHackers(hLvl1, hLvl2, hLvl3, hLvl4 - 1, hLvl5 + 1)
                 }
             }
+
             else -> {
                 println("Invalid upgrade level: $upgradeLvl")
             }
@@ -250,24 +283,28 @@ class GameRepository(
                     gameDao.setCryptoMiners(cmLvl1 - 1, cmLvl2 + 1, cmLvl3, cmLvl4, cmLvl5)
                 }
             }
+
             2 -> {
                 val upgrades = inventory.upgradeLvl3
                 if (cmLvl2 > 0 && upgrades > 0) {
                     gameDao.setCryptoMiners(cmLvl1, cmLvl2 - 1, cmLvl3 + 1, cmLvl4, cmLvl5)
                 }
             }
+
             3 -> {
                 val upgrades = inventory.upgradeLvl4
                 if (cmLvl3 > 0 && upgrades > 0) {
                     gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3 - 1, cmLvl4 + 1, cmLvl5)
                 }
             }
+
             4 -> {
                 val upgrades = inventory.upgradeLvl5
                 if (cmLvl4 > 0 && upgrades > 0) {
                     gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3, cmLvl4 - 1, cmLvl5 + 1)
                 }
             }
+
             else -> {
                 println("Invalid upgrade level: $upgradeLvl")
             }
@@ -290,24 +327,28 @@ class GameRepository(
                     gameDao.setBotnets(bLvl1 - 1, bLvl2 + 1, bLvl3, bLvl4, bLvl5)
                 }
             }
+
             2 -> {
                 val upgrades = inventory.upgradeLvl3
                 if (bLvl2 > 0 && upgrades > 0) {
                     gameDao.setBotnets(bLvl1, bLvl2 - 1, bLvl3 + 1, bLvl4, bLvl5)
                 }
             }
+
             3 -> {
                 val upgrades = inventory.upgradeLvl4
                 if (bLvl3 > 0 && upgrades > 0) {
                     gameDao.setBotnets(bLvl1, bLvl2, bLvl3 - 1, bLvl4 + 1, bLvl5)
                 }
             }
+
             4 -> {
                 val upgrades = inventory.upgradeLvl5
                 if (bLvl4 > 0 && upgrades > 0) {
                     gameDao.setBotnets(bLvl1, bLvl2, bLvl3, bLvl4 - 1, bLvl5 + 1)
                 }
             }
+
             else -> {
                 println("Invalid upgrade level: $upgradeLvl")
             }
@@ -388,8 +429,13 @@ class GameRepository(
         }
 
         if (boosts > 0) {
-            //TODO add real boost duration (read out of db)
-            val activeUntil = System.currentTimeMillis() + 100_000
+            val activeUntil = System.currentTimeMillis() +
+                    when (boostId) {
+                        LOW_BOOST_ID -> gameDao.getLowBoosterData().first().duration
+                        MEDIUM_BOOST_ID -> gameDao.getMediumBoosterData().first().duration
+                        HIGH_BOOST_ID -> gameDao.getHighBoosterData().first().duration
+                        else -> 0
+                    }!! * 60 * 1000 // From Min -> ms
             gameDao.updateBoostActivation(boostId, activeUntil)
 
             when (boostId) {
@@ -406,6 +452,29 @@ class GameRepository(
                 }
             }
         }
+    }
+
+    suspend fun isBoostActive(): Boolean {
+        val inventory = inventoryDataFlow.first()
+        if (inventory.activeBoostType > 0) {
+            val now = System.currentTimeMillis()
+            if (inventory.boostActiveUntil <= now) {
+                gameDao.updateBoostActivation(0, 0)
+                return false
+            }
+            return true
+        }
+        return false
+    }
+
+    suspend fun getBoostFactor(): Int {
+        val inventory = inventoryDataFlow.first()
+        return when (inventory.activeBoostType) {
+            LOW_BOOST_ID -> gameDao.getLowBoosterData().first().boostFactor
+            MEDIUM_BOOST_ID -> gameDao.getMediumBoosterData().first().boostFactor
+            HIGH_BOOST_ID -> gameDao.getHighBoosterData().first().boostFactor
+            else -> 1
+        }!!
     }
 
 }
