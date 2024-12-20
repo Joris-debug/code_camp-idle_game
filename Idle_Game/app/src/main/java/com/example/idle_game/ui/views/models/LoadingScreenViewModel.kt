@@ -51,17 +51,6 @@ class LoadingScreenViewModel @Inject constructor(
                     }
                 }
             }
-
-        }
-    }
-
-    fun checkFirstLogin(onLoginSuccess: () -> Unit) {
-        viewModelScope.launch {
-            var isSup = true
-            gameRepository.login({ isSup = false })
-            if (isSup) {
-                onLoginSuccess()
-            }
         }
     }
 }
