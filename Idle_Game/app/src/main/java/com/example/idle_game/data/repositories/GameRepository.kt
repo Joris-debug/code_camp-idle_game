@@ -438,7 +438,7 @@ class GameRepository(
         val inventory = inventoryDataFlow.first()
         if (inventory.activeBoostType > 0) {
             val now = System.currentTimeMillis()
-            if (gameDao.getBoostActiveUntil() <= now) {
+            if (gameDao.getBoostActiveUntil().first() <= now) {
                 gameDao.updateBoostActivation(0, 0)
                 return false
             }

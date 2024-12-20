@@ -41,7 +41,7 @@ interface GameDao {
     suspend fun addNewHacker(amount: Int)
 
     @Query("SELECT boost_active_until FROM inventorydata")
-    suspend fun getBoostActiveUntil(): Long
+    suspend fun getBoostActiveUntil(): Flow<Long>
 
     @Query("""
     UPDATE inventorydata 
