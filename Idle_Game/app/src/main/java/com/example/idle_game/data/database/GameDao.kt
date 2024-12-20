@@ -30,8 +30,15 @@ interface GameDao {
     @Upsert
     suspend fun insertInventory(inventory: InventoryData)
 
-    @Query("UPDATE inventorydata SET bitcoins = :bitcoins")
-    suspend fun updateBitcoins(bitcoins: Int)
+    @Query("UPDATE inventorydata SET bitcoins = bitcoins + :bitcoins")
+    suspend fun addBitcoins(bitcoins: Long)
+
+    @Query("""
+    UPDATE inventorydata
+    SET bitcoins = bitcoins - :bitcoins,
+        issued_bitcoins = issued_bitcoins + bitcoins
+    """)
+    suspend fun issueBitcoins(bitcoins: Long)
 
     @Query("UPDATE inventorydata SET hackers_lvl_1 = hackers_lvl_1 + 1")
     suspend fun addNewHacker()
@@ -114,13 +121,42 @@ interface GameDao {
     @Query("UPDATE inventorydata SET upgrade_lvl_5 = :upgrades")
     suspend fun updateLvl5Upgrades(upgrades: Int)
 
-    @Query("SELECT * FROM scoreboarddata")
+    @Query("SELECT * FROM scoreboarddata ORDER BY score DESC")
     fun getScoreBoard(): Flow<List<ScoreBoardData>>
+
+    @Upsert
+    suspend fun insertScoreBoard(player: ScoreBoardData)
 
     @Query("SELECT * FROM shopdata")
     fun getShop(): Flow<List<ShopData>>
 
+    @Query("SELECT * FROM shopdata WHERE name = 'low passive'")
+    fun getHackerShopData(): Flow<ShopData>
+
+    @Query("SELECT * FROM shopdata WHERE name = 'medium passive'")
+    fun getMinerShopData(): Flow<ShopData>
+
+    @Query("SELECT * FROM shopdata WHERE name = 'high passive'")
+    fun getBotnetShopData(): Flow<ShopData>
+
+    @Query("SELECT * FROM shopdata WHERE name = 'low Boost'")
+    fun getLowBoosterData(): Flow<ShopData>
+
+    @Query("SELECT * FROM shopdata WHERE name = 'medium Boost'")
+    fun getMediumBoosterData(): Flow<ShopData>
+
+    @Query("SELECT * FROM shopdata WHERE name = 'high Boost'")
+    fun getHighBoosterData(): Flow<ShopData>
+
+    @Query("SELECT * FROM shopdata WHERE name = 'upgrade lvl ' || :level")
+    fun getUpgradeData(level: Int): Flow<ShopData>
+
     @Upsert
     suspend fun insertShop(item: ShopData)
 
+    @Query("SELECT last_mining_timestamp FROM InventoryData")
+    suspend fun getLastMiningTimestamp(): Long?
+
+    @Query("UPDATE InventoryData SET last_mining_timestamp = :timeStamp")
+    suspend fun setMiningTimestamp(timeStamp: Long)
 }

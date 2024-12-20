@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -32,7 +33,7 @@ fun LoginView(viewModel: LoginViewModel = hiltViewModel(), onSignUpSuccess: () -
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White),
+            .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -41,25 +42,24 @@ fun LoginView(viewModel: LoginViewModel = hiltViewModel(), onSignUpSuccess: () -
             color = Color.Red
         )
         Text(
-            text = "Bitte Benutzernamen und Passwort eingeben: "
+            text = "Bitte Benutzernamen und Passwort eingeben: ",
+            color = MaterialTheme.colorScheme.onBackground
         )
         OutlinedTextField(
             value = inputUsername,
             onValueChange = { input -> inputUsername = viewModel.checkInput(input, true) },
             singleLine = true,
-//            onValueChange = { inputUsername = it },
             label = { Text("Benutzername") })
 
         OutlinedTextField(
             value = inputPassword,
             singleLine = true,
             onValueChange = { input -> inputPassword = viewModel.checkInput(input, false) },
-//            onValueChange = { inputPassword = it },
             label = { Text("Passwort") })
 
         OutlinedButton(
             onClick = { viewModel.buttonSubmit(inputUsername, inputPassword, { onSignUpSuccess() }) },
-            modifier = Modifier.background(Color.White)
+            modifier = Modifier
         ) { Text("Submit") }
     }
 }

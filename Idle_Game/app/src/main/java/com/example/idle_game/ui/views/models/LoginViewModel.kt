@@ -1,6 +1,5 @@
 package com.example.idle_game.ui.views.models
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.repositories.GameRepository
@@ -15,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val gameRepository: GameRepository,
+    private val gameRepository: GameRepository
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(LoginViewState())
     val viewState: StateFlow<LoginViewState> get() = _viewState
@@ -57,7 +56,7 @@ class LoginViewModel @Inject constructor(
                     })
             }
 
-            gameRepository.login()
+            gameRepository.login({success = false})
             if (success) {
                 onLoginSuccess()
             }

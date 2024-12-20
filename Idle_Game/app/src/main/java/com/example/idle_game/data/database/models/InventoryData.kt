@@ -3,12 +3,14 @@ package com.example.idle_game.data.database.models
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.Instant
 
 @Entity
 data class InventoryData (
     @PrimaryKey(autoGenerate = false)
     val uid: Int = 1,
-    @ColumnInfo(name = "bitcoins") val bitcoins: Int = 0,
+    @ColumnInfo(name = "bitcoins") val bitcoins: Long = 0,
+    @ColumnInfo(name = "issued_bitcoins") val issuedBitcoins: Long = 0,
     @ColumnInfo(name = "hackers_lvl_1") val hackersLvl1: Int = 0,
     @ColumnInfo(name = "hackers_lvl_2") val hackersLvl2: Int = 0,
     @ColumnInfo(name = "hackers_lvl_3") val hackersLvl3: Int = 0,
@@ -32,5 +34,6 @@ data class InventoryData (
     @ColumnInfo(name = "medium_boosts") val mediumBoosts: Int = 0,
     @ColumnInfo(name = "high_boosts") val highBoosts: Int = 0,
     @ColumnInfo(name = "active_boost_type") val activeBoostType: Int = 0, // 1, 2 or 3
-    @ColumnInfo(name = "boost_active_until") val boostActiveUntil: Long = 0
+    @ColumnInfo(name = "boost_active_until") val boostActiveUntil: Long = 0,
+    @ColumnInfo(name = "last_mining_timestamp") val lastMiningTimestamp: Long? = null
 )

@@ -1,15 +1,19 @@
 package com.example.idle_game.data.repositories
 
 import android.content.SharedPreferences
-import android.util.Log
 import com.example.idle_game.api.GameApi
-import com.example.idle_game.api.models.SignInRequest
-import com.example.idle_game.api.models.SignUpRequest
+import com.example.idle_game.api.models.ItemResponse
+import com.example.idle_game.api.models.ScoreResponse
+import com.example.idle_game.api.models.SetScoreRequest
+import com.example.idle_game.api.models.UserCredentialsRequest
 import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
+import com.example.idle_game.data.database.models.ShopData
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
+import java.time.Instant
 
 class GameRepository(
     private val api: GameApi,
@@ -19,6 +23,7 @@ class GameRepository(
     val playerDataFlow = gameDao.getPlayer()
     val inventoryDataFlow = gameDao.getInventory()
     val shopDataFlow = gameDao.getShop()
+    val scoreBoardDataFlow = gameDao.getScoreBoard()
 
     companion object {
         const val LOW_BOOST_ID = 1
@@ -27,9 +32,12 @@ class GameRepository(
     }
 
     suspend fun signUp(username: String, password: String, onFailure: () -> Unit = {}) {
-        val signUpRequest = SignUpRequest(username = username, password = password)
+        val userCredentialsRequest = UserCredentialsRequest(
+            username = username,
+            password = password
+        )
         try {
-            val resp = api.signUp(signUpRequest)
+            val resp = api.signUp(userCredentialsRequest)
             val refreshToken = sharedPreferences.getString("refresh_token", null)
             if (refreshToken != null) {
                 val playerData = PlayerData(
@@ -45,9 +53,12 @@ class GameRepository(
     }
 
     suspend fun signIn(username: String, password: String, onFailure: () -> Unit = {}) {
-        val signInRequest = SignInRequest(username = username, password = password)
+        val userCredentialsRequest = UserCredentialsRequest(
+            username = username,
+            password = password
+        )
         try {
-            val resp = api.signIn(signInRequest)
+            val resp = api.signIn(userCredentialsRequest)
             val refreshToken = sharedPreferences.getString("refresh_token", null)
             if (refreshToken != null) {
                 val playerData = PlayerData(
@@ -71,7 +82,7 @@ class GameRepository(
             if (accessToken != null) {
                 gameDao.updateAccessToken(accessToken)
             }
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             onFailure()
         }
     }
@@ -79,17 +90,104 @@ class GameRepository(
     // Makes a server request and fills the shop-data table
     suspend fun updateShop(onFailure: () -> Unit = {}) {
         val playerData = playerDataFlow.first()
+        var resp: List<ItemResponse> = emptyList()
         try {
             if (playerData.accessToken == null) {
                 throw NullPointerException("accessToken can't be null")
             }
-            val resp = api.getItems(playerData.accessToken)
+            try {
+                resp = api.getItems(playerData.accessToken)
+            } catch (e: HttpException) {
+                if (e.code() == 490) {
+                    // No valid access token
+                    login()
+                    resp = api.getItems(playerData.accessToken)
+                }
+            }
             for (item in resp) {
                 gameDao.insertShop(item.toShopData())
             }
-        } catch (e: HttpException) {
+        } catch (e: Exception) {
             onFailure()
         }
+    }
+
+    // Makes a server request and fills the score-board-data table
+    suspend fun fetchScoreBoard(onFailure: () -> Unit = {}) {
+        val playerData = playerDataFlow.first()
+        var resp: List<ScoreResponse> = emptyList()
+        try {
+            if (playerData.accessToken == null) {
+                throw NullPointerException("accessToken can't be null")
+            }
+            try {
+                resp = api.getScore(playerData.accessToken)
+            } catch (e: HttpException) {
+                if (e.code() == 490) {
+                    // No valid access token
+                    login()
+                    resp = api.getScore(playerData.accessToken)
+                }
+            }
+            for (player in resp) {
+                gameDao.insertScoreBoard(player.toScoreBoardData())
+            }
+        } catch (e: Exception) {
+            onFailure()
+        }
+    }
+
+    // Makes a server request and puts the player score on the board
+    // Call fetchScoreBoard afterwards to have the ScoreBoard updated
+    suspend fun updateScoreBoard(onFailure: () -> Unit = {}) {
+        try {
+            val playerData = playerDataFlow.first()
+            if (playerData.accessToken == null) {
+                throw NullPointerException("accessToken can't be null")
+            }
+
+            val inventoryData = inventoryDataFlow.first()
+            val setScoreRequest = SetScoreRequest(
+                username = playerData.username,
+                score = inventoryData.bitcoins + inventoryData.issuedBitcoins
+            )
+            try {
+                api.postScore(
+                    playerData.accessToken,
+                    setScoreRequest = setScoreRequest
+                )
+            } catch (e: HttpException) {
+                if (e.code() == 490) {
+                    // No valid access token
+                    login()
+                    api.postScore(
+                        playerData.accessToken,
+                        setScoreRequest = setScoreRequest
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            onFailure()
+        }
+    }
+
+    suspend fun getHackerShopData(): ShopData {
+        return gameDao.getHackerShopData().first()
+    }
+
+    suspend fun getMinerShopData(): ShopData {
+        return gameDao.getMinerShopData().first()
+    }
+
+    suspend fun getBotnetShopData(): ShopData {
+        return gameDao.getBotnetShopData().first()
+    }
+
+    suspend fun getUpgradeData(level: Int): ShopData? {
+        if (level < 2 || level > 5) {
+            return null
+        }
+        return gameDao.getUpgradeData(level).first()
     }
 
     // Call this function before accessing the inventory for the first time
@@ -98,8 +196,26 @@ class GameRepository(
     }
 
     // TODO add error handing if no inventory exists (all functions)
-    suspend fun updateBitcoins(bitcoins: Int) {
-        gameDao.updateBitcoins(bitcoins)
+    suspend fun addBitcoins(bitcoins: Long) {
+        if (bitcoins <= 0) {
+            return
+        }
+        gameDao.addBitcoins(bitcoins)
+    }
+
+    suspend fun issueBitcoins(bitcoins: Long) {
+        if (inventoryDataFlow.first().bitcoins < bitcoins) {
+            return
+        }
+        gameDao.issueBitcoins(bitcoins)
+    }
+
+    suspend fun getLastMiningTimestamp(): Instant? {
+        return gameDao.getLastMiningTimestamp()?.let { Instant.ofEpochMilli(it) }
+    }
+
+    suspend fun setMiningTimestamp(timestamp: Instant) {
+        gameDao.setMiningTimestamp(timestamp.toEpochMilli())
     }
 
     // Adds a new lvl 1 hacker to the inventory
@@ -313,8 +429,13 @@ class GameRepository(
         }
 
         if (boosts > 0) {
-            //TODO add real boost duration (read out of db)
-            val activeUntil = System.currentTimeMillis() + 100_000
+            val activeUntil = System.currentTimeMillis() +
+                    when (boostId) {
+                        LOW_BOOST_ID -> gameDao.getLowBoosterData().first().duration
+                        MEDIUM_BOOST_ID -> gameDao.getMediumBoosterData().first().duration
+                        HIGH_BOOST_ID -> gameDao.getHighBoosterData().first().duration
+                        else -> 0
+                    }!! * 60 * 1000 // From Min -> ms
             gameDao.updateBoostActivation(boostId, activeUntil)
 
             when (boostId) {
@@ -331,6 +452,29 @@ class GameRepository(
                 }
             }
         }
+    }
+
+    suspend fun isBoostActive(): Boolean {
+        val inventory = inventoryDataFlow.first()
+        if (inventory.activeBoostType > 0) {
+            val now = System.currentTimeMillis()
+            if (inventory.boostActiveUntil <= now) {
+                gameDao.updateBoostActivation(0, 0)
+                return false
+            }
+            return true
+        }
+        return false
+    }
+
+    suspend fun getBoostFactor(): Int {
+        val inventory = inventoryDataFlow.first()
+        return when (inventory.activeBoostType) {
+            LOW_BOOST_ID -> gameDao.getLowBoosterData().first().boostFactor
+            MEDIUM_BOOST_ID -> gameDao.getMediumBoosterData().first().boostFactor
+            HIGH_BOOST_ID -> gameDao.getHighBoosterData().first().boostFactor
+            else -> 1
+        }!!
     }
 
 }

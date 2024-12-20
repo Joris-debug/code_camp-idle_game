@@ -1,7 +1,6 @@
 package com.example.idle_game.ui.views.models
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.repositories.GameRepository
@@ -16,13 +15,18 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class LoadingSceenViewModel @Inject constructor(
+class LoadingScreenViewModel @Inject constructor(
     private val gameRepository: GameRepository,
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(LoadingScreenViewState())
     val viewState: StateFlow<LoadingScreenViewState> get() = _viewState
 
-    fun init(onLoginSuccess: () -> Unit, onLoginFailure: () -> Unit, context: Context, onWifiOK: () -> Unit) {
+    fun init(
+        onLoginSuccess: () -> Unit,
+        onLoginFailure: () -> Unit,
+        context: Context,
+        onWifiOK: () -> Unit
+    ) {
         var wifiOk = false
         viewModelScope.launch {
             while (!wifiOk) {
@@ -39,18 +43,25 @@ class LoadingSceenViewModel @Inject constructor(
                     )
                     onWifiOK()
                     var boolLoginFailed = false
-                    Log.d("DEBUG", "Vor Login")
                     gameRepository.login { boolLoginFailed = true }
-                    Log.d("DEBUG", "Nach Login: $boolLoginFailed")
-                    if(boolLoginFailed) {
+                    if (boolLoginFailed) {
                         onLoginFailure()
-
                     } else {
                         onLoginSuccess()
                     }
                 }
             }
 
+        }
+    }
+
+    fun checkFirstLogin(onLoginSuccess: () -> Unit) {
+        viewModelScope.launch {
+            var isSup = true
+            gameRepository.login({ isSup = false })
+            if (isSup) {
+                onLoginSuccess()
+            }
         }
     }
 }
