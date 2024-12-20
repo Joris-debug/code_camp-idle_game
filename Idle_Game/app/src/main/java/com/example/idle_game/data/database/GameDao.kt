@@ -37,8 +37,11 @@ interface GameDao {
     """)
     suspend fun issueBitcoins(bitcoins: Long)
 
-    @Query("UPDATE inventorydata SET hackers_lvl_1 = hackers_lvl_1 + 1")
-    suspend fun addNewHacker()
+    @Query("UPDATE inventorydata SET hackers_lvl_1 = hackers_lvl_1 + :amount")
+    suspend fun addNewHacker(amount: Int)
+
+    @Query("SELECT boost_active_until FROM inventorydata")
+    fun getBoostActiveUntil(): Flow<Long>
 
     @Query("""
     UPDATE inventorydata 
@@ -56,8 +59,8 @@ interface GameDao {
         hackersLvL5: Int
     )
 
-    @Query("UPDATE inventorydata SET crypto_miners_lvl_1 = crypto_miners_lvl_1 + 1")
-    suspend fun addNewCryptoMiner()
+    @Query("UPDATE inventorydata SET crypto_miners_lvl_1 = crypto_miners_lvl_1 + :amount")
+    suspend fun addNewCryptoMiner(amount: Int)
 
     @Query("""
     UPDATE inventorydata 
@@ -75,8 +78,8 @@ interface GameDao {
         cryptoMinersLvL5: Int
     )
 
-    @Query("UPDATE inventorydata SET botnets_lvl_1 = botnets_lvl_1 + 1")
-    suspend fun addNewBotnet()
+    @Query("UPDATE inventorydata SET botnets_lvl_1 = botnets_lvl_1 + :amount")
+    suspend fun addNewBotnet(amount: Int)
 
     @Query("""
     UPDATE inventorydata 
