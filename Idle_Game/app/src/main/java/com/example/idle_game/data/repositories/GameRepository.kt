@@ -2,6 +2,9 @@ package com.example.idle_game.data.repositories
 
 import android.content.SharedPreferences
 import com.example.idle_game.api.GameApi
+import com.example.idle_game.api.models.ItemResponse
+import com.example.idle_game.api.models.ScoreResponse
+import com.example.idle_game.api.models.ServerResponse
 import com.example.idle_game.api.models.SetScoreRequest
 import com.example.idle_game.api.models.UserCredentialsRequest
 import com.example.idle_game.data.database.GameDao
@@ -38,7 +41,6 @@ class GameRepository(
             if (refreshToken != null) {
                 val playerData = PlayerData(
                     username = username,
-                    password = password,
                     refreshToken = refreshToken,
                     accessToken = null
                 )
@@ -49,19 +51,17 @@ class GameRepository(
         }
     }
 
-    suspend fun signIn(onFailure: () -> Unit = {}) {
-        var playerData = playerDataFlow.first()
+    suspend fun signIn(username: String, password: String, onFailure: () -> Unit = {}) {
         val userCredentialsRequest = UserCredentialsRequest(
-            username = playerData.username,
-            password = playerData.password
+            username = username,
+            password = password
         )
         try {
             val resp = api.signIn(userCredentialsRequest)
             val refreshToken = sharedPreferences.getString("refresh_token", null)
             if (refreshToken != null) {
-                playerData = PlayerData(
-                    username = playerData.username,
-                    password = playerData.password,
+                val playerData = PlayerData(
+                    username = username,
                     refreshToken = refreshToken,
                     accessToken = null
                 )
@@ -76,13 +76,12 @@ class GameRepository(
     suspend fun login(onFailure: () -> Unit = {}) {
         val playerData = playerDataFlow.first()
         try {
-
             val resp = api.login(playerData.refreshToken)
             val accessToken = sharedPreferences.getString("access_token", null)
             if (accessToken != null) {
                 gameDao.updateAccessToken(accessToken)
             }
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             onFailure()
         }
     }
@@ -90,15 +89,24 @@ class GameRepository(
     // Makes a server request and fills the shop-data table
     suspend fun updateShop(onFailure: () -> Unit = {}) {
         val playerData = playerDataFlow.first()
+        var resp: List<ItemResponse> = emptyList()
         try {
             if (playerData.accessToken == null) {
                 throw NullPointerException("accessToken can't be null")
             }
-            val resp = api.getItems(playerData.accessToken)
+            try {
+                resp = api.getItems(playerData.accessToken)
+            } catch (e: HttpException) {
+                if (e.code() == 490) {
+                    // No valid access token
+                    login()
+                    resp = api.getItems(playerData.accessToken)
+                }
+            }
             for (item in resp) {
                 gameDao.insertShop(item.toShopData())
             }
-        } catch (e: HttpException) {
+        } catch (e: Exception) {
             onFailure()
         }
     }
@@ -106,15 +114,24 @@ class GameRepository(
     // Makes a server request and fills the score-board-data table
     suspend fun fetchScoreBoard(onFailure: () -> Unit = {}) {
         val playerData = playerDataFlow.first()
+        var resp: List<ScoreResponse> = emptyList()
         try {
             if (playerData.accessToken == null) {
                 throw NullPointerException("accessToken can't be null")
             }
-            val resp = api.getScore(playerData.accessToken)
+            try {
+                resp = api.getScore(playerData.accessToken)
+            } catch (e: HttpException) {
+                if (e.code() == 490) {
+                    // No valid access token
+                    login()
+                    resp = api.getScore(playerData.accessToken)
+                }
+            }
             for (player in resp) {
                 gameDao.insertScoreBoard(player.toScoreBoardData())
             }
-        } catch (e: HttpException) {
+        } catch (e: Exception) {
             onFailure()
         }
     }
@@ -131,14 +148,24 @@ class GameRepository(
             val inventoryData = inventoryDataFlow.first()
             val setScoreRequest = SetScoreRequest(
                 username = playerData.username,
-                inventoryData.bitcoins
+                score = inventoryData.bitcoins + inventoryData.issuedBitcoins
             )
-
-            val resp = api.postScore(
-                playerData.accessToken,
-                setScoreRequest = setScoreRequest
-            )
-        } catch (e: HttpException) {
+            try {
+                api.postScore(
+                    playerData.accessToken,
+                    setScoreRequest = setScoreRequest
+                )
+            } catch (e: HttpException) {
+                if (e.code() == 490) {
+                    // No valid access token
+                    login()
+                    api.postScore(
+                        playerData.accessToken,
+                        setScoreRequest = setScoreRequest
+                    )
+                }
+            }
+        } catch (e: Exception) {
             onFailure()
         }
     }
@@ -149,8 +176,18 @@ class GameRepository(
     }
 
     // TODO add error handing if no inventory exists (all functions)
-    suspend fun updateBitcoins(bitcoins: Long) {
-        gameDao.updateBitcoins(bitcoins)
+    suspend fun addBitcoins(bitcoins: Long) {
+        if (bitcoins <= 0) {
+            return
+        }
+        gameDao.addBitcoins(bitcoins)
+    }
+
+    suspend fun issueBitcoins(bitcoins: Long) {
+        if (inventoryDataFlow.first().bitcoins < bitcoins) {
+            return
+        }
+        gameDao.issueBitcoins(bitcoins)
     }
 
     // Adds a new lvl 1 hacker to the inventory
