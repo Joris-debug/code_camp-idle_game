@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
@@ -26,11 +27,13 @@ class StartViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow(StartViewState())
     val viewState: StateFlow<StartViewState> get() = _viewState
+    val inventoryFlow = gameRepository.inventoryDataFlow;
 
-    private suspend fun getPassiveCoinsPerSecond(inventory: InventoryData): Long {
-        val hacker = gameRepository.getHackerData()
-        val miner = gameRepository.getMinerData()
-        val botnet = gameRepository.getBotnetData()
+    private suspend fun getPassiveCoinsPerSecond(): Long {
+        val inventory = inventoryFlow.first();
+        val hacker = gameRepository.getHackerShopData()
+        val miner = gameRepository.getMinerShopData()
+        val botnet = gameRepository.getBotnetShopData()
         val multUpgrade2 = gameRepository.getUpgradeData(2)!!.multiplier!!
         val multUpgrade3 = gameRepository.getUpgradeData(3)!!.multiplier!!
         val multUpgrade4 = gameRepository.getUpgradeData(4)!!.multiplier!!
@@ -57,8 +60,9 @@ class StartViewModel @Inject constructor(
         return passiveCoinsPerSec
     }
 
-    private fun addCoins(newCoins: Long, inventory: InventoryData) {
+    private fun addCoins(newCoins: Long) {
         viewModelScope.launch {
+            val inventory = inventoryFlow.first()
             _viewState.value = _viewState.value.copy(
                 coins = _viewState.value.coins + newCoins,
                 isLoading = false,
@@ -77,20 +81,17 @@ class StartViewModel @Inject constructor(
             gameRepository.updateShop()
 
             //Calculate earned Coins since last time using the app
-            _viewState.value = _viewState.value.copy(coins = gameRepository.getInventory().bitcoins)
+            _viewState.value = _viewState.value.copy(coins = inventoryFlow.first().bitcoins)
             val lastTimestamp = gameRepository.getLastMiningTimestamp()
             if (lastTimestamp != null) {
                 val duration = Duration.between(lastTimestamp, Instant.now())
-                addCoins(
-                    getPassiveCoinsPerSecond(gameRepository.getInventory()) * duration.seconds,
-                    gameRepository.getInventory()
-                )
+                addCoins(getPassiveCoinsPerSecond() * duration.seconds)
             }
 
             while (true) { //Stops with end of Coroutine Lifecycle
-                val inventory = gameRepository.getInventory()
-                val newCoins = getPassiveCoinsPerSecond(inventory)
-                addCoins(newCoins, inventory)
+                val inventory = inventoryFlow.first()
+                val newCoins = getPassiveCoinsPerSecond()
+                addCoins(newCoins)
                 gameRepository.setMiningTimestamp(Instant.now())
                 delay(1000)
             }
@@ -108,10 +109,10 @@ class StartViewModel @Inject constructor(
             }
             _viewState.value =
                 _viewState.value.copy(
-                    activeBoost = gameRepository.getInventory().activeBoostType,
+                    activeBoost = inventoryFlow.first().activeBoostType,
                     coinsPerSec = _viewState.value.coinsPerSec + clickedCoins
                 )
-            addCoins(clickedCoins, gameRepository.getInventory())
+            addCoins(clickedCoins)
         }
     }
 

@@ -170,28 +170,16 @@ class GameRepository(
         }
     }
 
-    suspend fun getHackerData(): ShopData {
-        return gameDao.getHackerData()
+    suspend fun getHackerShopData(): ShopData {
+        return gameDao.getHackerShopData()
     }
 
-    suspend fun getMinerData(): ShopData {
-        return gameDao.getMinerData()
+    suspend fun getMinerShopData(): ShopData {
+        return gameDao.getMinerShopData()
     }
 
-    suspend fun getBotnetData(): ShopData {
-        return gameDao.getBotnetData()
-    }
-
-    suspend fun getLowBoostData(): ShopData {
-        return gameDao.getLowBoosterData()
-    }
-
-    suspend fun getMediumBoostData(): ShopData {
-        return gameDao.getMediumBoosterData()
-    }
-
-    suspend fun getHighBoostData(): ShopData {
-        return gameDao.getHighBoosterData()
+    suspend fun getBotnetShopData(): ShopData {
+        return gameDao.getBotnetShopData()
     }
 
     suspend fun getUpgradeData(level: Int): ShopData? {
@@ -219,10 +207,6 @@ class GameRepository(
             return
         }
         gameDao.issueBitcoins(bitcoins)
-    }
-
-    suspend fun getInventory(): InventoryData {
-        return inventoryDataFlow.first()
     }
 
     suspend fun getLastMiningTimestamp(): Instant? {
@@ -473,7 +457,7 @@ class GameRepository(
         val inventory = inventoryDataFlow.first()
         if (inventory.activeBoostType > 0) {
             val now = System.currentTimeMillis()
-            if (gameDao.getBoostActiveUntil() <= now) {
+            if (inventory.boostActiveUntil <= now) {
                 gameDao.updateBoostActivation(0, 0)
                 return false
             }

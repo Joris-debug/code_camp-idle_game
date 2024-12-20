@@ -106,9 +106,6 @@ interface GameDao {
     @Query("UPDATE inventorydata SET active_boost_type = :type, boost_active_until = :until")
     suspend fun updateBoostActivation(type: Int, until: Long)
 
-    @Query("SELECT boost_active_until FROM inventorydata")
-    suspend fun getBoostActiveUntil(): Long
-
     @Query("UPDATE inventorydata SET upgrade_lvl_2 = :upgrades")
     suspend fun updateLvl2Upgrades(upgrades: Int)
 
@@ -131,13 +128,13 @@ interface GameDao {
     fun getShop(): Flow<List<ShopData>>
 
     @Query("SELECT * FROM shopdata WHERE name = 'low passive'")
-    suspend fun getHackerData(): ShopData
+    suspend fun getHackerShopData(): ShopData
 
     @Query("SELECT * FROM shopdata WHERE name = 'medium passive'")
-    suspend fun getMinerData(): ShopData
+    suspend fun getMinerShopData(): ShopData
 
     @Query("SELECT * FROM shopdata WHERE name = 'high passive'")
-    suspend fun getBotnetData(): ShopData
+    suspend fun getBotnetShopData(): ShopData
 
     @Query("SELECT * FROM shopdata WHERE name = 'low Boost'")
     suspend fun getLowBoosterData(): ShopData
