@@ -159,8 +159,7 @@ class StartViewModel @Inject constructor(
                 }
 
                 3 -> {
-                    gameRepository.addHighBoost()
-                    gameRepository.activateHighBoost()
+                    gameRepository.DEBUG_ABMELDEN()
                 }
             }
         }

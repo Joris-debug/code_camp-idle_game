@@ -17,6 +17,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.test.espresso.util.filter
 import com.example.idle_game.ui.views.models.LoginViewModel
@@ -39,7 +41,8 @@ fun LoginView(viewModel: LoginViewModel = hiltViewModel(), onSignUpSuccess: () -
     ) {
         Text(
             text = viewState.value.errorMessage,
-            color = Color.Red
+            color = MaterialTheme.colorScheme.error,
+            textAlign = TextAlign.Center
         )
         Text(
             text = "Bitte Benutzernamen und Passwort eingeben: ",
@@ -49,6 +52,7 @@ fun LoginView(viewModel: LoginViewModel = hiltViewModel(), onSignUpSuccess: () -
             value = inputUsername,
             onValueChange = { input -> inputUsername = viewModel.checkInput(input, true) },
             singleLine = true,
+
             label = { Text("Benutzername") })
 
         OutlinedTextField(
