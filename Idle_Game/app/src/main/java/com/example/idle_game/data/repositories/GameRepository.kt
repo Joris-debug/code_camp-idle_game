@@ -1,6 +1,7 @@
 package com.example.idle_game.data.repositories
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.api.models.ItemResponse
 import com.example.idle_game.api.models.ScoreResponse
@@ -55,11 +56,9 @@ class GameRepository(
     suspend fun signIn(username: String, password: String, onFailure: () -> Unit = {}) {
         try {
             if (gameDao.getPlayer().first().username != username) {
-                gameDao.updateUsername(username)
                 createNewInventory()
             }
-        } catch (_: Exception) {
-        }
+        } catch (_: Exception) {}
         val userCredentialsRequest = UserCredentialsRequest(
             username = username,
             password = password
@@ -85,8 +84,14 @@ class GameRepository(
         }
     }
 
-    suspend fun DEBUG_ABMELDEN() {
+    //for settings-page
+    suspend fun logout() {
         gameDao.updateRefreshToken("Abmelden")
+        /*
+        * Important:
+        * Warn user: Loggin in with an other account will make him loose all data
+        * Info user: Restart the app to get for login (or force him to do: auto restart app (bad practice) or load LoginView)
+        * */
     }
 
     // Makes a server request and gets a new access_token

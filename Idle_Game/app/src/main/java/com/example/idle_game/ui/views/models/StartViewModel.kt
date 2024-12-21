@@ -158,7 +158,7 @@ class StartViewModel @Inject constructor(
                 }
 
                 3 -> {
-                    gameRepository.DEBUG_ABMELDEN()
+                    gameRepository.logout()
                 }
             }
         }

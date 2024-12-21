@@ -18,9 +18,6 @@ interface GameDao {
     @Upsert
     suspend fun insertPlayer(player: PlayerData)
 
-    @Query("UPDATE playerdata SET username = :username")
-    suspend fun updateUsername(username: String)
-
     @Query("UPDATE playerdata SET refresh_token = :refreshToken")
     suspend fun updateRefreshToken(refreshToken: String)
 
