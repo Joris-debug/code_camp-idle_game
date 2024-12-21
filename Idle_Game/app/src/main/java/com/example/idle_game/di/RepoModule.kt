@@ -2,11 +2,7 @@ package com.example.idle_game.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.idle_game.api.CookieInterceptor
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.data.database.GameDatabase

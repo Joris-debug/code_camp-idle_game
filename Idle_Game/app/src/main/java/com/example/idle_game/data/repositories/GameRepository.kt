@@ -1,7 +1,6 @@
 package com.example.idle_game.data.repositories
 
 import android.content.SharedPreferences
-import android.util.Log
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.api.models.ItemResponse
 import com.example.idle_game.api.models.ScoreResponse
@@ -11,7 +10,6 @@ import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
 import com.example.idle_game.data.database.models.ShopData
-import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 import java.time.Instant
