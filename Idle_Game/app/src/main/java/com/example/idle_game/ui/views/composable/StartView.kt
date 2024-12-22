@@ -39,7 +39,7 @@ fun StartView(
         }
         Text(text = "Bitcoins per Second: ${viewState.value.coinsPerSec}")
         Button(onClick = { viewModel.coinClick() }) {
-            Text("Klick for Bitcoins")
+            Text("Click for Bitcoins")
         }
 
         /*   Debug code start ------------------------------------------------------------------------------------------------*/

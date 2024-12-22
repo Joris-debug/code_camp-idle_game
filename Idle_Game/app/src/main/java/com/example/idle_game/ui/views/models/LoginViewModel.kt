@@ -18,21 +18,25 @@ class LoginViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(LoginViewState())
     val viewState: StateFlow<LoginViewState> get() = _viewState
 
-    fun checkInput(input: String, username: Boolean): String {
-        val allowedCharsName: String =
+    companion object {
+        const val ALLOWED_CHARS_NAME =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-        val allowedCharsPassword: String =
+        const val ALLOWED_CHARS_PASSWORD =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,+-_/&!?"
+        const val MAX_INPUT_LENGTH = 20
+    }
+
+    fun checkInput(input: String, username: Boolean): String {
         var errorString = ""
         var correctedString = input
 
-        if (input.length > 20) {
-            correctedString = input.substring(0, 20)
-            errorString = "Maximal 20 Zeichen!"
+        if (input.length > MAX_INPUT_LENGTH) {
+            correctedString = input.substring(0, MAX_INPUT_LENGTH)
+            errorString = "Maximal $MAX_INPUT_LENGTH Zeichen!"
         }
 
         if (username) {
-            if (input.any { it !in allowedCharsName }) {
+            if (input.any { it !in ALLOWED_CHARS_NAME }) {
                 if (errorString.isNotEmpty()) {
                     errorString += "\n"
                 }
@@ -42,10 +46,10 @@ class LoginViewModel @Inject constructor(
                 _viewState.value =
                     _viewState.value.copy(errorMessage = errorString)
             }
-            correctedString = correctedString.filter { it in allowedCharsName }
+            correctedString = correctedString.filter { it in ALLOWED_CHARS_NAME }
             return correctedString
         }
-        if (input.any { it !in allowedCharsPassword }) {
+        if (input.any { it !in ALLOWED_CHARS_PASSWORD }) {
             if (errorString.isNotEmpty()) {
                 errorString += "\n"
             }
@@ -55,7 +59,7 @@ class LoginViewModel @Inject constructor(
             _viewState.value =
                 _viewState.value.copy(errorMessage = errorString)
         }
-        correctedString = correctedString.filter { it in allowedCharsPassword }
+        correctedString = correctedString.filter { it in ALLOWED_CHARS_PASSWORD }
         return correctedString
     }
 
@@ -72,8 +76,11 @@ class LoginViewModel @Inject constructor(
                         username,
                         password,
                         {
-                            success = false; _viewState.value =
-                            _viewState.value.copy(errorMessage = "Benutzername bereits vergeben oder Passwort ungültig")
+                            success = false
+                            _viewState.value =
+                                _viewState.value.copy(
+                                    errorMessage = "Benutzername bereits vergeben oder Passwort ungültig"
+                                )
                         })
                 }
 

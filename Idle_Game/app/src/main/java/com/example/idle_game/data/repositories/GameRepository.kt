@@ -81,12 +81,12 @@ class GameRepository(
         }
     }
 
-    //for settings-page
+    // Called on the settings-page
     suspend fun logout() {
-        gameDao.updateRefreshToken("Abmelden")
+        gameDao.updateRefreshToken("") // Default value for the refresh token
         /*
         * Important:
-        * Warn user: Loggin in with an other account will make him loose all data
+        * Warn user: Login in with an other account will make him loose all data
         * Info user: Restart the app to get for login (or force him to do: auto restart app (bad practice) or load LoginView)
         * */
     }
