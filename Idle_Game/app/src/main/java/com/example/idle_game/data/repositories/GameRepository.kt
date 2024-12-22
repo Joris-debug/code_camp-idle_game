@@ -53,7 +53,7 @@ class GameRepository(
     }
 
     suspend fun signIn(username: String, password: String, onFailure: () -> Unit = {}) {
-        if (gameDao.getPlayersCount() != 0) { // DataBase already has an entry for an player
+        if (gameDao.getPlayersCount() != 0) { // Check for existing db entry
             if (gameDao.getPlayer().first().username != username) {
                 createNewInventory()
             }

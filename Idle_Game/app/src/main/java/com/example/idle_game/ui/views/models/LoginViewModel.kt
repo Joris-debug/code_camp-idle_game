@@ -33,6 +33,11 @@ class LoginViewModel @Inject constructor(
         if (input.length > MAX_INPUT_LENGTH) {
             correctedString = input.substring(0, MAX_INPUT_LENGTH)
             errorString = "Maximal $MAX_INPUT_LENGTH Zeichen!"
+        } else if(input.length < MAX_INPUT_LENGTH) {
+            if(_viewState.value.errorMessage.startsWith("Maximal $MAX_INPUT_LENGTH Zeichen!")) {
+                _viewState.value =
+                    _viewState.value.copy(errorMessage = "")
+            }
         }
 
         if (username) {
@@ -81,7 +86,8 @@ class LoginViewModel @Inject constructor(
                                 _viewState.value.copy(
                                     errorMessage = "Benutzername bereits vergeben oder Passwort ungültig"
                                 )
-                        })
+                        }
+                    )
                 }
 
                 gameRepository.login({ success = false })
