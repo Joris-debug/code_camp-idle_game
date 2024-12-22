@@ -18,6 +18,9 @@ interface GameDao {
     @Upsert
     suspend fun insertPlayer(player: PlayerData)
 
+    @Query("SELECT COUNT(*) FROM playerdata")
+    suspend fun getPlayersCount(): Int
+
     @Query("UPDATE playerdata SET refresh_token = :refreshToken")
     suspend fun updateRefreshToken(refreshToken: String)
 
@@ -26,6 +29,9 @@ interface GameDao {
 
     @Query("SELECT * FROM inventorydata WHERE uid = 1")
     fun getInventory(): Flow<InventoryData>
+
+    @Query("SELECT COUNT(*) FROM inventorydata")
+    suspend fun getInventoriesCount(): Int
 
     @Upsert
     suspend fun insertInventory(inventory: InventoryData)

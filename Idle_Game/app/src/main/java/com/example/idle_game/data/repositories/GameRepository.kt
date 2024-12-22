@@ -1,7 +1,6 @@
 package com.example.idle_game.data.repositories
 
 import android.content.SharedPreferences
-import android.util.Log
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.api.models.ItemResponse
 import com.example.idle_game.api.models.ScoreResponse
@@ -54,11 +53,11 @@ class GameRepository(
     }
 
     suspend fun signIn(username: String, password: String, onFailure: () -> Unit = {}) {
-        try {
+        if (gameDao.getPlayersCount() != 0) { // DataBase already has an entry for an player
             if (gameDao.getPlayer().first().username != username) {
                 createNewInventory()
             }
-        } catch (_: Exception) {}
+        }
         val userCredentialsRequest = UserCredentialsRequest(
             username = username,
             password = password
@@ -73,9 +72,7 @@ class GameRepository(
                     accessToken = null
                 )
                 gameDao.insertPlayer(playerData)
-                try {
-                    inventoryDataFlow.first().bitcoins //Try to get Data out of existing? db
-                } catch (e: Exception) {
+                if (gameDao.getInventoriesCount() == 0) {
                     createNewInventory()
                 }
             }
