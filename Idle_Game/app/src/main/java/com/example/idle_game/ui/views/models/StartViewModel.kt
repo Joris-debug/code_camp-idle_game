@@ -14,8 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.time.Duration
-import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -31,7 +29,7 @@ class StartViewModel @Inject constructor(
     private suspend fun getPassiveCoinsPerSecond(): Long {
         val inventory = inventoryFlow.first();
         val hacker = gameRepository.getHackerShopData()
-        val miner = gameRepository.getMinerShopData()
+        val miner = gameRepository.getCryptoMinerShopData()
         val botnet = gameRepository.getBotnetShopData()
         val multUpgrade2 = gameRepository.getUpgradeData(2)!!.multiplier!!
         val multUpgrade3 = gameRepository.getUpgradeData(3)!!.multiplier!!
@@ -96,7 +94,6 @@ class StartViewModel @Inject constructor(
             }
         }
     }
-
 
     fun coinClick() {
         viewModelScope.launch {

@@ -210,7 +210,7 @@ class GameRepository(
         return gameDao.getHackerShopData().first()
     }
 
-    suspend fun getMinerShopData(): ShopData {
+    suspend fun getCryptoMinerShopData(): ShopData {
         return gameDao.getCryptoMinerShopData().first()
     }
 

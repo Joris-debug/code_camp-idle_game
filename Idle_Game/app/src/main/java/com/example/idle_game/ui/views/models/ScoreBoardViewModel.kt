@@ -13,7 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ScoreBoardViewModel @Inject constructor(
     private val gameRepository: GameRepository,
-): ViewModel() {
+) : ViewModel() {
 
     private val _uiStateFlow = MutableStateFlow(ScoreBoardViewState())
     val uiStateFlow: StateFlow<ScoreBoardViewState> = _uiStateFlow
