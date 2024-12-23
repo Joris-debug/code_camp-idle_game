@@ -12,7 +12,6 @@ import com.example.idle_game.data.database.models.PlayerData
 import com.example.idle_game.data.database.models.ShopData
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
-import java.time.Instant
 
 class GameRepository(
     private val api: GameApi,
@@ -86,9 +85,9 @@ class GameRepository(
         gameDao.updateRefreshToken("") // Default value for the refresh token
         /*
         * Important:
-        * Warn user: Login in with an other account will make him loose all data
-        * Info user: Restart the app to get for login (or force him to do: auto restart app (bad practice) or load LoginView)
-        * */
+        * Warn user: Login in with an other account will make him lose all data
+        * Info user: Restart the app to return to login page (or force him to do: auto restart app (bad practice) or load LoginView)
+        */
     }
 
     // Makes a server request and gets a new access_token
@@ -155,8 +154,8 @@ class GameRepository(
         }
     }
 
-    // Makes a server request and puts the player score on the board
-    // Call fetchScoreBoard afterwards to have the ScoreBoard updated
+    // Makes a server request and puts the player score on the board,
+    // call fetchScoreBoard afterwards to have the ScoreBoard updated
     suspend fun updateScoreBoard(onFailure: () -> Unit = {}) {
         try {
             val playerData = playerDataFlow.first()
@@ -194,7 +193,7 @@ class GameRepository(
     }
 
     suspend fun getMinerShopData(): ShopData {
-        return gameDao.getMinerShopData().first()
+        return gameDao.getCryptoMinerShopData().first()
     }
 
     suspend fun getBotnetShopData(): ShopData {
@@ -209,11 +208,10 @@ class GameRepository(
     }
 
     // Call this function before accessing the inventory for the first time
-    suspend fun createNewInventory() {
+    private suspend fun createNewInventory() {
         gameDao.insertInventory(InventoryData())
     }
 
-    // TODO add error handing if no inventory exists (all functions)
     suspend fun addBitcoins(bitcoins: Long) {
         if (bitcoins <= 0) {
             return
@@ -228,12 +226,8 @@ class GameRepository(
         gameDao.issueBitcoins(bitcoins)
     }
 
-    suspend fun getLastMiningTimestamp(): Instant? {
-        return gameDao.getLastMiningTimestamp()?.let { Instant.ofEpochMilli(it) }
-    }
-
-    suspend fun setMiningTimestamp(timestamp: Instant) {
-        gameDao.setMiningTimestamp(timestamp.toEpochMilli())
+    suspend fun setMiningTimestamp(timestamp: Long) {
+        gameDao.setMiningTimestamp(timestamp)
     }
 
     // Adds a new lvl 1 hacker to the inventory
@@ -449,9 +443,9 @@ class GameRepository(
         if (boosts > 0) {
             val activeUntil = System.currentTimeMillis() +
                     when (boostId) {
-                        LOW_BOOST_ID -> gameDao.getLowBoosterData().first().duration
-                        MEDIUM_BOOST_ID -> gameDao.getMediumBoosterData().first().duration
-                        HIGH_BOOST_ID -> gameDao.getHighBoosterData().first().duration
+                        LOW_BOOST_ID -> gameDao.getLowBoostData().first().duration
+                        MEDIUM_BOOST_ID -> gameDao.getMediumBoostData().first().duration
+                        HIGH_BOOST_ID -> gameDao.getHighBoostData().first().duration
                         else -> 0
                     }!! * 60 * 1000 // From Min -> ms
             gameDao.updateBoostActivation(boostId, activeUntil)
@@ -488,9 +482,9 @@ class GameRepository(
     suspend fun getBoostFactor(): Int {
         val inventory = inventoryDataFlow.first()
         return when (inventory.activeBoostType) {
-            LOW_BOOST_ID -> gameDao.getLowBoosterData().first().boostFactor
-            MEDIUM_BOOST_ID -> gameDao.getMediumBoosterData().first().boostFactor
-            HIGH_BOOST_ID -> gameDao.getHighBoosterData().first().boostFactor
+            LOW_BOOST_ID -> gameDao.getLowBoostData().first().boostFactor
+            MEDIUM_BOOST_ID -> gameDao.getMediumBoostData().first().boostFactor
+            HIGH_BOOST_ID -> gameDao.getHighBoostData().first().boostFactor
             else -> 1
         }!!
     }

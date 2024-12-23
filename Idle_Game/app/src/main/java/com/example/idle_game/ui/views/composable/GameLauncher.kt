@@ -10,7 +10,6 @@ import com.example.idle_game.ui.navigation.NavigationGraph
 
 @Composable
 fun Idle_GameLauncher(navController: NavHostController) {
-    // Zeige das Spiel mit BottomBar und der Navigation an
     Scaffold(
         bottomBar = { BottomBar(navController) }
     ) { innerPadding ->

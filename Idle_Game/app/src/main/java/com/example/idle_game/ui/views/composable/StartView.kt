@@ -50,7 +50,6 @@ fun StartView(
         Button(onClick = {viewModel.addBooster(2)}) { Text("Add new Booster lvl 2") }
         Button(onClick = {viewModel.addBooster(3)}) { Text("Abmelden") }
         /*   Debug code end   ------------------------------------------------------------------------------------------------*/
-
     }
 
 }
