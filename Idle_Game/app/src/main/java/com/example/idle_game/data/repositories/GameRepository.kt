@@ -10,7 +10,6 @@ import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
 import com.example.idle_game.data.database.models.ShopData
-import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 import java.time.Instant
@@ -46,6 +45,7 @@ class GameRepository(
                     accessToken = null
                 )
                 gameDao.insertPlayer(playerData)
+                createNewInventory()
             }
         } catch (e: HttpException) {
             onFailure()
@@ -53,6 +53,11 @@ class GameRepository(
     }
 
     suspend fun signIn(username: String, password: String, onFailure: () -> Unit = {}) {
+        if (gameDao.getPlayersCount() != 0) { // Check for existing db entry
+            if (gameDao.getPlayer().first().username != username) {
+                createNewInventory()
+            }
+        }
         val userCredentialsRequest = UserCredentialsRequest(
             username = username,
             password = password
@@ -67,10 +72,23 @@ class GameRepository(
                     accessToken = null
                 )
                 gameDao.insertPlayer(playerData)
+                if (gameDao.getInventoriesCount() == 0) {
+                    createNewInventory()
+                }
             }
         } catch (e: HttpException) {
             onFailure()
         }
+    }
+
+    // Called on the settings-page
+    suspend fun logout() {
+        gameDao.updateRefreshToken("") // Default value for the refresh token
+        /*
+        * Important:
+        * Warn user: Login in with an other account will make him loose all data
+        * Info user: Restart the app to get for login (or force him to do: auto restart app (bad practice) or load LoginView)
+        * */
     }
 
     // Makes a server request and gets a new access_token

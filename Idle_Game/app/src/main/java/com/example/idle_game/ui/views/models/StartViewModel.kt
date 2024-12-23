@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.repositories.GameRepository
 import com.example.idle_game.data.workers.NotWorker
 import com.example.idle_game.ui.views.states.StartViewState
@@ -159,8 +158,7 @@ class StartViewModel @Inject constructor(
                 }
 
                 3 -> {
-                    gameRepository.addHighBoost()
-                    gameRepository.activateHighBoost()
+                    gameRepository.logout()
                 }
             }
         }
