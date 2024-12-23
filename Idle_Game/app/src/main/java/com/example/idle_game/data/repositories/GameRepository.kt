@@ -9,7 +9,9 @@ import com.example.idle_game.api.models.UserCredentialsRequest
 import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
+import com.example.idle_game.data.database.models.ScoreBoardData
 import com.example.idle_game.data.database.models.ShopData
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 
@@ -18,15 +20,31 @@ class GameRepository(
     private val gameDao: GameDao,
     private val sharedPreferences: SharedPreferences
 ) {
-    val playerDataFlow = gameDao.getPlayer()
-    val inventoryDataFlow = gameDao.getInventory()
-    val shopDataFlow = gameDao.getShop()
-    val scoreBoardDataFlow = gameDao.getScoreBoard()
+    private val playerDataFlow = gameDao.getPlayer()
+    private val inventoryDataFlow = gameDao.getInventory()
+    private val shopDataFlow = gameDao.getShop()
+    private val scoreBoardDataFlow = gameDao.getScoreBoard()
 
     companion object {
         const val LOW_BOOST_ID = 1
         const val MEDIUM_BOOST_ID = 2
         const val HIGH_BOOST_ID = 3
+    }
+
+    fun getPlayerDataFlow(): Flow<PlayerData> {
+        return playerDataFlow
+    }
+
+    fun getInventoryDataFlow(): Flow<InventoryData> {
+        return inventoryDataFlow
+    }
+
+    fun getShopDataFlow(): Flow<List<ShopData>> {
+        return shopDataFlow
+    }
+
+    fun getScoreBoardDataFlow(): Flow<List<ScoreBoardData>> {
+        return scoreBoardDataFlow
     }
 
     suspend fun signUp(username: String, password: String, onFailure: () -> Unit = {}) {

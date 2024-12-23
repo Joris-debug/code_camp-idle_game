@@ -26,7 +26,7 @@ class StartViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow(StartViewState())
     val viewState: StateFlow<StartViewState> get() = _viewState
-    private val inventoryFlow = gameRepository.inventoryDataFlow;
+    private val inventoryFlow = gameRepository.getInventoryDataFlow()
 
     private suspend fun getPassiveCoinsPerSecond(): Long {
         val inventory = inventoryFlow.first();
