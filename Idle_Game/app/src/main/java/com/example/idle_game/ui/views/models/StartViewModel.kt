@@ -14,8 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.time.Duration
-import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -26,12 +24,12 @@ class StartViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow(StartViewState())
     val viewState: StateFlow<StartViewState> get() = _viewState
-    val inventoryFlow = gameRepository.inventoryDataFlow;
+    private val inventoryFlow = gameRepository.getInventoryDataFlow()
 
     private suspend fun getPassiveCoinsPerSecond(): Long {
         val inventory = inventoryFlow.first();
         val hacker = gameRepository.getHackerShopData()
-        val miner = gameRepository.getMinerShopData()
+        val miner = gameRepository.getCryptoMinerShopData()
         val botnet = gameRepository.getBotnetShopData()
         val multUpgrade2 = gameRepository.getUpgradeData(2)!!.multiplier!!
         val multUpgrade3 = gameRepository.getUpgradeData(3)!!.multiplier!!
@@ -61,14 +59,14 @@ class StartViewModel @Inject constructor(
 
     private fun addCoins(newCoins: Long) {
         viewModelScope.launch {
-            val inventory = inventoryFlow.first()
+            val inv = inventoryFlow.first()
             _viewState.value = _viewState.value.copy(
                 coins = _viewState.value.coins + newCoins,
                 isLoading = false,
                 errorMessage = null,
-                hackers = inventory.hackersLvl1 + inventory.hackersLvl2 + inventory.hackersLvl3 + inventory.hackersLvl4 + inventory.hackersLvl5,
-                bots = inventory.botnetsLvl1 + inventory.botnetsLvl2 + inventory.botnetsLvl3 + inventory.botnetsLvl4 + inventory.botnetsLvl5,
-                miners = inventory.cryptoMinersLvl1 + inventory.cryptoMinersLvl2 + inventory.cryptoMinersLvl3 + inventory.cryptoMinersLvl4 + inventory.cryptoMinersLvl5,
+                hackers = inv.hackersLvl1 + inv.hackersLvl2 + inv.hackersLvl3 + inv.hackersLvl4 + inv.hackersLvl5,
+                bots = inv.botnetsLvl1 + inv.botnetsLvl2 + inv.botnetsLvl3 + inv.botnetsLvl4 + inv.botnetsLvl5,
+                miners = inv.cryptoMinersLvl1 + inv.cryptoMinersLvl2 + inv.cryptoMinersLvl3 + inv.cryptoMinersLvl4 + inv.cryptoMinersLvl5,
             )
             gameRepository.addBitcoins(newCoins)
         }
@@ -76,23 +74,23 @@ class StartViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch { //Coroutine for passive income
+        viewModelScope.launch { // Coroutine for passive income
+            val millisPerSec: Long = 1000
             gameRepository.updateShop()
-
-            //Calculate earned Coins since last time using the app
             _viewState.value = _viewState.value.copy(coins = inventoryFlow.first().bitcoins)
-            val lastTimestamp = gameRepository.getLastMiningTimestamp()
-            if (lastTimestamp != null) {
-                val duration = Duration.between(lastTimestamp, Instant.now())
-                addCoins(getPassiveCoinsPerSecond() * duration.seconds)
-            }
 
-            while (true) { //Stops with end of Coroutine Lifecycle
-                val inventory = inventoryFlow.first()
-                val newCoins = getPassiveCoinsPerSecond()
-                addCoins(newCoins)
-                gameRepository.setMiningTimestamp(Instant.now())
-                delay(1000)
+            while (true) { // Stops with end of coroutine lifecycle
+                val lastTimestamp = inventoryFlow.first().lastMiningTimestamp
+                gameRepository.setMiningTimestamp(System.currentTimeMillis())
+                val duration = (System.currentTimeMillis() - lastTimestamp) / millisPerSec
+                // ^ Get the duration in seconds ^
+                /*
+                * Why do I calculate the duration in every iteration?
+                * A: The thread or even the entire app could freeze because of external factors,
+                * which would lead to an incorrect coin count after responding again
+                */
+                addCoins(getPassiveCoinsPerSecond() * duration)
+                delay(millisPerSec)
             }
         }
     }
@@ -123,7 +121,7 @@ class StartViewModel @Inject constructor(
         workManager.enqueue(workRequest)
     }
 
-    //TODO: Remove debug code before merge to main
+    // TODO: Remove debug code before merge to main
 
     /*   Debug code start ------------------------------------------------------------------------------------------------*/
     fun addHacker() {

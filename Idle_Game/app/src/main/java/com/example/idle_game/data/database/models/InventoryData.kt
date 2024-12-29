@@ -35,5 +35,5 @@ data class InventoryData (
     @ColumnInfo(name = "high_boosts") val highBoosts: Int = 0,
     @ColumnInfo(name = "active_boost_type") val activeBoostType: Int = 0, // 1, 2 or 3
     @ColumnInfo(name = "boost_active_until") val boostActiveUntil: Long = 0,
-    @ColumnInfo(name = "last_mining_timestamp") val lastMiningTimestamp: Long? = null
+    @ColumnInfo(name = "last_mining_timestamp") val lastMiningTimestamp: Long = System.currentTimeMillis()
 )
