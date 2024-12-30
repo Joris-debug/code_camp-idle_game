@@ -4,12 +4,12 @@ import android.content.SharedPreferences
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.api.models.ItemResponse
 import com.example.idle_game.api.models.ScoreResponse
-import com.example.idle_game.api.models.ServerResponse
 import com.example.idle_game.api.models.SetScoreRequest
 import com.example.idle_game.api.models.UserCredentialsRequest
 import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
+import com.example.idle_game.data.database.models.ShopData
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 
@@ -44,6 +44,7 @@ class GameRepository(
                     accessToken = null
                 )
                 gameDao.insertPlayer(playerData)
+                createNewInventory()
             }
         } catch (e: HttpException) {
             onFailure()
@@ -51,6 +52,11 @@ class GameRepository(
     }
 
     suspend fun signIn(username: String, password: String, onFailure: () -> Unit = {}) {
+        if (gameDao.getPlayersCount() != 0) { // Check for existing db entry
+            if (gameDao.getPlayer().first().username != username) {
+                createNewInventory()
+            }
+        }
         val userCredentialsRequest = UserCredentialsRequest(
             username = username,
             password = password
@@ -65,10 +71,24 @@ class GameRepository(
                     accessToken = null
                 )
                 gameDao.insertPlayer(playerData)
+                if (gameDao.getInventoriesCount() == 0) {
+                    createNewInventory()
+                }
             }
         } catch (e: HttpException) {
             onFailure()
         }
+    }
+
+
+    // Called on the settings-page
+    suspend fun logout() {
+        gameDao.updateRefreshToken("") // Default value for the refresh token
+        /*
+        * Important:
+        * Warn user: Login in with an other account will make him lose all data
+        * Info user: Restart the app to return to login page (or force him to do: auto restart app (bad practice) or load LoginView)
+        */
     }
 
     // Makes a server request and gets a new access_token
@@ -169,6 +189,25 @@ class GameRepository(
         }
     }
 
+    suspend fun getHackerShopData(): ShopData {
+        return gameDao.getHackerShopData().first()
+    }
+
+    suspend fun getCryptoMinerShopData(): ShopData {
+        return gameDao.getCryptoMinerShopData().first()
+    }
+
+    suspend fun getBotnetShopData(): ShopData {
+        return gameDao.getBotnetShopData().first()
+    }
+
+    suspend fun getUpgradeData(level: Int): ShopData? {
+        if (level < 2 || level > 5) {
+            return null
+        }
+        return gameDao.getUpgradeData(level).first()
+    }
+
     // Call this function before accessing the inventory for the first time
     suspend fun createNewInventory() {
         gameDao.insertInventory(InventoryData())
@@ -189,9 +228,13 @@ class GameRepository(
         gameDao.issueBitcoins(bitcoins)
     }
 
+    suspend fun setMiningTimestamp(timestamp: Long) {
+        gameDao.setMiningTimestamp(timestamp)
+    }
+
     // Adds a new lvl 1 hacker to the inventory
-    suspend fun addNewHacker() {
-        gameDao.addNewHacker()
+    suspend fun addNewHacker(amount: Int) {
+        gameDao.addNewHacker(amount = amount)
     }
 
     // Uses a level k upgrade on a level k-1 hacker, if both exist
@@ -315,51 +358,51 @@ class GameRepository(
     }
 
     // Adds a new lvl 1 crypto miner to the inventory
-    suspend fun addNewCryptoMiner() {
-        gameDao.addNewCryptoMiner()
+    suspend fun addNewCryptoMiner(amount: Int) {
+        gameDao.addNewCryptoMiner(amount = amount)
     }
 
     // Adds a new lvl 1 botnet to the inventory
-    suspend fun addNewBotnet() {
-        gameDao.addNewBotnet()
+    suspend fun addNewBotnet(amount: Int) {
+        gameDao.addNewBotnet(amount = amount)
     }
 
-    suspend fun addUpgradeLvl2() {
+    suspend fun addUpgradeLvl2(amount: Int) {
         var upgrades = gameDao.getInventory().first().upgradeLvl2
-        gameDao.updateLvl2Upgrades(++upgrades)
+        gameDao.updateLvl2Upgrades(upgrades + amount)
     }
 
-    suspend fun addUpgradeLvl3() {
+    suspend fun addUpgradeLvl3(amount: Int) {
         var upgrades = gameDao.getInventory().first().upgradeLvl3
-        gameDao.updateLvl3Upgrades(++upgrades)
+        gameDao.updateLvl3Upgrades(upgrades + amount)
     }
 
-    suspend fun addUpgradeLvl4() {
+    suspend fun addUpgradeLvl4(amount: Int) {
         var upgrades = gameDao.getInventory().first().upgradeLvl4
-        gameDao.updateLvl4Upgrades(++upgrades)
+        gameDao.updateLvl4Upgrades(upgrades + amount)
     }
 
-    suspend fun addUpgradeLvl5() {
+    suspend fun addUpgradeLvl5(amount: Int) {
         var upgrades = gameDao.getInventory().first().upgradeLvl5
-        gameDao.updateLvl5Upgrades(++upgrades)
+        gameDao.updateLvl5Upgrades(upgrades + amount)
     }
 
     // Adds a new low boost to the inventory
-    suspend fun addLowBoost() {
+    suspend fun addLowBoost(amount: Int) {
         var boosts = gameDao.getInventory().first().lowBoosts
-        gameDao.updateLowBoosts(++boosts)
+        gameDao.updateLowBoosts(boosts + amount)
     }
 
     // Adds a new medium boost to the inventory
-    suspend fun addMediumBoost() {
+    suspend fun addMediumBoost(amount: Int) {
         var boosts = gameDao.getInventory().first().mediumBoosts
-        gameDao.updateMediumBoosts(++boosts)
+        gameDao.updateMediumBoosts(boosts + amount)
     }
 
     // Adds a new high boost to the inventory
-    suspend fun addHighBoost() {
+    suspend fun addHighBoost(amount: Int) {
         var boosts = gameDao.getInventory().first().highBoosts
-        gameDao.updateHighBoosts(++boosts)
+        gameDao.updateHighBoosts(boosts + amount)
     }
 
     // Activates a single low boost
@@ -372,9 +415,22 @@ class GameRepository(
         activateBoost(MEDIUM_BOOST_ID);
     }
 
-    // Activates a single medium boost
+    // Activates a single High boost
     suspend fun activateHighBoost() {
         activateBoost(HIGH_BOOST_ID);
+    }
+
+    suspend fun isBoostActive(): Boolean {
+        val inventory = inventoryDataFlow.first()
+        if (inventory.activeBoostType > 0) {
+            val now = System.currentTimeMillis()
+            if (inventory.boostActiveUntil <= now) {
+                gameDao.updateBoostActivation(0, 0)
+                return false
+            }
+            return true
+        }
+        return false
     }
 
     // Only used internally
@@ -403,6 +459,76 @@ class GameRepository(
 
                 HIGH_BOOST_ID -> {
                     gameDao.updateHighBoosts(--boosts)
+                }
+            }
+        }
+    }
+
+    suspend fun getBoostFactor(): Int {
+        val inventory = inventoryDataFlow.first()
+        return when (inventory.activeBoostType) {
+            LOW_BOOST_ID -> gameDao.getLowBoostData().first().boostFactor
+            MEDIUM_BOOST_ID -> gameDao.getMediumBoostData().first().boostFactor
+            HIGH_BOOST_ID -> gameDao.getHighBoostData().first().boostFactor
+            else -> 1
+        }!!
+    }
+
+    //Updating the database after buying items
+    suspend fun buyItem(item: ShopData, amount: Int) {
+        when (item.name) {
+            "low Boost" -> addLowBoost(amount = amount)
+            "medium Boost" -> addMediumBoost(amount = amount)
+            "high Boost" -> addHighBoost(amount = amount)
+            "low passive" -> addNewHacker(amount = amount)
+            "medium passive" -> addNewCryptoMiner(amount = amount)
+            "high passive" -> addNewBotnet(amount = amount)
+            "upgrade lvl 2" -> addUpgradeLvl2(amount = amount)
+            "upgrade lvl 3" -> addUpgradeLvl3(amount = amount)
+            "upgrade lvl 4" -> addUpgradeLvl4(amount = amount)
+            "upgrade lvl 5" -> addUpgradeLvl5(amount = amount)
+        }
+    }
+
+    //Updating database after using items
+    suspend fun useItem(item: ShopData, useOn: String) {
+        if (!isBoostActive()) {
+            when (item.name) {
+                "low Boost" -> activateLowBoost()
+                "medium Boost" -> activateMediumBoost()
+                "high Boost" -> activateHighBoost()
+            }
+        }
+        when (item.name) {
+            "upgrade lvl 2" -> {
+                when (useOn) {
+                    "Hacker" -> upgradeHacker(1)
+                    "Miner" -> upgradeCryptoMiner(1)
+                    "BotNet" -> upgradeBotnet(1)
+                }
+            }
+
+            "upgrade lvl 3" -> {
+                when (useOn) {
+                    "Hacker" -> upgradeHacker(2)
+                    "Miner" -> upgradeCryptoMiner(2)
+                    "BotNet" -> upgradeBotnet(2)
+                }
+            }
+
+            "upgrade lvl 4" -> {
+                when (useOn) {
+                    "Hacker" -> upgradeHacker(3)
+                    "Miner" -> upgradeCryptoMiner(3)
+                    "BotNet" -> upgradeBotnet(3)
+                }
+            }
+
+            "upgrade lvl 5" -> {
+                when (useOn) {
+                    "Hacker" -> upgradeHacker(4)
+                    "Miner" -> upgradeCryptoMiner(4)
+                    "BotNet" -> upgradeBotnet(4)
                 }
             }
         }

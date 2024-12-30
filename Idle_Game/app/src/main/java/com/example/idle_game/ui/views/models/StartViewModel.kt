@@ -1,11 +1,15 @@
 package com.example.idle_game.ui.views.models
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.example.idle_game.data.repositories.GameRepository
+import com.example.idle_game.data.repositories.GameRepository.Companion.HIGH_BOOST_ID
+import com.example.idle_game.data.repositories.GameRepository.Companion.LOW_BOOST_ID
+import com.example.idle_game.data.repositories.GameRepository.Companion.MEDIUM_BOOST_ID
 import com.example.idle_game.data.workers.NotWorker
 import com.example.idle_game.ui.views.states.StartViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +28,7 @@ class StartViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow(StartViewState())
     val viewState: StateFlow<StartViewState> get() = _viewState
-    private val inventoryFlow = gameRepository.getInventoryDataFlow()
+    private val inventoryFlow = gameRepository.inventoryDataFlow
 
     private suspend fun getPassiveCoinsPerSecond(): Long {
         val inventory = inventoryFlow.first();
@@ -120,48 +124,4 @@ class StartViewModel @Inject constructor(
 
         workManager.enqueue(workRequest)
     }
-
-    // TODO: Remove debug code before merge to main
-
-    /*   Debug code start ------------------------------------------------------------------------------------------------*/
-    fun addHacker() {
-        viewModelScope.launch {
-            gameRepository.addNewHacker()
-        }
-    }
-
-    fun addBot() {
-        viewModelScope.launch {
-            gameRepository.addNewBotnet()
-        }
-    }
-
-    fun addMiner() {
-        viewModelScope.launch {
-            gameRepository.addNewCryptoMiner()
-        }
-    }
-
-    fun addBooster(lvl: Int) {
-        viewModelScope.launch {
-            when (lvl) {
-                1 -> {
-                    gameRepository.addLowBoost()
-                    gameRepository.activateLowBoost()
-                }
-
-                2 -> {
-                    gameRepository.addMediumBoost()
-                    gameRepository.activateMediumBoost()
-                }
-
-                3 -> {
-                    gameRepository.logout()
-                }
-            }
-        }
-    }
-
-    /*   Debug code end   ------------------------------------------------------------------------------------------------*/
-
 }
