@@ -7,17 +7,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.work.WorkManager
 import com.example.idle_game.ui.views.models.StartViewModel
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 
 
 @Composable
 fun StartView(
     workManager: WorkManager = WorkManager.getInstance(LocalContext.current),
-    viewModel: StartViewModel = viewModel()
+    viewModel: StartViewModel = hiltViewModel()
 ) {
     val viewState = viewModel.viewState.collectAsState()
 
@@ -25,24 +26,30 @@ fun StartView(
         if (viewState.value.isLoading) {
             CircularProgressIndicator()
         } else {
-            Text(text = "Counter: ${viewState.value.counter}")
+            Text(text = "Coins: ${viewState.value.coins}")
         }
 
         if (viewState.value.errorMessage != null) {
             Text(text = "Error: ${viewState.value.errorMessage}")
         }
-
-        Button(onClick = { viewModel.incrementCounter(1, 15, workManager) }) {
-            Text("Hacker +1")
+        Row {
+            Text(text = "Hackers: ${viewState.value.hackers}  ")
+            Text(text = "Botnets: ${viewState.value.bots}  ")
+            Text(text = "Miners: ${viewState.value.miners}  ")
+        }
+        Text(text = "Bitcoins per Second: ${viewState.value.coinsPerSec}")
+        Button(onClick = { viewModel.coinClick() }) {
+            Text("Click for Bitcoins")
         }
 
-        Button(onClick = { viewModel.incrementCounter(2, 20, workManager) }) {
-            Text("BotNet +2")
-        }
-
-        Button(onClick = { viewModel.incrementCounter(3, 30, workManager) }) {
-            Text("Miner +3")
-        }
+        /*   Debug code start ------------------------------------------------------------------------------------------------*/
+        Button(onClick = {viewModel.addHacker()}) { Text("Add new Hacker") }
+        Button(onClick = {viewModel.addBot()}) { Text("Add new Bot") }
+        Button(onClick = {viewModel.addMiner()}) { Text("Add new Miner") }
+        Button(onClick = {viewModel.addBooster(1)}) { Text("Add new Booster lvl 1") }
+        Button(onClick = {viewModel.addBooster(2)}) { Text("Add new Booster lvl 2") }
+        Button(onClick = {viewModel.addBooster(3)}) { Text("Abmelden") }
+        /*   Debug code end   ------------------------------------------------------------------------------------------------*/
     }
 
 }

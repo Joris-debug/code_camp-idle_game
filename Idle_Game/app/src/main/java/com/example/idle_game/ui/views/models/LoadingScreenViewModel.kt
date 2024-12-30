@@ -15,13 +15,18 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class LoadingSceenViewModel @Inject constructor(
+class LoadingScreenViewModel @Inject constructor(
     private val gameRepository: GameRepository,
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(LoadingScreenViewState())
     val viewState: StateFlow<LoadingScreenViewState> get() = _viewState
 
-    fun init(onLoginSuccess: () -> Unit, onLoginFailure: () -> Unit, context: Context, onWifiOK: () -> Unit) {
+    fun init(
+        onLoginSuccess: () -> Unit,
+        onLoginFailure: () -> Unit,
+        context: Context,
+        onWifiOK: () -> Unit
+    ) {
         var wifiOk = false
         viewModelScope.launch {
             while (!wifiOk) {
@@ -37,25 +42,14 @@ class LoadingSceenViewModel @Inject constructor(
                         connectionString = ""
                     )
                     onWifiOK()
-                    var boolLoginFailed = false;
+                    var boolLoginFailed = false
                     gameRepository.login { boolLoginFailed = true }
-                    if(boolLoginFailed) {
+                    if (boolLoginFailed) {
                         onLoginFailure()
                     } else {
                         onLoginSuccess()
                     }
                 }
-            }
-
-        }
-    }
-
-    fun checkFirstLogin(onLoginSuccess: () -> Unit) {
-        viewModelScope.launch {
-            var isSup = true
-            gameRepository.login({ isSup = false })
-            if (isSup) {
-                onLoginSuccess()
             }
         }
     }
