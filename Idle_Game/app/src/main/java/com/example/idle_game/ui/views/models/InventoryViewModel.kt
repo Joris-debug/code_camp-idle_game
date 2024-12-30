@@ -1,4 +1,5 @@
 package com.example.idle_game.ui.views.models
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.database.models.InventoryData
@@ -56,6 +57,13 @@ class InventoryViewModel @Inject constructor(
     fun useItem(itemToBuy: ShopData, it: String) {
         viewModelScope.launch {
             gameRepository.useItem(itemToBuy, it)
+        }
+    }
+
+    fun updateBitcoinBalance(cost: Long){
+        viewModelScope.launch {
+            Log.d("BitcoinUpdate", "Updating balance by $cost")
+            gameRepository.issueBitcoins(cost)
         }
     }
 }

@@ -55,9 +55,7 @@ fun StartView(
                 Text(text = "Miners: ${viewState.value.miners}  ")
             }
 
-            //TODO: There is a bug in Game Logic. viewState.value.coins is showing Long.MIN_VALUE and is resetting to "0" after restarting App
             Text(text = "Bitcoins per Second: ${viewState.value.coinsPerSec}")
-            Text(text = "Bitcoin Guthaben: ${viewState.value.coins + Long.MAX_VALUE + 1}")
             Button(onClick = { viewModel.coinClick() }) {
                 Text("Click for Bitcoins")
             }
