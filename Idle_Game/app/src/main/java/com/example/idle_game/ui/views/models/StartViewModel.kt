@@ -62,8 +62,6 @@ class StartViewModel @Inject constructor(
             val inv = inventoryFlow.first()
             _viewState.value = _viewState.value.copy(
                 coins = _viewState.value.coins + newCoins,
-                isLoading = false,
-                errorMessage = null,
                 hackers = inv.hackersLvl1 + inv.hackersLvl2 + inv.hackersLvl3 + inv.hackersLvl4 + inv.hackersLvl5,
                 bots = inv.botnetsLvl1 + inv.botnetsLvl2 + inv.botnetsLvl3 + inv.botnetsLvl4 + inv.botnetsLvl5,
                 miners = inv.cryptoMinersLvl1 + inv.cryptoMinersLvl2 + inv.cryptoMinersLvl3 + inv.cryptoMinersLvl4 + inv.cryptoMinersLvl5,
