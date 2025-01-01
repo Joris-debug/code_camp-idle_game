@@ -14,8 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.time.Duration
-import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -26,12 +24,12 @@ class StartViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow(StartViewState())
     val viewState: StateFlow<StartViewState> get() = _viewState
-    val inventoryFlow = gameRepository.inventoryDataFlow;
+    private val inventoryFlow = gameRepository.getInventoryDataFlow()
 
     private suspend fun getPassiveCoinsPerSecond(): Long {
         val inventory = inventoryFlow.first();
         val hacker = gameRepository.getHackerShopData()
-        val miner = gameRepository.getMinerShopData()
+        val miner = gameRepository.getCryptoMinerShopData()
         val botnet = gameRepository.getBotnetShopData()
         val multUpgrade2 = gameRepository.getUpgradeData(2)!!.multiplier!!
         val multUpgrade3 = gameRepository.getUpgradeData(3)!!.multiplier!!
@@ -86,23 +84,23 @@ class StartViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch { //Coroutine for passive income
+        viewModelScope.launch { // Coroutine for passive income
+            val millisPerSec: Long = 1000
             gameRepository.updateShop()
-
-            //Calculate earned Coins since last time using the app
             _viewState.value = _viewState.value.copy(coins = inventoryFlow.first().bitcoins)
-            val lastTimestamp = gameRepository.getLastMiningTimestamp()
-            if (lastTimestamp != null) {
-                val duration = Duration.between(lastTimestamp, Instant.now())
-                addCoins(getPassiveCoinsPerSecond() * duration.seconds)
-            }
 
-            while (true) { //Stops with end of Coroutine Lifecycle
-                val inventory = inventoryFlow.first()
-                val newCoins = getPassiveCoinsPerSecond()
-                addCoins(newCoins)
-                gameRepository.setMiningTimestamp(Instant.now())
-                delay(1000)
+            while (true) { // Stops with end of coroutine lifecycle
+                val lastTimestamp = inventoryFlow.first().lastMiningTimestamp
+                gameRepository.setMiningTimestamp(System.currentTimeMillis())
+                val duration = (System.currentTimeMillis() - lastTimestamp) / millisPerSec
+                // ^ Get the duration in seconds ^
+                /*
+                * Why do I calculate the duration in every iteration?
+                * A: The thread or even the entire app could freeze because of external factors,
+                * which would lead to an incorrect coin count after responding again
+                */
+                addCoins(getPassiveCoinsPerSecond() * duration)
+                delay(millisPerSec)
             }
         }
     }
@@ -133,7 +131,7 @@ class StartViewModel @Inject constructor(
         workManager.enqueue(workRequest)
     }
 
-    //TODO: Remove debug code before merge to main
+    // TODO: Remove debug code before merge to main
 
     /*   Debug code start ------------------------------------------------------------------------------------------------*/
     fun addHacker() {
@@ -168,8 +166,7 @@ class StartViewModel @Inject constructor(
                 }
 
                 3 -> {
-                    gameRepository.addHighBoost()
-                    gameRepository.activateHighBoost()
+                    gameRepository.logout()
                 }
             }
         }

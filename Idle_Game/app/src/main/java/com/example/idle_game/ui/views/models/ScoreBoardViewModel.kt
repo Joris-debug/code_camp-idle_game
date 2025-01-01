@@ -18,8 +18,8 @@ class ScoreBoardViewModel @Inject constructor(
     private val _uiStateFlow = MutableStateFlow(ScoreBoardViewState())
     val uiStateFlow: StateFlow<ScoreBoardViewState> = _uiStateFlow
 
-    private val scoreData = gameRepository.scoreBoardDataFlow
-    private val playerData = gameRepository.playerDataFlow
+    private val scoreData = gameRepository.getScoreBoardDataFlow()
+    private val playerData = gameRepository.getPlayerDataFlow()
     private var isButtonEnabled = true
 
     init {

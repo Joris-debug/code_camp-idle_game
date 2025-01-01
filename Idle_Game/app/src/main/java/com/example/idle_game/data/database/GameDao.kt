@@ -18,11 +18,20 @@ interface GameDao {
     @Upsert
     suspend fun insertPlayer(player: PlayerData)
 
+    @Query("SELECT COUNT(*) FROM playerdata")
+    suspend fun getPlayersCount(): Int // Used to check if player data exists
+
+    @Query("UPDATE playerdata SET refresh_token = :refreshToken")
+    suspend fun updateRefreshToken(refreshToken: String)
+
     @Query("UPDATE playerdata SET access_token = :accessToken")
     suspend fun updateAccessToken(accessToken: String)
 
     @Query("SELECT * FROM inventorydata WHERE uid = 1")
     fun getInventory(): Flow<InventoryData>
+
+    @Query("SELECT COUNT(*) FROM inventorydata")
+    suspend fun getInventoriesCount(): Int // Used to check if inventory exists
 
     @Upsert
     suspend fun insertInventory(inventory: InventoryData)
@@ -131,28 +140,25 @@ interface GameDao {
     fun getHackerShopData(): Flow<ShopData>
 
     @Query("SELECT * FROM shopdata WHERE name = 'medium passive'")
-    fun getMinerShopData(): Flow<ShopData>
+    fun getCryptoMinerShopData(): Flow<ShopData>
 
     @Query("SELECT * FROM shopdata WHERE name = 'high passive'")
     fun getBotnetShopData(): Flow<ShopData>
 
     @Query("SELECT * FROM shopdata WHERE name = 'low Boost'")
-    fun getLowBoosterData(): Flow<ShopData>
+    fun getLowBoostData(): Flow<ShopData>
 
     @Query("SELECT * FROM shopdata WHERE name = 'medium Boost'")
-    fun getMediumBoosterData(): Flow<ShopData>
+    fun getMediumBoostData(): Flow<ShopData>
 
     @Query("SELECT * FROM shopdata WHERE name = 'high Boost'")
-    fun getHighBoosterData(): Flow<ShopData>
+    fun getHighBoostData(): Flow<ShopData>
 
     @Query("SELECT * FROM shopdata WHERE name = 'upgrade lvl ' || :level")
     fun getUpgradeData(level: Int): Flow<ShopData>
 
     @Upsert
     suspend fun insertShop(item: ShopData)
-
-    @Query("SELECT last_mining_timestamp FROM InventoryData")
-    suspend fun getLastMiningTimestamp(): Long?
 
     @Query("UPDATE InventoryData SET last_mining_timestamp = :timeStamp")
     suspend fun setMiningTimestamp(timeStamp: Long)

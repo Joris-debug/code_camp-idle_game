@@ -42,7 +42,7 @@ class LoadingScreenViewModel @Inject constructor(
                         connectionString = ""
                     )
                     onWifiOK()
-                    var boolLoginFailed = false;
+                    var boolLoginFailed = false
                     gameRepository.login { boolLoginFailed = true }
                     if (boolLoginFailed) {
                         onLoginFailure()
@@ -51,7 +51,6 @@ class LoadingScreenViewModel @Inject constructor(
                     }
                 }
             }
-
         }
     }
 }
