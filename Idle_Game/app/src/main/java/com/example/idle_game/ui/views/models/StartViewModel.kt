@@ -28,7 +28,7 @@ class StartViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow(StartViewState())
     val viewState: StateFlow<StartViewState> get() = _viewState
-    private val inventoryFlow = gameRepository.inventoryDataFlow
+    private val inventoryFlow = gameRepository.getInventoryDataFlow()
 
     private suspend fun getPassiveCoinsPerSecond(): Long {
         val inventory = inventoryFlow.first();
@@ -66,7 +66,7 @@ class StartViewModel @Inject constructor(
             val inv = inventoryFlow.first()
             gameRepository.addBitcoins(newCoins)
             _viewState.value = _viewState.value.copy(
-                coins = gameRepository.inventoryDataFlow.first().bitcoins,
+                coins = gameRepository.getInventoryDataFlow().first().bitcoins,
                 isLoading = false,
                 errorMessage = null,
                 hackers = inv.hackersLvl1 + inv.hackersLvl2 + inv.hackersLvl3 + inv.hackersLvl4 + inv.hackersLvl5,

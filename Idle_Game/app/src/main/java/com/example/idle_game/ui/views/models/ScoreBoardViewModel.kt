@@ -7,6 +7,7 @@ import com.example.idle_game.ui.views.states.ScoreBoardViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,8 +19,8 @@ class ScoreBoardViewModel @Inject constructor(
     private val _uiStateFlow = MutableStateFlow(ScoreBoardViewState())
     val uiStateFlow: StateFlow<ScoreBoardViewState> = _uiStateFlow
 
-    private val scoreData = gameRepository.scoreBoardDataFlow
-    private val playerData = gameRepository.playerDataFlow
+    private val scoreData = gameRepository.getScoreBoardDataFlow()
+    private val playerData = gameRepository.getPlayerDataFlow()
     private var isButtonEnabled = true
 
     init {

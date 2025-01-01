@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 
 @HiltViewModel
 class InventoryViewModel @Inject constructor(
@@ -20,8 +21,8 @@ class InventoryViewModel @Inject constructor(
     private val _uiStateFlow = MutableStateFlow(InventoryViewState())
     val uiStateFlow: StateFlow<InventoryViewState> = _uiStateFlow
 
-    private val shopData = gameRepository.shopDataFlow
-    private val inventoryData = gameRepository.inventoryDataFlow
+    private val shopData = gameRepository.getShopDataFlow()
+    private val inventoryData = gameRepository.getInventoryDataFlow()
 
     init {
         viewModelScope.launch {

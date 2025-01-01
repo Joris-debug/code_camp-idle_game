@@ -9,7 +9,9 @@ import com.example.idle_game.api.models.UserCredentialsRequest
 import com.example.idle_game.data.database.GameDao
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.PlayerData
+import com.example.idle_game.data.database.models.ScoreBoardData
 import com.example.idle_game.data.database.models.ShopData
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 
@@ -18,16 +20,34 @@ class GameRepository(
     private val gameDao: GameDao,
     private val sharedPreferences: SharedPreferences
 ) {
-    val playerDataFlow = gameDao.getPlayer()
-    val inventoryDataFlow = gameDao.getInventory()
-    val shopDataFlow = gameDao.getShop()
-    val scoreBoardDataFlow = gameDao.getScoreBoard()
+    private var playerDataFlow = gameDao.getPlayer()
+    private val inventoryDataFlow = gameDao.getInventory()
+    private val shopDataFlow = gameDao.getShop()
+    private val scoreBoardDataFlow = gameDao.getScoreBoard()
 
     companion object {
         const val LOW_BOOST_ID = 1
         const val MEDIUM_BOOST_ID = 2
         const val HIGH_BOOST_ID = 3
     }
+
+    fun getPlayerDataFlow(): Flow<PlayerData> {
+        return playerDataFlow
+    }
+
+    fun getInventoryDataFlow(): Flow<InventoryData> {
+        return inventoryDataFlow
+    }
+
+    fun getShopDataFlow(): Flow<List<ShopData>> {
+        return shopDataFlow
+    }
+
+    fun getScoreBoardDataFlow(): Flow<List<ScoreBoardData>> {
+        return scoreBoardDataFlow
+    }
+
+
 
     suspend fun signUp(username: String, password: String, onFailure: () -> Unit = {}) {
         val userCredentialsRequest = UserCredentialsRequest(
@@ -93,7 +113,7 @@ class GameRepository(
 
     // Makes a server request and gets a new access_token
     suspend fun login(onFailure: () -> Unit = {}) {
-        val playerData = playerDataFlow.first()
+        val playerData = getPlayerDataFlow().first()
         try {
             val resp = api.login(playerData.refreshToken)
             val accessToken = sharedPreferences.getString("access_token", null)
@@ -107,7 +127,7 @@ class GameRepository(
 
     // Makes a server request and fills the shop-data table
     suspend fun updateShop(onFailure: () -> Unit = {}) {
-        val playerData = playerDataFlow.first()
+        val playerData = getPlayerDataFlow().first()
         var resp: List<ItemResponse> = emptyList()
         try {
             if (playerData.accessToken == null) {
@@ -132,7 +152,7 @@ class GameRepository(
 
     // Makes a server request and fills the score-board-data table
     suspend fun fetchScoreBoard(onFailure: () -> Unit = {}) {
-        val playerData = playerDataFlow.first()
+        val playerData = getPlayerDataFlow().first()
         var resp: List<ScoreResponse> = emptyList()
         try {
             if (playerData.accessToken == null) {
@@ -159,12 +179,12 @@ class GameRepository(
     // Call fetchScoreBoard afterwards to have the ScoreBoard updated
     suspend fun updateScoreBoard(onFailure: () -> Unit = {}) {
         try {
-            val playerData = playerDataFlow.first()
+            val playerData = getPlayerDataFlow().first()
             if (playerData.accessToken == null) {
                 throw NullPointerException("accessToken can't be null")
             }
 
-            val inventoryData = inventoryDataFlow.first()
+            val inventoryData = getInventoryDataFlow().first()
             val setScoreRequest = SetScoreRequest(
                 username = playerData.username,
                 score = inventoryData.bitcoins + inventoryData.issuedBitcoins
@@ -222,7 +242,7 @@ class GameRepository(
     }
 
     suspend fun issueBitcoins(bitcoins: Long) {
-        if (inventoryDataFlow.first().bitcoins < bitcoins) {
+        if (getInventoryDataFlow().first().bitcoins < bitcoins) {
             return
         }
         gameDao.issueBitcoins(bitcoins)
@@ -239,7 +259,7 @@ class GameRepository(
 
     // Uses a level k upgrade on a level k-1 hacker, if both exist
     private suspend fun upgradeHacker(upgradeLvl: Int) {
-        val inventory = inventoryDataFlow.first()
+        val inventory = getInventoryDataFlow().first()
         val hLvl1 = inventory.hackersLvl1
         val hLvl2 = inventory.hackersLvl2
         val hLvl3 = inventory.hackersLvl3
@@ -279,7 +299,7 @@ class GameRepository(
 
     // Uses a level k upgrade on a level k-1 crypto miner, if both exist
     private suspend fun upgradeCryptoMiner(upgradeLvl: Int) {
-        val inventory = inventoryDataFlow.first()
+        val inventory = getInventoryDataFlow().first()
         val cmLvl1 = inventory.cryptoMinersLvl1
         val cmLvl2 = inventory.cryptoMinersLvl2
         val cmLvl3 = inventory.cryptoMinersLvl3
@@ -319,7 +339,7 @@ class GameRepository(
 
     // Uses a level k upgrade on a level k-1 botnet, if both exist
     private suspend fun upgradeBotnet(upgradeLvl: Int) {
-        val inventory = inventoryDataFlow.first()
+        val inventory = getInventoryDataFlow().first()
         val bLvl1 = inventory.botnetsLvl1
         val bLvl2 = inventory.botnetsLvl2
         val bLvl3 = inventory.botnetsLvl3
@@ -421,7 +441,7 @@ class GameRepository(
     }
 
     suspend fun isBoostActive(): Boolean {
-        val inventory = inventoryDataFlow.first()
+        val inventory = getInventoryDataFlow().first()
         if (inventory.activeBoostType > 0) {
             val now = System.currentTimeMillis()
             if (inventory.boostActiveUntil <= now) {
@@ -444,8 +464,13 @@ class GameRepository(
         }
 
         if (boosts > 0) {
-            //TODO add real boost duration (read out of db)
-            val activeUntil = System.currentTimeMillis() + 100_000
+            val activeUntil = System.currentTimeMillis() +
+                    when (boostId) {
+                        LOW_BOOST_ID -> gameDao.getLowBoostData().first().duration
+                        MEDIUM_BOOST_ID -> gameDao.getMediumBoostData().first().duration
+                        HIGH_BOOST_ID -> gameDao.getHighBoostData().first().duration
+                        else -> 0
+                    }!! * 60 * 1000 // From Min -> ms
             gameDao.updateBoostActivation(boostId, activeUntil)
 
             when (boostId) {
@@ -465,7 +490,7 @@ class GameRepository(
     }
 
     suspend fun getBoostFactor(): Int {
-        val inventory = inventoryDataFlow.first()
+        val inventory = getInventoryDataFlow().first()
         return when (inventory.activeBoostType) {
             LOW_BOOST_ID -> gameDao.getLowBoostData().first().boostFactor
             MEDIUM_BOOST_ID -> gameDao.getMediumBoostData().first().boostFactor
