@@ -28,37 +28,24 @@ fun StartView(
 ) {
     val viewState = viewModel.viewState.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Idle Game") }
-            )
+    Column(modifier = Modifier.fillMaxSize()) {
+        if (viewState.value.isLoading) {
+            CircularProgressIndicator()
+        } else {
+            Text(text = "Coins: ${viewState.value.coins}")
         }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            if (viewState.value.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            } else {
-                Text(text = "Coins: ${viewState.value.coins}")
-            }
 
-            if (viewState.value.errorMessage != null) {
-                Text(text = "Error: ${viewState.value.errorMessage}")
-            }
-            Row {
-                Text(text = "Hackers: ${viewState.value.hackers}  ")
-                Text(text = "Botnets: ${viewState.value.bots}  ")
-                Text(text = "Miners: ${viewState.value.miners}  ")
-            }
-
-            Text(text = "Bitcoins per Second: ${viewState.value.coinsPerSec}")
-            Button(onClick = { viewModel.coinClick() }) {
-                Text("Click for Bitcoins")
-            }
+        if (viewState.value.errorMessage != null) {
+            Text(text = "Error: ${viewState.value.errorMessage}")
+        }
+        Row {
+            Text(text = "Hackers: ${viewState.value.hackers}  ")
+            Text(text = "Botnets: ${viewState.value.bots}  ")
+            Text(text = "Miners: ${viewState.value.miners}  ")
+        }
+        Text(text = "Bitcoins per Second: ${viewState.value.coinsPerSec}")
+        Button(onClick = { viewModel.coinClick() }) {
+            Text("Click for Bitcoins")
         }
     }
 }

@@ -35,11 +35,11 @@ fun NavigationGraph(
         composable("StartView") {
             StartView()
         }
-        composable("ScoreBoardView") {
-            ScoreBoardView()
-        }
         composable("InventoryView") {
             InventoryView()
+        }
+        composable("ScoreBoardView") {
+            ScoreBoardView()
         }
     }
 }
@@ -63,6 +63,18 @@ fun BottomBar(navController: NavController) {
                 restoreState = false }
         }, icon = { Icon(Icons.Default.Home, contentDescription = "Start")})
 
+        NavigationBarItem(selected = currentRoute == "InventoryView", onClick = {
+            navController.navigate("InventoryView") {
+                navController.graph.startDestinationRoute?.let { screenRoute ->
+                    popUpTo(screenRoute) {
+                        saveState = false
+                        inclusive = false
+                    }
+                }
+                launchSingleTop = true
+                restoreState = false }
+        }, icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Inventory")})
+
         NavigationBarItem(selected = currentRoute == "ScoreBoardView", onClick = {
             navController.navigate("ScoreBoardView") {
                 navController.graph.startDestinationRoute?.let { screenRoute ->
@@ -77,19 +89,5 @@ fun BottomBar(navController: NavController) {
             val scoreboardIcon = painterResource(id = R.drawable.ic_scoreboard)
             Icon(scoreboardIcon, contentDescription = "Scoreboard")
         })
-
-        NavigationBarItem(selected = currentRoute == "InventoryView", onClick = {
-            navController.navigate("InventoryView") {
-                navController.graph.startDestinationRoute?.let { screenRoute ->
-                    popUpTo(screenRoute) {
-                        saveState = false
-                        inclusive = false
-                    }
-                }
-                launchSingleTop = true
-                restoreState = false }
-        }, icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Inventory")})
-
-
     }
 }
