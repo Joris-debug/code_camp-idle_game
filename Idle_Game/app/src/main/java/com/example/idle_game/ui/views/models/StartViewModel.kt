@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.repositories.GameRepository
 import com.example.idle_game.data.workers.NotWorker
 import com.example.idle_game.ui.views.states.StartViewState
@@ -65,11 +64,21 @@ class StartViewModel @Inject constructor(
             val inventory = inventoryFlow.first()
             _viewState.value = _viewState.value.copy(
                 coins = _viewState.value.coins + newCoins,
-                isLoading = false,
-                errorMessage = null,
-                hackers = inventory.hackersLvl1 + inventory.hackersLvl2 + inventory.hackersLvl3 + inventory.hackersLvl4 + inventory.hackersLvl5,
-                bots = inventory.botnetsLvl1 + inventory.botnetsLvl2 + inventory.botnetsLvl3 + inventory.botnetsLvl4 + inventory.botnetsLvl5,
-                miners = inventory.cryptoMinersLvl1 + inventory.cryptoMinersLvl2 + inventory.cryptoMinersLvl3 + inventory.cryptoMinersLvl4 + inventory.cryptoMinersLvl5,
+                hackerLvl1 = inventory.hackersLvl1,
+                hackerLvl2 = inventory.hackersLvl2,
+                hackerLvl3 = inventory.hackersLvl3,
+                hackerLvl4 = inventory.hackersLvl4,
+                hackerLvl5 = inventory.hackersLvl5,
+                minerLvl1 = inventory.cryptoMinersLvl1,
+                minerLvl2 = inventory.cryptoMinersLvl2,
+                minerLvl3 = inventory.cryptoMinersLvl3,
+                minerLvl4 = inventory.cryptoMinersLvl4,
+                minerLvl5 = inventory.cryptoMinersLvl5,
+                botnetLvl1 = inventory.botnetsLvl1,
+                botnetLvl2 = inventory.botnetsLvl2,
+                botnetLvl3 = inventory.botnetsLvl3,
+                botnetLvl4 = inventory.botnetsLvl4,
+                botnetLvl5 = inventory.botnetsLvl5
             )
             gameRepository.addBitcoins(newCoins)
         }
