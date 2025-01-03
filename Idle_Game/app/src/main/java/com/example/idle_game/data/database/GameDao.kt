@@ -49,9 +49,6 @@ interface GameDao {
     @Query("UPDATE inventorydata SET hackers_lvl_1 = hackers_lvl_1 + :amount")
     suspend fun addNewHacker(amount: Int)
 
-    @Query("SELECT boost_active_until FROM inventorydata")
-    fun getBoostActiveUntil(): Flow<Long>
-
     @Query("""
     UPDATE inventorydata 
     SET hackers_lvl_1 = :hackersLvL1, 

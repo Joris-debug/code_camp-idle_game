@@ -43,5 +43,4 @@ class ScoreBoardViewModel @Inject constructor(
             isButtonEnabled = true
         }
     }
-
 }

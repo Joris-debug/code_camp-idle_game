@@ -50,7 +50,6 @@ import com.google.accompanist.pager.*
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
-    //HideStatusBar()
     val viewState = viewModel.uiStateFlow.collectAsState().value
     val shopDataList = viewState.shopData.collectAsState(initial = emptyList()).value
     val inventoryData = viewState.inventoryData.collectAsState(initial = InventoryData()).value
