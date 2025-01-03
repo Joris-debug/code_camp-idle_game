@@ -20,7 +20,6 @@ import com.example.idle_game.R
 import com.example.idle_game.ui.views.composable.ScoreBoardView
 import com.example.idle_game.ui.views.composable.StartView
 
-
 @Composable
 fun NavigationGraph(
     modifier: Modifier = Modifier,
@@ -46,7 +45,6 @@ fun NavigationGraph(
 
 @Composable
 fun BottomBar(navController: NavController) {
-
     BottomAppBar() {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route

@@ -55,15 +55,14 @@ class InventoryViewModel @Inject constructor(
         }
     }
 
-    fun useItem(itemToBuy: ShopData, it: String) {
+    fun useItem(itemToBuy: ShopData, useOn: String) {
         viewModelScope.launch {
-            gameRepository.useItem(itemToBuy, it)
+            gameRepository.useItem(itemToBuy, useOn)
         }
     }
 
     fun updateBitcoinBalance(cost: Long){
         viewModelScope.launch {
-            Log.d("BitcoinUpdate", "Updating balance by $cost")
             gameRepository.issueBitcoins(cost)
         }
     }

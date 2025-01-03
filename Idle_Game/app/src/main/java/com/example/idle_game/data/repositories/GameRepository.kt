@@ -20,7 +20,7 @@ class GameRepository(
     private val gameDao: GameDao,
     private val sharedPreferences: SharedPreferences
 ) {
-    private var playerDataFlow = gameDao.getPlayer()
+    private val playerDataFlow = gameDao.getPlayer()
     private val inventoryDataFlow = gameDao.getInventory()
     private val shopDataFlow = gameDao.getShop()
     private val scoreBoardDataFlow = gameDao.getScoreBoard()
@@ -46,8 +46,6 @@ class GameRepository(
     fun getScoreBoardDataFlow(): Flow<List<ScoreBoardData>> {
         return scoreBoardDataFlow
     }
-
-
 
     suspend fun signUp(username: String, password: String, onFailure: () -> Unit = {}) {
         val userCredentialsRequest = UserCredentialsRequest(
@@ -100,7 +98,6 @@ class GameRepository(
         }
     }
 
-
     // Called on the settings-page
     suspend fun logout() {
         gameDao.updateRefreshToken("") // Default value for the refresh token
@@ -113,7 +110,7 @@ class GameRepository(
 
     // Makes a server request and gets a new access_token
     suspend fun login(onFailure: () -> Unit = {}) {
-        val playerData = getPlayerDataFlow().first()
+        val playerData = playerDataFlow.first()
         try {
             val resp = api.login(playerData.refreshToken)
             val accessToken = sharedPreferences.getString("access_token", null)
@@ -127,7 +124,7 @@ class GameRepository(
 
     // Makes a server request and fills the shop-data table
     suspend fun updateShop(onFailure: () -> Unit = {}) {
-        val playerData = getPlayerDataFlow().first()
+        val playerData = playerDataFlow.first()
         var resp: List<ItemResponse> = emptyList()
         try {
             if (playerData.accessToken == null) {
@@ -152,7 +149,7 @@ class GameRepository(
 
     // Makes a server request and fills the score-board-data table
     suspend fun fetchScoreBoard(onFailure: () -> Unit = {}) {
-        val playerData = getPlayerDataFlow().first()
+        val playerData = playerDataFlow.first()
         var resp: List<ScoreResponse> = emptyList()
         try {
             if (playerData.accessToken == null) {
@@ -179,12 +176,12 @@ class GameRepository(
     // Call fetchScoreBoard afterwards to have the ScoreBoard updated
     suspend fun updateScoreBoard(onFailure: () -> Unit = {}) {
         try {
-            val playerData = getPlayerDataFlow().first()
+            val playerData = playerDataFlow.first()
             if (playerData.accessToken == null) {
                 throw NullPointerException("accessToken can't be null")
             }
 
-            val inventoryData = getInventoryDataFlow().first()
+            val inventoryData = inventoryDataFlow.first()
             val setScoreRequest = SetScoreRequest(
                 username = playerData.username,
                 score = inventoryData.bitcoins + inventoryData.issuedBitcoins
@@ -242,7 +239,7 @@ class GameRepository(
     }
 
     suspend fun issueBitcoins(bitcoins: Long) {
-        if (getInventoryDataFlow().first().bitcoins < bitcoins) {
+        if (inventoryDataFlow.first().bitcoins < bitcoins) {
             return
         }
         gameDao.issueBitcoins(bitcoins)
@@ -259,7 +256,7 @@ class GameRepository(
 
     // Uses a level k upgrade on a level k-1 hacker, if both exist
     private suspend fun upgradeHacker(upgradeLvl: Int) {
-        val inventory = getInventoryDataFlow().first()
+        val inventory = inventoryDataFlow.first()
         val hLvl1 = inventory.hackersLvl1
         val hLvl2 = inventory.hackersLvl2
         val hLvl3 = inventory.hackersLvl3
@@ -299,7 +296,7 @@ class GameRepository(
 
     // Uses a level k upgrade on a level k-1 crypto miner, if both exist
     private suspend fun upgradeCryptoMiner(upgradeLvl: Int) {
-        val inventory = getInventoryDataFlow().first()
+        val inventory = inventoryDataFlow.first()
         val cmLvl1 = inventory.cryptoMinersLvl1
         val cmLvl2 = inventory.cryptoMinersLvl2
         val cmLvl3 = inventory.cryptoMinersLvl3
@@ -339,7 +336,7 @@ class GameRepository(
 
     // Uses a level k upgrade on a level k-1 botnet, if both exist
     private suspend fun upgradeBotnet(upgradeLvl: Int) {
-        val inventory = getInventoryDataFlow().first()
+        val inventory = inventoryDataFlow.first()
         val bLvl1 = inventory.botnetsLvl1
         val bLvl2 = inventory.botnetsLvl2
         val bLvl3 = inventory.botnetsLvl3
@@ -441,7 +438,7 @@ class GameRepository(
     }
 
     suspend fun isBoostActive(): Boolean {
-        val inventory = getInventoryDataFlow().first()
+        val inventory = inventoryDataFlow.first()
         if (inventory.activeBoostType > 0) {
             val now = System.currentTimeMillis()
             if (inventory.boostActiveUntil <= now) {
@@ -490,7 +487,7 @@ class GameRepository(
     }
 
     suspend fun getBoostFactor(): Int {
-        val inventory = getInventoryDataFlow().first()
+        val inventory = inventoryDataFlow.first()
         return when (inventory.activeBoostType) {
             LOW_BOOST_ID -> gameDao.getLowBoostData().first().boostFactor
             MEDIUM_BOOST_ID -> gameDao.getMediumBoostData().first().boostFactor
@@ -586,5 +583,4 @@ class GameRepository(
             }
         }
     }
-
 }

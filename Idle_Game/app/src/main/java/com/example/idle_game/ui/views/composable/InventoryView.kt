@@ -1,4 +1,5 @@
 package com.example.idle_game.ui.views.composable
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -165,8 +166,8 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
             val amount = quantity.toIntOrNull() ?: 1
             val cost = itemToBuy!!.cost * amount
 
-            if(cost <= inventoryData.bitcoins){
-                viewModel.buyItem(itemToBuy!!, amount)
+            if (cost <= inventoryData.bitcoins) {
+                viewModel.buyItem(itemToBuy, amount)
                 viewModel.updateBitcoinBalance(cost.toLong())
                 setShowDialog(false)
             }
@@ -176,9 +177,8 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
         inventoryData = inventoryData,
         setQuantity = setQuantity,
 
-    )
+        )
 }
-
 
 @Composable
 fun CategoryScreen(
@@ -307,7 +307,7 @@ fun ShowDialog(
 
             "Kaufen" -> {
                 val amount = quantity.toIntOrNull() ?: 1
-                val cost = itemToBuy!!.cost * amount
+                val cost = itemToBuy.cost * amount
 
                 if (cost <= inventoryData.bitcoins) {
                     QuantityDialog(
@@ -339,8 +339,7 @@ fun ShowDialog(
 fun InsufficientFundsDialog(
     onDismiss: () -> Unit,
     setQuantity: (String) -> Unit,
-
-) {
+    ) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -352,7 +351,6 @@ fun InsufficientFundsDialog(
             TextButton(onClick = { setQuantity("1") }) {
                 Text("OK")
             }
-
         }
     )
 }
@@ -374,7 +372,6 @@ fun ApplyOnDialog(
     var availableHackers = 0
     var availableMiner = 0
     var availableBotNets = 0
-
 
     when (itemToBuy?.name) {
         "upgrade lvl 2" -> {
@@ -617,8 +614,3 @@ fun ApplyDialog(
         }
     )
 }
-
-
-
-
-

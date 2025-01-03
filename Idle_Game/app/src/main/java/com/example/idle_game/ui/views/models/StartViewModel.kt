@@ -66,7 +66,7 @@ class StartViewModel @Inject constructor(
             val inv = inventoryFlow.first()
             gameRepository.addBitcoins(newCoins)
             _viewState.value = _viewState.value.copy(
-                coins = gameRepository.getInventoryDataFlow().first().bitcoins,
+                coins = inventoryFlow.first().bitcoins,
                 isLoading = false,
                 errorMessage = null,
                 hackers = inv.hackersLvl1 + inv.hackersLvl2 + inv.hackersLvl3 + inv.hackersLvl4 + inv.hackersLvl5,
