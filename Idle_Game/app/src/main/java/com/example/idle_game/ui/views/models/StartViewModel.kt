@@ -8,6 +8,7 @@ import androidx.work.WorkRequest
 import com.example.idle_game.data.repositories.GameRepository
 import com.example.idle_game.data.workers.NotWorker
 import com.example.idle_game.ui.views.states.StartViewState
+import com.example.idle_game.util.shortBigNumbers
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +26,27 @@ class StartViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(StartViewState())
     val viewState: StateFlow<StartViewState> get() = _viewState
     private val inventoryFlow = gameRepository.getInventoryDataFlow()
+    private var showShorted: Boolean = false
+    private var coins: Long = 0
+    private var coinsPerSec: Long = 0
+
+
+    private fun toDisplay(value: Number): String {
+        return if (showShorted) {
+            shortBigNumbers(value.toLong())
+        } else {
+            value.toString()
+        }
+    }
+
+    fun switchDisplayMode() {
+        viewModelScope.launch {
+            showShorted = !showShorted
+            addCoins(0) //Just to set values in correct Display-Mode
+            getPassiveCoinsPerSecond()
+        }
+
+    }
 
     private suspend fun getPassiveCoinsPerSecond(): Long {
         val inventory = inventoryFlow.first();
@@ -52,7 +74,8 @@ class StartViewModel @Inject constructor(
                 inventory.botnetsLvl4 * botnet.unitPerSec * multUpgrade4 +
                 inventory.botnetsLvl5 * botnet.unitPerSec * multUpgrade5
                 ).toLong()
-        _viewState.value = _viewState.value.copy(coinsPerSec = passiveCoinsPerSec)
+        _viewState.value = _viewState.value.copy(coinsPerSec = toDisplay(passiveCoinsPerSec))
+        coinsPerSec = passiveCoinsPerSec
 
         return passiveCoinsPerSec
     }
@@ -61,33 +84,23 @@ class StartViewModel @Inject constructor(
         viewModelScope.launch {
             val inventory = inventoryFlow.first()
             _viewState.value = _viewState.value.copy(
-                coins = _viewState.value.coins + newCoins,
-                hackerLvl1 = inventory.hackersLvl1,
-                hackerLvl2 = inventory.hackersLvl2,
-                hackerLvl3 = inventory.hackersLvl3,
-                hackerLvl4 = inventory.hackersLvl4,
-                hackerLvl5 = inventory.hackersLvl5,
-                minerLvl1 = inventory.cryptoMinersLvl1,
-                minerLvl2 = inventory.cryptoMinersLvl2,
-                minerLvl3 = inventory.cryptoMinersLvl3,
-                minerLvl4 = inventory.cryptoMinersLvl4,
-                minerLvl5 = inventory.cryptoMinersLvl5,
-                botnetLvl1 = inventory.botnetsLvl1,
-                botnetLvl2 = inventory.botnetsLvl2,
-                botnetLvl3 = inventory.botnetsLvl3,
-                botnetLvl4 = inventory.botnetsLvl4,
-                botnetLvl5 = inventory.botnetsLvl5
+                coins = toDisplay(coins + newCoins),
+                hackerCount = toDisplay(inventory.hackersLvl1 + inventory.hackersLvl2 + inventory.hackersLvl3 + inventory.hackersLvl4 + inventory.hackersLvl5),
+                minerCount = toDisplay(inventory.cryptoMinersLvl1 + inventory.cryptoMinersLvl2 + inventory.cryptoMinersLvl3 + inventory.cryptoMinersLvl4 + inventory.cryptoMinersLvl5),
+                botnetCount = toDisplay(inventory.botnetsLvl1 + inventory.botnetsLvl2 + inventory.botnetsLvl3 + inventory.botnetsLvl4 + inventory.botnetsLvl5)
             )
+            coins += newCoins
             gameRepository.addBitcoins(newCoins)
         }
-
     }
 
     init {
         viewModelScope.launch { // Coroutine for passive income
             val millisPerSec: Long = 1000
             gameRepository.updateShop()
-            _viewState.value = _viewState.value.copy(coins = inventoryFlow.first().bitcoins)
+            _viewState.value =
+                _viewState.value.copy(coins = toDisplay(inventoryFlow.first().bitcoins))
+            coins = inventoryFlow.first().bitcoins
 
             while (true) { // Stops with end of coroutine lifecycle
                 val lastTimestamp = inventoryFlow.first().lastMiningTimestamp
@@ -117,8 +130,9 @@ class StartViewModel @Inject constructor(
             _viewState.value =
                 _viewState.value.copy(
                     activeBoost = inventoryFlow.first().activeBoostType,
-                    coinsPerSec = _viewState.value.coinsPerSec + clickedCoins
+                    coinsPerSec = toDisplay(coinsPerSec + clickedCoins)
                 )
+            coinsPerSec += clickedCoins
             addCoins(clickedCoins)
         }
     }
@@ -130,48 +144,5 @@ class StartViewModel @Inject constructor(
 
         workManager.enqueue(workRequest)
     }
-
-    // TODO: Remove debug code before merge to main
-
-    /*   Debug code start ------------------------------------------------------------------------------------------------*/
-    fun addHacker() {
-        viewModelScope.launch {
-            gameRepository.addNewHacker()
-        }
-    }
-
-    fun addBot() {
-        viewModelScope.launch {
-            gameRepository.addNewBotnet()
-        }
-    }
-
-    fun addMiner() {
-        viewModelScope.launch {
-            gameRepository.addNewCryptoMiner()
-        }
-    }
-
-    fun addBooster(lvl: Int) {
-        viewModelScope.launch {
-            when (lvl) {
-                1 -> {
-                    gameRepository.addLowBoost()
-                    gameRepository.activateLowBoost()
-                }
-
-                2 -> {
-                    gameRepository.addMediumBoost()
-                    gameRepository.activateMediumBoost()
-                }
-
-                3 -> {
-                    gameRepository.logout()
-                }
-            }
-        }
-    }
-
-    /*   Debug code end   ------------------------------------------------------------------------------------------------*/
 
 }
