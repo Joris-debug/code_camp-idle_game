@@ -1,11 +1,15 @@
 package com.example.idle_game.ui.views.models
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.example.idle_game.data.repositories.GameRepository
+import com.example.idle_game.data.repositories.GameRepository.Companion.HIGH_BOOST_ID
+import com.example.idle_game.data.repositories.GameRepository.Companion.LOW_BOOST_ID
+import com.example.idle_game.data.repositories.GameRepository.Companion.MEDIUM_BOOST_ID
 import com.example.idle_game.data.workers.NotWorker
 import com.example.idle_game.ui.views.states.StartViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,17 +64,16 @@ class StartViewModel @Inject constructor(
     private fun addCoins(newCoins: Long) {
         viewModelScope.launch {
             val inv = inventoryFlow.first()
+            gameRepository.addBitcoins(newCoins)
             _viewState.value = _viewState.value.copy(
-                coins = _viewState.value.coins + newCoins,
+                coins = inventoryFlow.first().bitcoins,
                 isLoading = false,
                 errorMessage = null,
                 hackers = inv.hackersLvl1 + inv.hackersLvl2 + inv.hackersLvl3 + inv.hackersLvl4 + inv.hackersLvl5,
                 bots = inv.botnetsLvl1 + inv.botnetsLvl2 + inv.botnetsLvl3 + inv.botnetsLvl4 + inv.botnetsLvl5,
                 miners = inv.cryptoMinersLvl1 + inv.cryptoMinersLvl2 + inv.cryptoMinersLvl3 + inv.cryptoMinersLvl4 + inv.cryptoMinersLvl5,
             )
-            gameRepository.addBitcoins(newCoins)
         }
-
     }
 
     init {
@@ -120,48 +123,4 @@ class StartViewModel @Inject constructor(
 
         workManager.enqueue(workRequest)
     }
-
-    // TODO: Remove debug code before merge to main
-
-    /*   Debug code start ------------------------------------------------------------------------------------------------*/
-    fun addHacker() {
-        viewModelScope.launch {
-            gameRepository.addNewHacker()
-        }
-    }
-
-    fun addBot() {
-        viewModelScope.launch {
-            gameRepository.addNewBotnet()
-        }
-    }
-
-    fun addMiner() {
-        viewModelScope.launch {
-            gameRepository.addNewCryptoMiner()
-        }
-    }
-
-    fun addBooster(lvl: Int) {
-        viewModelScope.launch {
-            when (lvl) {
-                1 -> {
-                    gameRepository.addLowBoost()
-                    gameRepository.activateLowBoost()
-                }
-
-                2 -> {
-                    gameRepository.addMediumBoost()
-                    gameRepository.activateMediumBoost()
-                }
-
-                3 -> {
-                    gameRepository.logout()
-                }
-            }
-        }
-    }
-
-    /*   Debug code end   ------------------------------------------------------------------------------------------------*/
-
 }
