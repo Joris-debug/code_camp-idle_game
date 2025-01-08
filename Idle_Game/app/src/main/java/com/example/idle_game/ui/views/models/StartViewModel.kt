@@ -104,7 +104,6 @@ class StartViewModel @Inject constructor(
 
             while (true) { // Stops with end of coroutine lifecycle
                 val lastTimestamp = inventoryFlow.first().lastMiningTimestamp
-                gameRepository.setMiningTimestamp(System.currentTimeMillis())
                 val duration = (System.currentTimeMillis() - lastTimestamp) / millisPerSec
                 // ^ Get the duration in seconds ^
                 /*
@@ -112,6 +111,8 @@ class StartViewModel @Inject constructor(
                 * A: The thread or even the entire app could freeze because of external factors,
                 * which would lead to an incorrect coin count after responding again
                 */
+                gameRepository.setMiningTimestamp(lastTimestamp + duration * millisPerSec)
+                // ^ Ensure the timestamp is incremented in 1-second intervals only ^
                 addCoins(getPassiveCoinsPerSecond() * duration)
                 delay(millisPerSec)
             }

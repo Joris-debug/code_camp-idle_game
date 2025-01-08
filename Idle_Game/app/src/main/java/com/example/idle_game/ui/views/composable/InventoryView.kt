@@ -333,7 +333,7 @@ fun ShowDialog(
     }
 }
 
-//Dialog that appears if user has to less BTC
+//Dialog that appears if user has to little BTC
 @Composable
 fun InsufficientFundsDialog(
     onDismiss: () -> Unit,

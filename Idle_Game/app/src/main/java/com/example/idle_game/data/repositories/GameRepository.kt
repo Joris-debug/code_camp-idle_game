@@ -230,7 +230,6 @@ class GameRepository(
         gameDao.insertInventory(InventoryData())
     }
 
-    // TODO add error handing if no inventory exists (all functions)
     suspend fun addBitcoins(bitcoins: Long) {
         if (bitcoins <= 0) {
             return
@@ -249,9 +248,19 @@ class GameRepository(
         gameDao.setMiningTimestamp(timestamp)
     }
 
-    // Adds a new lvl 1 hacker to the inventory
+    // Adds new lvl 1 hackers to the inventory
     private suspend fun addNewHacker(amount: Int) {
         gameDao.addNewHacker(amount = amount)
+    }
+
+    // Adds new lvl 1 crypto miners to the inventory
+    private suspend fun addNewCryptoMiner(amount: Int) {
+        gameDao.addNewCryptoMiner(amount = amount)
+    }
+
+    // Adds new lvl 1 botnets to the inventory
+    private suspend fun addNewBotnet(amount: Int) {
+        gameDao.addNewBotnet(amount = amount)
     }
 
     // Uses a level k upgrade on a level k-1 hacker, if both exist
@@ -374,51 +383,41 @@ class GameRepository(
         }
     }
 
-    // Adds a new lvl 1 crypto miner to the inventory
-    private suspend fun addNewCryptoMiner(amount: Int) {
-        gameDao.addNewCryptoMiner(amount = amount)
-    }
-
-    // Adds a new lvl 1 botnet to the inventory
-    private suspend fun addNewBotnet(amount: Int) {
-        gameDao.addNewBotnet(amount = amount)
-    }
-
     private suspend fun addUpgradeLvl2(amount: Int) {
-        val upgrades = gameDao.getInventory().first().upgradeLvl2
+        val upgrades = inventoryDataFlow.first().upgradeLvl2
         gameDao.updateLvl2Upgrades(upgrades + amount)
     }
 
     private suspend fun addUpgradeLvl3(amount: Int) {
-        val upgrades = gameDao.getInventory().first().upgradeLvl3
+        val upgrades = inventoryDataFlow.first().upgradeLvl3
         gameDao.updateLvl3Upgrades(upgrades + amount)
     }
 
     private suspend fun addUpgradeLvl4(amount: Int) {
-        val upgrades = gameDao.getInventory().first().upgradeLvl4
+        val upgrades = inventoryDataFlow.first().upgradeLvl4
         gameDao.updateLvl4Upgrades(upgrades + amount)
     }
 
     private suspend fun addUpgradeLvl5(amount: Int) {
-        val upgrades = gameDao.getInventory().first().upgradeLvl5
+        val upgrades = inventoryDataFlow.first().upgradeLvl5
         gameDao.updateLvl5Upgrades(upgrades + amount)
     }
 
-    // Adds a new low boost to the inventory
+    // Adds new low boosts to the inventory
     private suspend fun addLowBoost(amount: Int) {
-        val boosts = gameDao.getInventory().first().lowBoosts
+        val boosts = inventoryDataFlow.first().lowBoosts
         gameDao.updateLowBoosts(boosts + amount)
     }
 
-    // Adds a new medium boost to the inventory
+    // Adds new medium boosts to the inventory
     private suspend fun addMediumBoost(amount: Int) {
-        val boosts = gameDao.getInventory().first().mediumBoosts
+        val boosts = inventoryDataFlow.first().mediumBoosts
         gameDao.updateMediumBoosts(boosts + amount)
     }
 
-    // Adds a new high boost to the inventory
+    // Adds new high boosts to the inventory
     private suspend fun addHighBoost(amount: Int) {
-        val boosts = gameDao.getInventory().first().highBoosts
+        val boosts = inventoryDataFlow.first().highBoosts
         gameDao.updateHighBoosts(boosts + amount)
     }
 
@@ -452,7 +451,7 @@ class GameRepository(
 
     // Only used internally
     private suspend fun activateBoost(boostId: Int) {
-        val inventory = gameDao.getInventory().first()
+        val inventory = inventoryDataFlow.first()
         var boosts = when (boostId) {
             LOW_BOOST_ID -> inventory.lowBoosts
             MEDIUM_BOOST_ID -> inventory.mediumBoosts
@@ -496,7 +495,7 @@ class GameRepository(
         }!!
     }
 
-    //Updating the database after buying items
+    // Updating the database after buying items
     suspend fun buyItem(item: ShopData, amount: Int) {
         when (item.name) {
             "low Boost" -> addLowBoost(amount = amount)
@@ -512,7 +511,7 @@ class GameRepository(
         }
     }
 
-    //Updating database after using items
+    // Updating database after using items
     suspend fun useItem(item: ShopData, useOn: String) {
         if (!isBoostActive()) {
             when (item.name) {
