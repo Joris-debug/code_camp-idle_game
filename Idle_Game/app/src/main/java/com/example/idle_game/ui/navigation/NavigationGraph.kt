@@ -1,6 +1,7 @@
 package com.example.idle_game.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.BottomAppBar
@@ -19,6 +20,7 @@ import com.example.idle_game.ui.views.composable.InventoryView
 import com.example.idle_game.R
 import com.example.idle_game.ui.views.composable.ScoreBoardView
 import com.example.idle_game.ui.views.composable.StartView
+import com.example.idle_game.ui.views.composable.TestView
 
 @Composable
 fun NavigationGraph(
@@ -39,6 +41,9 @@ fun NavigationGraph(
         }
         composable("ScoreBoardView") {
             ScoreBoardView()
+        }
+        composable("TestView") {
+            TestView()
         }
     }
 }
@@ -87,5 +92,17 @@ fun BottomBar(navController: NavController) {
             val scoreboardIcon = painterResource(id = R.drawable.ic_scoreboard)
             Icon(scoreboardIcon, contentDescription = "Scoreboard")
         })
+
+        NavigationBarItem(selected = currentRoute == "TestView", onClick = {
+            navController.navigate("TestView") {
+                navController.graph.startDestinationRoute?.let { screenRoute ->
+                    popUpTo(screenRoute) {
+                        saveState = false
+                        inclusive = false
+                    }
+                }
+                launchSingleTop = true
+                restoreState = false }
+        }, icon = { Icon(Icons.Default.Build, contentDescription = "Test")})
     }
 }
