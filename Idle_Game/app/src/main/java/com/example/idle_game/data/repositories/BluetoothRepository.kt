@@ -10,6 +10,7 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
@@ -23,8 +24,8 @@ class BluetoothRepository @Inject constructor(
             as? BluetoothManager
         ?: throw Exception("Bluetooth is not supported by this device")
 
-    private val scanner: BluetoothLeScanner
-        get() = bluetooth.adapter.bluetoothLeScanner
+    private val scanner: BluetoothAdapter?
+        get() = bluetooth.adapter
 
     val discoveredDevices: MutableList<BluetoothDevice> = mutableListOf()
 
@@ -51,29 +52,24 @@ class BluetoothRepository @Inject constructor(
         return bluetoothConnectPermission && bluetoothScanPermission && bluetoothAdvertisePermission
     }
 
-    private var selectedDevice: BluetoothDevice? = null
-
-    private val scanCallback = object : ScanCallback() {
-        @SuppressLint("MissingPermission")
-        override fun onScanResult(callbackType: Int, result: ScanResult?) {
-            super.onScanResult(callbackType, result)
-            if (result != null) {
-                if (!discoveredDevices.contains(result.device)) {
-                    discoveredDevices.add(result.device)
-                }
-            }
-        }
-        override fun onScanFailed(errorCode: Int) {
-            super.onScanFailed(errorCode)
-            //TODO: Something went wrong
+    private val foundDeviceReceiver = FoundDeviceReceiver { device ->
+        if (!discoveredDevices.contains(device)) {
+            discoveredDevices.add(device)
         }
     }
 
     @SuppressLint("MissingPermission")
     fun startScanning() {
-        if (checkBluetoothPermissions()) {
-            scanner.startScan(scanCallback)
+        if(!checkBluetoothPermissions()) {
+            return
         }
+
+        context.registerReceiver(
+            foundDeviceReceiver,
+            IntentFilter(BluetoothDevice.ACTION_FOUND)
+        )
+
+        scanner?.startDiscovery()
     }
 
     // Asks the user to activate BT, if the device supports it and the permissions are granted
@@ -112,8 +108,7 @@ class BluetoothRepository @Inject constructor(
     @SuppressLint("MissingPermission")
     fun stopScanning() {
         if (checkBluetoothPermissions() && bluetooth.adapter.isDiscovering) {
-            scanner.stopScan(scanCallback)
-            Log.d("stopBluetoothScan:", "Bluetooth scan stopped")
+            scanner?.cancelDiscovery()
         }
     }
 
