@@ -20,7 +20,7 @@ import com.example.idle_game.ui.views.composable.InventoryView
 import com.example.idle_game.R
 import com.example.idle_game.ui.views.composable.ScoreBoardView
 import com.example.idle_game.ui.views.composable.StartView
-import com.example.idle_game.ui.views.composable.TestView
+import com.example.idle_game.ui.views.composable.BluetoothView
 
 @Composable
 fun NavigationGraph(
@@ -43,7 +43,7 @@ fun NavigationGraph(
             ScoreBoardView()
         }
         composable("TestView") {
-            TestView()
+            BluetoothView()
         }
     }
 }
