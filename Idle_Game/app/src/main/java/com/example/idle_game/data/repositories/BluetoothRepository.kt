@@ -32,7 +32,7 @@ class BluetoothRepository @Inject constructor(
     private val bluetoothAdapter: BluetoothAdapter?
         get() = bluetooth.adapter
 
-    val discoveredDevices: Set<BluetoothDevice> = mutableSetOf()
+    val discoveredDevices: MutableSet<BluetoothDevice> = mutableSetOf()
 
     private val foundDeviceReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -47,7 +47,7 @@ class BluetoothRepository @Inject constructor(
                         intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                     }
                     device?.let { dev ->
-                        discoveredDevices.plus(dev)
+                        discoveredDevices.add(dev)
                     }
                 }
             }
