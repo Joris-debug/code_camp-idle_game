@@ -72,6 +72,11 @@ fun BluetoothView(viewModel: BluetoothViewModel = hiltViewModel()) {
         ) {
             Text(text = "Request Bluetooth Permissions")
         }
+        Button(
+            onClick = { viewModel.enableDiscoverability() }
+        ) {
+            Text(text = "Enable discoverability")
+        }
 
         Button(
             onClick = { viewModel.startBluetoothScan() }

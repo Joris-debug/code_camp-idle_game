@@ -11,7 +11,7 @@ class BluetoothViewModel @Inject constructor(
     private val bluetoothRepository: BluetoothRepository,
 ) : ViewModel() {
 
-    fun activateBluetooth() = bluetoothRepository.startBluetoothConnection()
+    fun activateBluetooth() = bluetoothRepository.enableBluetoothConnection()
 
     fun isBluetoothEnabled() = bluetoothRepository.isBluetoothEnabled()
 
@@ -22,4 +22,6 @@ class BluetoothViewModel @Inject constructor(
     fun getDevices(): MutableList<BluetoothDevice>  {
         return bluetoothRepository.discoveredDevices
     }
+
+    fun enableDiscoverability() = bluetoothRepository.enableBluetoothDiscoverability()
 }

@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import com.example.idle_game.data.repositories.BluetoothRepository
 import com.example.idle_game.ui.theme.AppTheme
 import com.example.idle_game.ui.views.composable.Idle_GameLauncher
 import com.example.idle_game.ui.views.composable.LoadingScreenView

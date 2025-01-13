@@ -5,6 +5,8 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothServerSocket
+import android.bluetooth.BluetoothSocket
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,6 +16,10 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.IOException
+import java.util.UUID
 import javax.inject.Inject
 
 class BluetoothRepository @Inject constructor(
@@ -26,7 +32,7 @@ class BluetoothRepository @Inject constructor(
     private val bluetoothAdapter: BluetoothAdapter?
         get() = bluetooth.adapter
 
-    val discoveredDevices: MutableList<BluetoothDevice> = mutableListOf()
+    val discoveredDevices: Set<BluetoothDevice> = mutableSetOf()
 
     private val foundDeviceReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -41,12 +47,161 @@ class BluetoothRepository @Inject constructor(
                         intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                     }
                     device?.let { dev ->
-                        if (!discoveredDevices.contains(dev)) {
-                            discoveredDevices.add(dev)
-                        }
+                        discoveredDevices.plus(dev)
                     }
                 }
             }
+        }
+    }
+
+    private var connectionEstablished = false
+    private var serverSocket: BluetoothServerSocket? = null
+    private var clientSocket: BluetoothSocket? = null
+
+    companion object {
+        const val SERVICE_NAME = "CoinCraze"
+        val SERVICE_UUID: UUID = UUID.nameUUIDFromBytes(SERVICE_NAME.toByteArray())
+    }
+
+    private val readBuffer: ByteArray = ByteArray(1024) // Buffer store for the stream
+
+    @SuppressLint("MissingPermission")
+    fun getPairedDevices(): Set<BluetoothDevice> {
+        if (!checkBluetoothPermissions()) {
+            Log.d("getPairedDevices()", "Missing permissions")
+            return mutableSetOf()
+        }
+        return bluetoothAdapter?.bondedDevices ?: mutableSetOf()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun createServerSocket() {
+        if (!checkBluetoothPermissions()) {
+            Log.e("createServerSocket()", "Missing permissions")
+            return
+        }
+        connectionEstablished = false
+        serverSocket = bluetoothAdapter?.listenUsingInsecureRfcommWithServiceRecord(SERVICE_NAME, SERVICE_UUID)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun createClientSocket(device: BluetoothDevice) {
+        if (!checkBluetoothPermissions()) {
+            Log.e("createClientSocket()", "Missing permissions")
+            return
+        }
+        connectionEstablished = false
+        clientSocket = device.createRfcommSocketToServiceRecord(SERVICE_UUID)
+    }
+
+    suspend fun listenOnServerSocket() {
+        if (serverSocket == null) {
+            createServerSocket()
+            if (serverSocket == null) {
+                return
+            }
+        }
+        // Keep listening until exception occurs or a socket is returned.
+        var shouldLoop = true
+        while (shouldLoop) {
+            val socket: BluetoothSocket? = try {
+                serverSocket?.accept()
+            } catch (e: IOException) {
+                Log.e("listenOnServerSocket()", "Socket's accept() method failed", e)
+                shouldLoop = false
+                null
+            }
+            socket?.also {
+                connectionEstablished = true
+                clientSocket = socket
+                serverSocket?.close()
+                shouldLoop = false
+            }
+        }
+    }
+
+    // Closes the connect socket and causes the thread to finish.
+    fun cancelListenOnServerSocket() {
+        try {
+            serverSocket?.close()
+        } catch (e: IOException) {
+            Log.e("cancelListenOnServerSocket()", "Could not close the connect socket", e)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    fun connectFromClientSocket(device: BluetoothDevice) {
+        if (clientSocket == null) {
+            createClientSocket(device)
+            if (clientSocket == null) {
+                return
+            }
+        }
+        if (!checkBluetoothPermissions()) {
+            return
+        }
+        // Cancel discovery because it otherwise slows down the connection.
+        bluetoothAdapter?.cancelDiscovery()
+
+        clientSocket?.let { socket ->
+            // Connect to the remote device through the socket. This call blocks
+            // until it succeeds or throws an exception.
+            socket.connect()
+            // The connection attempt succeeded.
+            connectionEstablished = true
+        }
+    }
+
+    // Closes the client socket and causes the thread to finish.
+    fun cancelConnectFromClientSocket() {
+        try {
+            clientSocket?.close()
+        } catch (e: IOException) {
+            Log.e("cancelConnectFromClientSocket()", "Could not close the client socket", e)
+        }
+    }
+
+    suspend fun read(): String {
+        val stringBuilder = StringBuilder()
+
+        try {
+            withContext(Dispatchers.IO) {
+                var numBytes: Int
+                while (true) {
+                    numBytes = clientSocket!!.inputStream.read(readBuffer)
+
+                    if (numBytes == -1) {
+                        break
+                    }
+                    val data = String(readBuffer, 0, numBytes)
+                    stringBuilder.append(data)
+                }
+            }
+        } catch (e: IOException) {
+            Log.d("read()", "Input stream was disconnected", e)
+            return "Error: ${e.message}"
+        }
+        return stringBuilder.toString()
+    }
+
+    suspend fun write(message: String) {
+        val bytes = message.toByteArray()
+        try {
+            withContext(Dispatchers.IO) {
+                clientSocket!!.outputStream.write(bytes)
+            }
+        } catch (e: IOException) {
+            Log.e("write()", "Error occurred when sending data", e)
+            return
+        }
+    }
+
+    // Call this method to shut down the connection.
+    fun cancelConnection() {
+        try {
+            clientSocket?.close()
+        } catch (e: IOException) {
+            Log.e("cancelConnection()", "Could not close the connect socket", e)
         }
     }
 
@@ -87,10 +242,9 @@ class BluetoothRepository @Inject constructor(
         bluetoothAdapter?.startDiscovery()
     }
 
-    // Asks the user to activate BT, if the device supports it and the permissions are granted
-    // Only for Debugging, this should all be done on the viewmodel layer
+    // Only for debugging, activities are not supposed to be started here
     @SuppressLint("MissingPermission")
-    fun startBluetoothConnection() {
+    fun enableBluetoothConnection() {
         if (!isBluetoothEnabled()) {
             if (!checkBluetoothPermissions()) {
                 Log.d("startBluetoothConnection:", "Missing permissions")
@@ -99,6 +253,22 @@ class BluetoothRepository @Inject constructor(
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             enableBtIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(enableBtIntent)
+        }
+    }
+
+    // Only for debugging, activities are not supposed to be started here
+    @SuppressLint("MissingPermission")
+    fun enableBluetoothDiscoverability() {
+        if (isBluetoothEnabled()) {
+            if (!checkBluetoothPermissions()) {
+                Log.d("startBluetoothConnection:", "Missing permissions")
+                return
+            }
+            val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
+                putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
+            }
+            discoverableIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(discoverableIntent)
         }
     }
 
