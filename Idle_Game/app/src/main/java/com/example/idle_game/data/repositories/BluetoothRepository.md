@@ -30,9 +30,28 @@ There are currently two ways to obtain devices:
    Bluetooth scans take about 12 seconds. Be sure to call `stopBluetoothScan()` after you’re done discovering devices.
    All devices that were found can be obtained by calling `getDiscoveredDevices()`.
 ### Note   
-   `getPairedDevices()` as well as `getDiscoveredDevices()` will give you access to instances of BluetoothDevice.
-   You will need the desired device object for the next step.
-   For the discovery process to work, Bluetooth must be enabled, and you need the following permissions:
-   * BLUETOOTH_ADVERTISE
-   * BLUETOOTH_SCAN
-   * BLUETOOTH_CONNECT
+`getPairedDevices()` as well as `getDiscoveredDevices()` will give you access to instances of BluetoothDevice.
+You will need the desired device object for the next step.
+For the discovery process to work, Bluetooth must be enabled, and you need the following permissions:
+* BLUETOOTH_ADVERTISE
+* BLUETOOTH_SCAN
+* BLUETOOTH_CONNECT
+These permissions are required for all the remaining steps.
+## Start a connection
+To start a connection, one device will act as the server, while the other will act as the client.  
+A device can become a server by calling the function `listenOnServerSocket()`.  
+You can check if a client has successfully connected to the server by calling `todo()`, which returns `true` in that case, and `false` otherwise.
+
+The client, on the other hand, needs to call the function `connectFromClientSocket(dev)`.  
+`dev` should be the instance of `BluetoothDevice` discussed in the **Discover Devices** section.
+If done correctly, a connection should now be established.
+## Transmit Data
+Everything we have done so far has led us to the most important aspect of a Bluetooth connection:  
+sharing data between the devices.  
+To do so, you can call the functions `write(message)` and `read()`.  
+`write()` takes a message as a `String`. You can read the message on the receiver side by calling `read()`,  
+which reads everything from the buffer and returns it as a `String`.
+## Closing a Connection
+All good things must come to an end.  
+Sooner or later, your devices must part ways.  
+To ensure that your repository keeps working as intended, call the function `closeConnection()` on both devices.

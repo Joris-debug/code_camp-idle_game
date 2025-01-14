@@ -94,7 +94,7 @@ class BluetoothRepository @Inject constructor(
         clientSocket = device.createRfcommSocketToServiceRecord(SERVICE_UUID)
     }
 
-    suspend fun listenOnServerSocket() {
+    fun listenOnServerSocket() {
         if (serverSocket == null) {
             createServerSocket()
             if (serverSocket == null) {
@@ -152,15 +152,6 @@ class BluetoothRepository @Inject constructor(
         }
     }
 
-    // Closes the client socket and causes the thread to finish.
-    fun cancelConnectFromClientSocket() {
-        try {
-            clientSocket?.close()
-        } catch (e: IOException) {
-            Log.e("cancelConnectFromClientSocket()", "Could not close the client socket", e)
-        }
-    }
-
     suspend fun read(): String {
         val stringBuilder = StringBuilder()
 
@@ -190,7 +181,7 @@ class BluetoothRepository @Inject constructor(
     }
 
     // Call this method to shut down the connection.
-    fun cancelConnection() {
+    fun closeConnection() {
         try {
             clientSocket?.close()
         } catch (e: IOException) {
