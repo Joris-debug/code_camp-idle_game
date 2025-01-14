@@ -25,14 +25,13 @@ import javax.inject.Inject
 class BluetoothRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
+    // TODO: handle this error gracefully
     private val bluetooth = context.getSystemService(Context.BLUETOOTH_SERVICE)
             as? BluetoothManager
         ?: throw Exception("Bluetooth is not supported by this device")
 
     private val bluetoothAdapter: BluetoothAdapter?
         get() = bluetooth.adapter
-
-    val discoveredDevices: MutableSet<BluetoothDevice> = mutableSetOf()
 
     private val foundDeviceReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -54,139 +53,24 @@ class BluetoothRepository @Inject constructor(
         }
     }
 
+    private val discoveredDevices: MutableSet<BluetoothDevice> = mutableSetOf()
     private var connectionEstablished = false
     private var serverSocket: BluetoothServerSocket? = null
-    private var clientSocket: BluetoothSocket? = null
+    private var socket: BluetoothSocket? = null
+    private val readBuffer: ByteArray = ByteArray(BUFFER_SIZE) // Buffer store for the stream
 
     companion object {
+        const val BUFFER_SIZE = 2048
         const val SERVICE_NAME = "CoinCraze"
         val SERVICE_UUID: UUID = UUID.nameUUIDFromBytes(SERVICE_NAME.toByteArray())
     }
 
-    private val readBuffer: ByteArray = ByteArray(1024) // Buffer store for the stream
-
-    @SuppressLint("MissingPermission")
-    fun getPairedDevices(): Set<BluetoothDevice> {
-        if (!checkBluetoothPermissions()) {
-            Log.d("getPairedDevices()", "Missing permissions")
-            return mutableSetOf()
-        }
-        return bluetoothAdapter?.bondedDevices ?: mutableSetOf()
+    fun isConnected(): Boolean {
+        return connectionEstablished
     }
 
-    @SuppressLint("MissingPermission")
-    private fun createServerSocket() {
-        if (!checkBluetoothPermissions()) {
-            Log.e("createServerSocket()", "Missing permissions")
-            return
-        }
-        connectionEstablished = false
-        serverSocket = bluetoothAdapter?.listenUsingInsecureRfcommWithServiceRecord(SERVICE_NAME, SERVICE_UUID)
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun createClientSocket(device: BluetoothDevice) {
-        if (!checkBluetoothPermissions()) {
-            Log.e("createClientSocket()", "Missing permissions")
-            return
-        }
-        connectionEstablished = false
-        clientSocket = device.createRfcommSocketToServiceRecord(SERVICE_UUID)
-    }
-
-    fun listenOnServerSocket() {
-        if (serverSocket == null) {
-            createServerSocket()
-            if (serverSocket == null) {
-                return
-            }
-        }
-        // Keep listening until exception occurs or a socket is returned.
-        var shouldLoop = true
-        while (shouldLoop) {
-            val socket: BluetoothSocket? = try {
-                serverSocket?.accept()
-            } catch (e: IOException) {
-                Log.e("listenOnServerSocket()", "Socket's accept() method failed", e)
-                shouldLoop = false
-                null
-            }
-            socket?.also {
-                connectionEstablished = true
-                clientSocket = socket
-                serverSocket?.close()
-                shouldLoop = false
-            }
-        }
-    }
-
-    // Closes the connect socket and causes the thread to finish.
-    fun cancelListenOnServerSocket() {
-        try {
-            serverSocket?.close()
-        } catch (e: IOException) {
-            Log.e("cancelListenOnServerSocket()", "Could not close the connect socket", e)
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    fun connectFromClientSocket(device: BluetoothDevice) {
-        if (clientSocket == null) {
-            createClientSocket(device)
-            if (clientSocket == null) {
-                return
-            }
-        }
-        if (!checkBluetoothPermissions()) {
-            return
-        }
-        // Cancel discovery because it otherwise slows down the connection.
-        bluetoothAdapter?.cancelDiscovery()
-
-        clientSocket?.let { socket ->
-            // Connect to the remote device through the socket. This call blocks
-            // until it succeeds or throws an exception.
-            socket.connect()
-            // The connection attempt succeeded.
-            connectionEstablished = true
-        }
-    }
-
-    suspend fun read(): String {
-        val stringBuilder = StringBuilder()
-
-        try {
-            withContext(Dispatchers.IO) {
-                val numBytes: Int = clientSocket!!.inputStream.read(readBuffer)
-                val data = String(readBuffer, 0, numBytes)
-                stringBuilder.append(data)
-            }
-        } catch (e: IOException) {
-            Log.d("read()", "Input stream was disconnected", e)
-            return "Error: ${e.message}"
-        }
-        return stringBuilder.toString()
-    }
-
-    suspend fun write(message: String) {
-        val bytes = message.toByteArray()
-        try {
-            withContext(Dispatchers.IO) {
-                clientSocket!!.outputStream.write(bytes)
-            }
-        } catch (e: IOException) {
-            Log.e("write()", "Error occurred when sending data", e)
-            return
-        }
-    }
-
-    // Call this method to shut down the connection.
-    fun closeConnection() {
-        try {
-            clientSocket?.close()
-        } catch (e: IOException) {
-            Log.e("cancelConnection()", "Could not close the connect socket", e)
-        }
+    fun getDiscoveredDevices(): Set<BluetoothDevice> {
+        return discoveredDevices.toSet()
     }
 
     // Returns true if the device has activated bluetooth
@@ -215,6 +99,136 @@ class BluetoothRepository @Inject constructor(
     }
 
     @SuppressLint("MissingPermission")
+    fun getPairedDevices(): Set<BluetoothDevice> {
+        if (!checkBluetoothPermissions()) {
+            Log.d("getPairedDevices()", "Missing permissions")
+            return setOf()
+        }
+        return bluetoothAdapter?.bondedDevices ?: setOf()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun createServerSocket() {
+        if (!checkBluetoothPermissions()) {
+            Log.e("createServerSocket()", "Missing permissions")
+            return
+        }
+        connectionEstablished = false
+        serverSocket =
+            bluetoothAdapter?.listenUsingInsecureRfcommWithServiceRecord(SERVICE_NAME, SERVICE_UUID)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun createClientSocket(device: BluetoothDevice) {
+        if (!checkBluetoothPermissions()) {
+            Log.e("createClientSocket()", "Missing permissions")
+            return
+        }
+        connectionEstablished = false
+        socket = device.createRfcommSocketToServiceRecord(SERVICE_UUID)
+    }
+
+    fun listenOnServerSocket() {
+        if (serverSocket == null) {
+            createServerSocket()
+            if (serverSocket == null) {
+                // Socket creation was not successful
+                return
+            }
+        }
+        // Keep listening until exception occurs or a socket is returned.
+        var shouldLoop = true
+        while (shouldLoop) {
+            val socket: BluetoothSocket? = try {
+                serverSocket?.accept()
+            } catch (e: IOException) {
+                Log.e("listenOnServerSocket()", "Socket's accept() method failed", e)
+                shouldLoop = false
+                null
+            }
+            socket?.also {
+                connectionEstablished = true
+                this.socket = socket
+                serverSocket?.close()
+                shouldLoop = false
+            }
+        }
+    }
+
+    // Closes the connect socket and causes the thread to finish.
+    fun cancelListenOnServerSocket() {
+        try {
+            serverSocket?.close()
+        } catch (e: IOException) {
+            Log.e("cancelListenOnServerSocket()", "Could not close the connect socket", e)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    fun connectFromClientSocket(device: BluetoothDevice) {
+        if (!checkBluetoothPermissions()) {
+            return
+        }
+        if (socket == null) {
+            createClientSocket(device)
+            if (socket == null) {
+                // Socket creation was not successful
+                return
+            }
+        }
+        // Cancel discovery because it otherwise slows down the connection.
+        bluetoothAdapter?.cancelDiscovery()
+
+        socket?.let { socket ->
+            // Connect to the remote device through the socket. This call blocks
+            // until it succeeds or throws an exception.
+            socket.connect()
+            // The connection attempt succeeded.
+            connectionEstablished = true
+        }
+    }
+
+    suspend fun read(): String {
+        var message: String
+        try {
+            withContext(Dispatchers.IO) {
+                val numBytes: Int = socket!!.inputStream.read(readBuffer)
+                val data = String(readBuffer, 0, numBytes)
+                message = data
+            }
+        } catch (e: IOException) {
+            Log.d("read()", "Input stream was disconnected", e)
+            return "Error: ${e.message}"
+        }
+        return message
+    }
+
+    suspend fun write(message: String) {
+        val bytes = message.toByteArray()
+        try {
+            withContext(Dispatchers.IO) {
+                socket!!.outputStream.write(bytes)
+            }
+        } catch (e: IOException) {
+            Log.e("write(...)", "Error occurred when sending data", e)
+            return
+        }
+    }
+
+    // Call this method to shut down the connection.
+    fun closeConnection() {
+        if (!checkBluetoothPermissions()) {
+            return
+        }
+        try {
+            socket?.close()
+            connectionEstablished = false
+        } catch (e: IOException) {
+            Log.e("closeConnection()", "Could not close the connect socket", e)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
     fun startScanning() {
         if(!checkBluetoothPermissions()) {
             return
@@ -231,7 +245,7 @@ class BluetoothRepository @Inject constructor(
     fun enableBluetoothConnection() {
         if (!isBluetoothEnabled()) {
             if (!checkBluetoothPermissions()) {
-                Log.d("startBluetoothConnection:", "Missing permissions")
+                Log.d("enableBluetoothConnection():", "Missing permissions")
                 return
             }
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
@@ -245,7 +259,7 @@ class BluetoothRepository @Inject constructor(
     fun enableBluetoothDiscoverability() {
         if (isBluetoothEnabled()) {
             if (!checkBluetoothPermissions()) {
-                Log.d("startBluetoothConnection:", "Missing permissions")
+                Log.d("enableBluetoothDiscoverability():", "Missing permissions")
                 return
             }
             val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {

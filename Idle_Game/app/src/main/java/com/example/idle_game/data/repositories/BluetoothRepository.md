@@ -18,7 +18,7 @@ class MyViewModel @Inject constructor(
      
 }
 ```
-## Discover devices
+## Discover Devices
 If you wish to transfer data, you need to know which device should receive the information.
 There are currently two ways to obtain devices:
 1. Iterate over the list of already paired devices:
@@ -29,22 +29,28 @@ There are currently two ways to obtain devices:
    To do so, start discovering devices by calling the function `startBluetoothScan()`.
    Bluetooth scans take about 12 seconds. Be sure to call `stopBluetoothScan()` after you’re done discovering devices.
    All devices that were found can be obtained by calling `getDiscoveredDevices()`.
-### Note   
+### Note
 `getPairedDevices()` as well as `getDiscoveredDevices()` will give you access to instances of BluetoothDevice.
 You will need the desired device object for the next step.
-For the discovery process to work, Bluetooth must be enabled, and you need the following permissions:
-* BLUETOOTH_ADVERTISE
-* BLUETOOTH_SCAN
-* BLUETOOTH_CONNECT
+For the discovery process to work, Bluetooth must be enabled.
+You can only discover devices that have made themselves discoverable in the system settings.
+This can typically be done through a prompt, similar to the process of enabling Bluetooth.
+Additionally, you need the following permissions:
+* `BLUETOOTH_ADVERTISE`
+* `BLUETOOTH_SCAN`
+* `BLUETOOTH_CONNECT`
+
 These permissions are required for all the remaining steps.
-## Start a connection
+## Start a Connection
 To start a connection, one device will act as the server, while the other will act as the client.  
 A device can become a server by calling the function `listenOnServerSocket()`.  
-You can check if a client has successfully connected to the server by calling `todo()`, which returns `true` in that case, and `false` otherwise.
+You can check if a client has successfully connected to the server by calling `isConnected()`, which returns `true` in that case, and `false` otherwise.
 
-The client, on the other hand, needs to call the function `connectFromClientSocket(dev)`.  
-`dev` should be the instance of `BluetoothDevice` discussed in the **Discover Devices** section.
+The client, on the other hand, needs to call the function `connectFromClientSocket(device)`.  
+`device` should be the instance of `BluetoothDevice` discussed in the **Discover Devices** section.
 If done correctly, a connection should now be established.
+### Note
+Keep in mind that `listenOnServerSocket()` is a blocking call, terminating once a client connects.
 ## Transmit Data
 Everything we have done so far has led us to the most important aspect of a Bluetooth connection:  
 sharing data between the devices.  
