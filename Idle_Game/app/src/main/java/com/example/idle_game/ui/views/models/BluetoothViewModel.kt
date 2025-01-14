@@ -25,7 +25,7 @@ class BluetoothViewModel @Inject constructor(
 
     fun stopBluetoothScan() = bluetoothRepository.stopScanning()
 
-    fun getDevices(): MutableSet<BluetoothDevice>  {
+    fun getDevices(): Set<BluetoothDevice>  {
         return bluetoothRepository.getDiscoveredDevices()
     }
 

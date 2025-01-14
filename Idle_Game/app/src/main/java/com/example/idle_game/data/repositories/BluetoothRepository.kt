@@ -274,11 +274,11 @@ class BluetoothRepository @Inject constructor(
     @SuppressLint("MissingPermission")
     fun startBluetoothScan() {
         if (!checkBluetoothPermissions()) {
-            Log.d("startBluetoothScan:", "Missing Bluetooth permissions")
+            Log.d("startBluetoothScan():", "Missing Bluetooth permissions")
             return
         }
         if (!isBluetoothEnabled()) {
-            Log.d("startBluetoothScan:", "Bluetooth is not enabled")
+            Log.d("startBluetoothScan():", "Bluetooth is not enabled")
             return
         }
         stopScanning()

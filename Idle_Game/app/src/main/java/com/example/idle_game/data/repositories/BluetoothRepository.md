@@ -61,3 +61,12 @@ which reads everything from the buffer and returns it as a `String`.
 All good things must come to an end.  
 Sooner or later, your devices must part ways.  
 To ensure that your repository keeps working as intended, call the function `closeConnection()` on both devices.
+## FYI
+When calling a suspended function within a ViewModel coroutine, it is recommended to follow this pattern:
+```
+viewModelScope.launch(Dispatchers.IO) {
+    bluetoothRepository.write("Ping - - - Pong")
+}
+```
+`Dispatchers.IO`: This dispatcher is optimized for I/O-bound operations (e.g., network requests, file I/O, or interacting with Bluetooth devices).
+By using it, you avoid blocking the main thread, ensuring that UI updates are not delayed and the app remains responsive.
