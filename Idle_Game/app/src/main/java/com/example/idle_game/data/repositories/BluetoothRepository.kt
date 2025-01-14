@@ -166,16 +166,9 @@ class BluetoothRepository @Inject constructor(
 
         try {
             withContext(Dispatchers.IO) {
-                var numBytes: Int
-                while (true) {
-                    numBytes = clientSocket!!.inputStream.read(readBuffer)
-
-                    if (numBytes == -1) {
-                        break
-                    }
-                    val data = String(readBuffer, 0, numBytes)
-                    stringBuilder.append(data)
-                }
+                val numBytes: Int = clientSocket!!.inputStream.read(readBuffer)
+                val data = String(readBuffer, 0, numBytes)
+                stringBuilder.append(data)
             }
         } catch (e: IOException) {
             Log.d("read()", "Input stream was disconnected", e)

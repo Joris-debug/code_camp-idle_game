@@ -13,16 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.ui.views.models.BluetoothViewModel
@@ -88,7 +85,6 @@ fun BluetoothView(viewModel: BluetoothViewModel = hiltViewModel()) {
         ) {
             Text(text = "Stop Bluetooth Scan")
         }
-
         Button(
             onClick = {
                 val devices = viewModel.getDevices()
@@ -112,6 +108,41 @@ fun BluetoothView(viewModel: BluetoothViewModel = hiltViewModel()) {
                 text = "Display devices"
             )
         }
+
+        Button(
+            onClick = { viewModel.startBtServer() }
+        ) {
+            Text(text = "Start Bluetooth Server")
+        }
+
+        Button(
+            onClick = { viewModel.connectBtServer() }
+        ) {
+            Text(text = "Connect to Tablet")
+        }
+
+        Button(
+            onClick = { viewModel.sendMessage() }
+        ) {
+            Text(text = "Send message")
+        }
+
+        Button(
+            onClick = {viewModel.readMessage()}
+        ) {
+            Text(text = "Read message")
+        }
+
+        Button(
+            onClick = {
+                AlertDialog.Builder(context)
+                    .setTitle(viewModel.message)
+                    .setPositiveButton("OK", null)
+                    .show()}
+        ) {
+            Text(text = "Display message")
+        }
+
     }
 
 }
