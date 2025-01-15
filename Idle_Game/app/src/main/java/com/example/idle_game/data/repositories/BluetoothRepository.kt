@@ -128,7 +128,7 @@ class BluetoothRepository @Inject constructor(
         socket = device.createRfcommSocketToServiceRecord(SERVICE_UUID)
     }
 
-    fun listenOnServerSocket() {
+    suspend fun listenOnServerSocket() {
         if (serverSocket == null) {
             createServerSocket()
             if (serverSocket == null) {
@@ -138,19 +138,21 @@ class BluetoothRepository @Inject constructor(
         }
         // Keep listening until exception occurs or a socket is returned.
         var shouldLoop = true
-        while (shouldLoop) {
-            val socket: BluetoothSocket? = try {
-                serverSocket?.accept()
-            } catch (e: IOException) {
-                Log.e("listenOnServerSocket()", "Socket's accept() method failed", e)
-                shouldLoop = false
-                null
-            }
-            socket?.also {
-                connectionEstablished = true
-                this.socket = socket
-                serverSocket?.close()
-                shouldLoop = false
+        withContext(Dispatchers.IO) {
+            while (shouldLoop) {
+                val socket: BluetoothSocket? = try {
+                    serverSocket?.accept()
+                } catch (e: IOException) {
+                    Log.e("listenOnServerSocket()", "Socket's accept() method failed", e)
+                    shouldLoop = false
+                    null
+                }
+                socket?.also {
+                    connectionEstablished = true
+                    this@BluetoothRepository.socket = socket // Use fully qualified reference
+                    serverSocket?.close()
+                    shouldLoop = false
+                }
             }
         }
     }
@@ -165,7 +167,7 @@ class BluetoothRepository @Inject constructor(
     }
 
     @SuppressLint("MissingPermission")
-    fun connectFromClientSocket(device: BluetoothDevice) {
+    suspend fun connectFromClientSocket(device: BluetoothDevice) {
         if (!checkBluetoothPermissions()) {
             return
         }
@@ -182,10 +184,24 @@ class BluetoothRepository @Inject constructor(
         socket?.let { socket ->
             // Connect to the remote device through the socket. This call blocks
             // until it succeeds or throws an exception.
-            socket.connect()
+            withContext(Dispatchers.IO) {
+                socket.connect()
+            }
             // The connection attempt succeeded.
             connectionEstablished = true
         }
+    }
+
+    // Returns true if data is available to read from the input stream of the socket.
+    fun isDataAvailable(): Boolean {
+        try {
+            return socket!!.inputStream.available() > 0
+        } catch (e: IOException) {
+            Log.d("isDataAvailable()", "Error accessing socket input stream", e)
+        } catch (e: NullPointerException) {
+            Log.d("isDataAvailable()", "Socket is null", e)
+        }
+        return false
     }
 
     suspend fun read(): String {

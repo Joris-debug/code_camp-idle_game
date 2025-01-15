@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.repositories.BluetoothRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,7 +31,7 @@ class BluetoothViewModel @Inject constructor(
     fun enableDiscoverability() = bluetoothRepository.enableBluetoothDiscoverability()
 
     fun startBtServer() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             bluetoothRepository.listenOnServerSocket()
         }
     }
@@ -44,7 +43,7 @@ class BluetoothViewModel @Inject constructor(
             message = "Could not find device"
             return
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             message = "connecting to server"
             bluetoothRepository.connectFromClientSocket(myTablet)
             message = "connection established"
@@ -52,7 +51,7 @@ class BluetoothViewModel @Inject constructor(
     }
 
     fun sendMessage() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             message = "sending"
             bluetoothRepository.write("Hello")
             message = "done sending"
@@ -60,7 +59,7 @@ class BluetoothViewModel @Inject constructor(
     }
 
     fun readMessage() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             message = "reading"
             message = bluetoothRepository.read()
         }
