@@ -57,7 +57,7 @@ sharing data between the devices.
 To do so, you can call the functions `write(message)` and `read()`.  
 `write()` takes a message as a `String`. You can read the message on the receiver side by calling `read()`,  
 which reads everything from the buffer and returns it as a `String`.
-## Note
+### Note
 `read()` will block until it has successfully read data from the input stream of the socket.
 To prevent blocking, you can use the `isDataAvailable()` function first.
 It will return `true` if there is data available in the input stream, allowing you to check before calling `read()`.

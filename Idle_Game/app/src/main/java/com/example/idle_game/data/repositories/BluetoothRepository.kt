@@ -184,11 +184,15 @@ class BluetoothRepository @Inject constructor(
         socket?.let { socket ->
             // Connect to the remote device through the socket. This call blocks
             // until it succeeds or throws an exception.
-            withContext(Dispatchers.IO) {
-                socket.connect()
+            try {
+                withContext(Dispatchers.IO) {
+                    socket.connect()
+                }
+                // The connection attempt succeeded.
+                connectionEstablished = true
+            } catch (e: IOException) {
+                Log.d("connectFromClientSocket", "Connection failed: ${e.message}", e)
             }
-            // The connection attempt succeeded.
-            connectionEstablished = true
         }
     }
 
