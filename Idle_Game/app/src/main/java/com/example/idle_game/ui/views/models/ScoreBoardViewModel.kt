@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ScoreBoardViewModel @Inject constructor(
     private val gameRepository: GameRepository,
-    private val workManger: WorkManager,
+    private val workManager: WorkManager,
 ) : ViewModel() {
 
     private val _uiStateFlow = MutableStateFlow(ScoreBoardViewState())
@@ -57,8 +57,8 @@ class ScoreBoardViewModel @Inject constructor(
     private fun startWork() {
         val scoreWorkRequest =
             PeriodicWorkRequestBuilder<ScoreBoardWorker>(15, TimeUnit.MINUTES).build()
-        workManger.enqueueUniquePeriodicWork(
-            WORK_KEY, ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, scoreWorkRequest
+        workManager.enqueueUniquePeriodicWork(
+            WORK_KEY, ExistingPeriodicWorkPolicy.UPDATE, scoreWorkRequest
         )
     }
 
