@@ -22,7 +22,6 @@ class ScoreBoardViewModel @Inject constructor(
     private val workManager: WorkManager,
     val soundManager: SoundManager
 ) : ViewModel() {
-
     private val _uiStateFlow = MutableStateFlow(ScoreBoardViewState())
     val uiStateFlow: StateFlow<ScoreBoardViewState> = _uiStateFlow
 
