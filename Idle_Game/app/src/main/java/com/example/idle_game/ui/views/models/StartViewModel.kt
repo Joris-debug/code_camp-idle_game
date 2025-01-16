@@ -100,9 +100,9 @@ class StartViewModel @Inject constructor(
             gameRepository.updateShop()
             _viewState.value =
                 _viewState.value.copy(coins = toDisplay(inventoryFlow.first().bitcoins))
-            coins = inventoryFlow.first().bitcoins
 
             while (true) { // Stops with end of coroutine lifecycle
+                coins = inventoryFlow.first().bitcoins
                 val lastTimestamp = inventoryFlow.first().lastMiningTimestamp
                 val duration = (System.currentTimeMillis() - lastTimestamp) / millisPerSec
                 // ^ Get the duration in seconds ^
