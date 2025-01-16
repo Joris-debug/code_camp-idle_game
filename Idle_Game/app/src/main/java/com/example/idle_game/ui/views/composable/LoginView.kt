@@ -19,9 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.ui.views.models.LoginViewModel
+import com.example.idle_game.util.SoundManager
 
 @Composable
-fun LoginView(viewModel: LoginViewModel = hiltViewModel(), onSignUpSuccess: () -> Unit) {
+fun LoginView(
+    viewModel: LoginViewModel = hiltViewModel(),
+    onSignUpSuccess: () -> Unit
+) {
     val viewState = viewModel.viewState.collectAsState()
     var inputUsername by remember { mutableStateOf("") }
     var inputPassword by remember { mutableStateOf("") }
@@ -56,7 +60,10 @@ fun LoginView(viewModel: LoginViewModel = hiltViewModel(), onSignUpSuccess: () -
             label = { Text("Passwort") })
 
         OutlinedButton(
-            onClick = { viewModel.buttonSubmit(inputUsername, inputPassword, { onSignUpSuccess() }) },
+            onClick = {
+                viewModel.soundManager.playSound(SoundManager.CURSOR_SOUND_RESOURCE_ID)
+                viewModel.buttonSubmit(inputUsername, inputPassword, { onSignUpSuccess() })
+            },
             modifier = Modifier
         ) { Text("Submit") }
     }

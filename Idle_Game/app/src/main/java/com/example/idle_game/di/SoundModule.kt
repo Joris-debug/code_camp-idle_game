@@ -14,12 +14,8 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 class SoundModule {
 
-    companion object {
-        const val MAX_STREAMS = 16
-    }
-
     @Provides
-    fun provideSoundPool(@ApplicationContext context: Context): SoundPool {
+    fun provideSoundPool(): SoundPool {
         return SoundPool.Builder()
             .setMaxStreams(MAX_STREAMS)
             .setAudioAttributes(
@@ -41,4 +37,7 @@ class SoundModule {
         return soundManager
     }
 
+    companion object {
+        const val MAX_STREAMS = 16
+    }
 }

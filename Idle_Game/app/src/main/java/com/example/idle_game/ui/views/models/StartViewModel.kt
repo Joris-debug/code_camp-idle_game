@@ -1,15 +1,8 @@
 package com.example.idle_game.ui.views.models
 
-import android.content.Context
-import android.media.SoundPool
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
-import androidx.work.WorkRequest
-import com.example.idle_game.R
 import com.example.idle_game.data.repositories.GameRepository
-import com.example.idle_game.data.workers.NotWorker
 import com.example.idle_game.ui.views.states.StartViewState
 import com.example.idle_game.util.SoundManager
 import com.example.idle_game.util.shortBigNumbers
@@ -19,7 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -140,13 +132,4 @@ class StartViewModel @Inject constructor(
             addCoins(clickedCoins)
         }
     }
-
-    private fun scheduleNotWorker(delayMinutes: Long, workManager: WorkManager) {
-        val workRequest: WorkRequest = OneTimeWorkRequest.Builder(NotWorker::class.java)
-            .setInitialDelay(delayMinutes, TimeUnit.MINUTES)
-            .build()
-
-        workManager.enqueue(workRequest)
-    }
-
 }

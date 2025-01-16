@@ -30,10 +30,6 @@ class ScoreBoardViewModel @Inject constructor(
     private val playerData = gameRepository.getPlayerDataFlow()
     private var isButtonEnabled = true
 
-    companion object {
-        const val WORK_KEY = "score-updater"
-    }
-
     init {
         viewModelScope.launch {
             gameRepository.updateScoreBoard()
@@ -64,4 +60,7 @@ class ScoreBoardViewModel @Inject constructor(
         )
     }
 
+    companion object {
+        const val WORK_KEY = "score-updater"
+    }
 }

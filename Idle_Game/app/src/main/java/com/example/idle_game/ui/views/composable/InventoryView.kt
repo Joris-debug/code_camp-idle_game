@@ -56,13 +56,13 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
     val inventoryData = viewState.inventoryData.collectAsState(initial = InventoryData()).value
     val selectedItem = viewState.selectedItem
 
-    //State for showing the confirmation dialog
+    // State for showing the confirmation dialog
     val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
     val (itemToBuy, setItemToBuy) = remember { mutableStateOf<ShopData?>(null) }
     val (dialogMessage, setDialogMessage) = remember { mutableStateOf("") }
     val (dialogTitle, setDialogTitle) = remember { mutableStateOf("") }
 
-    //State for quantity input
+    // State for quantity input
     val (quantity, setQuantity) = remember { mutableStateOf("1") }
 
     // Partition the shop data into categories (e.g., Upgrade, Boost, Passive)
@@ -351,12 +351,12 @@ fun ShowDialog(
     }
 }
 
-//Dialog that appears if user has to less BTC
+// Dialog that appears if user has too little BTC
 @Composable
 fun InsufficientFundsDialog(
     onDismiss: () -> Unit,
     setQuantity: (String) -> Unit,
-    ) {
+) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -372,7 +372,7 @@ fun InsufficientFundsDialog(
     )
 }
 
-//Shows Dialog when user want to use an upgrade
+// Shows Dialog when user want to use an upgrade
 @Composable
 fun ApplyOnDialog(
     title: String,
@@ -536,7 +536,7 @@ fun ShopItemButtons(
     }
 }
 
-//Dialog for input text field
+// Dialog for input text field
 @Composable
 fun QuantityDialog(
     message: String,

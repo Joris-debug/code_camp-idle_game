@@ -25,12 +25,6 @@ class GameRepository(
     private val shopDataFlow = gameDao.getShop()
     private val scoreBoardDataFlow = gameDao.getScoreBoard()
 
-    companion object {
-        const val LOW_BOOST_ID = 1
-        const val MEDIUM_BOOST_ID = 2
-        const val HIGH_BOOST_ID = 3
-    }
-
     fun getPlayerDataFlow(): Flow<PlayerData> {
         return playerDataFlow
     }
@@ -582,5 +576,11 @@ class GameRepository(
                 addUpgradeLvl5(-1)
             }
         }
+    }
+
+    companion object {
+        const val LOW_BOOST_ID = 1
+        const val MEDIUM_BOOST_ID = 2
+        const val HIGH_BOOST_ID = 3
     }
 }

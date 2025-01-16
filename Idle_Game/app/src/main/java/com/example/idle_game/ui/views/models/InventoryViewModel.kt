@@ -32,7 +32,7 @@ class InventoryViewModel @Inject constructor(
         }
     }
 
-    //Get amount of certain items
+    // Get amount of certain items
     fun getAmountOfItems(item: ShopData, inventoryData: InventoryData): Int {
         return when (item.name) {
             "low Boost" -> inventoryData.lowBoosts

@@ -13,9 +13,12 @@ import com.example.idle_game.ui.views.composable.LoadingScreenView
 import com.example.idle_game.ui.views.composable.LoginView
 import com.example.idle_game.util.SoundManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var soundManager: SoundManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,14 +31,15 @@ class MainActivity : ComponentActivity() {
                 val isSignedUp = remember { mutableStateOf(false) }  // True when signed-up and logged-in
 
                 if (isSignedUp.value || isLoggedIn.value == true) {
-                    Idle_GameLauncher(navController = navController)
+                    Idle_GameLauncher(navController = navController, soundManager)
                 } else {
                     LoadingScreenView(
                         viewModel = hiltViewModel(),
                         onLoginSuccess = { isLoggedIn.value = true },
                         onLoginFailure = { isLoggedIn.value = false },
                         context = this,
-                        onWifiOK = { isWifiOK.value = true })
+                        onWifiOK = { isWifiOK.value = true }
+                    )
                     if (isLoggedIn.value == false && isWifiOK.value) {
                         LoginView(
                             viewModel = hiltViewModel(),

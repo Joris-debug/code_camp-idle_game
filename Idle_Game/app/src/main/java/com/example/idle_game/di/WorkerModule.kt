@@ -16,5 +16,4 @@ class WorkerModule {
     fun providesWorkManager(@ApplicationContext context: Context): WorkManager {
         return WorkManager.getInstance(context)
     }
-
 }
