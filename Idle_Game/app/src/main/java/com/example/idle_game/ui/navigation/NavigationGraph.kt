@@ -2,6 +2,7 @@ package com.example.idle_game.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem
@@ -14,10 +15,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.idle_game.ui.views.composable.InventoryView
 import com.example.idle_game.R
 import com.example.idle_game.ui.views.composable.ScoreBoardView
 import com.example.idle_game.ui.views.composable.StartView
-
 
 @Composable
 fun NavigationGraph(
@@ -33,6 +34,9 @@ fun NavigationGraph(
         composable("StartView") {
             StartView()
         }
+        composable("InventoryView") {
+            InventoryView()
+        }
         composable("ScoreBoardView") {
             ScoreBoardView()
         }
@@ -41,7 +45,6 @@ fun NavigationGraph(
 
 @Composable
 fun BottomBar(navController: NavController) {
-
     BottomAppBar() {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -58,6 +61,18 @@ fun BottomBar(navController: NavController) {
                 restoreState = false }
         }, icon = { Icon(Icons.Default.Home, contentDescription = "Start")})
 
+        NavigationBarItem(selected = currentRoute == "InventoryView", onClick = {
+            navController.navigate("InventoryView") {
+                navController.graph.startDestinationRoute?.let { screenRoute ->
+                    popUpTo(screenRoute) {
+                        saveState = false
+                        inclusive = false
+                    }
+                }
+                launchSingleTop = true
+                restoreState = false }
+        }, icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Inventory")})
+
         NavigationBarItem(selected = currentRoute == "ScoreBoardView", onClick = {
             navController.navigate("ScoreBoardView") {
                 navController.graph.startDestinationRoute?.let { screenRoute ->
@@ -72,6 +87,5 @@ fun BottomBar(navController: NavController) {
             val scoreboardIcon = painterResource(id = R.drawable.ic_scoreboard)
             Icon(scoreboardIcon, contentDescription = "Scoreboard")
         })
-
     }
 }
