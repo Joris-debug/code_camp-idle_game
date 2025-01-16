@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.ui.views.models.ScoreBoardViewModel
+import com.example.idle_game.util.SoundManager
 
 @Composable
 fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
@@ -103,7 +104,10 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
         }
         Button(
             colors = ButtonDefaults.buttonColors(),
-            onClick = { viewModel.refreshScoreBoard() },
+            onClick = {
+                viewModel.soundManager.playSound(SoundManager.CURSOR_SOUND_RESOURCE_ID)
+                viewModel.refreshScoreBoard()
+            },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(16.dp)

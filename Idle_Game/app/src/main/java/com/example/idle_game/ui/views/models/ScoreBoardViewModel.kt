@@ -7,6 +7,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.idle_game.data.repositories.GameRepository
 import com.example.idle_game.ui.views.states.ScoreBoardViewState
+import com.example.idle_game.util.SoundManager
 import com.example.idle_game.worker.ScoreBoardWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class ScoreBoardViewModel @Inject constructor(
     private val gameRepository: GameRepository,
     private val workManager: WorkManager,
+    val soundManager: SoundManager
 ) : ViewModel() {
 
     private val _uiStateFlow = MutableStateFlow(ScoreBoardViewState())

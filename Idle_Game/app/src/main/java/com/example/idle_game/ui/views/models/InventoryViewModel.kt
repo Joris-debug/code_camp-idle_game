@@ -1,23 +1,23 @@
 package com.example.idle_game.ui.views.models
-import android.util.Log
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.ShopData
 import com.example.idle_game.data.repositories.GameRepository
 import com.example.idle_game.ui.views.states.InventoryViewState
+import com.example.idle_game.util.SoundManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
 
 @HiltViewModel
 class InventoryViewModel @Inject constructor(
-    val gameRepository: GameRepository
+    val gameRepository: GameRepository,
+    val soundManager: SoundManager
 ) : ViewModel() {
-
     private val _uiStateFlow = MutableStateFlow(InventoryViewState())
     val uiStateFlow: StateFlow<InventoryViewState> = _uiStateFlow
 

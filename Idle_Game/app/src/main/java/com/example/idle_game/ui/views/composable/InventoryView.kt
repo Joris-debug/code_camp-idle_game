@@ -44,6 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.ShopData
 import com.example.idle_game.ui.views.models.InventoryViewModel
+import com.example.idle_game.util.SoundManager
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.*
 
@@ -69,8 +70,16 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
     val boostItems = shopDataList.filter { it.name.contains("boost", ignoreCase = true) }
     val passiveItems = shopDataList.filter { it.name.contains("passive", ignoreCase = true) }
 
+    val pagerState = rememberPagerState()
+
+    LaunchedEffect(pagerState.currentPage) {
+        // Play sound when switching page
+        viewModel.soundManager.playSound(SoundManager.SWIPE_SOUND_RESOURCE_ID)
+    }
+
     // Set up the HorizontalPager for swiping between screens
     HorizontalPager(
+        state = pagerState,
         count = 3, // 3 screens
         modifier = Modifier.fillMaxSize()
     ) { page ->
@@ -158,10 +167,12 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
         quantity = quantity,
         onQuantityChange = setQuantity,
         onUseItem = {
+            viewModel.soundManager.playSound(SoundManager.CURSOR_SOUND_RESOURCE_ID)
             viewModel.useItem(itemToBuy!!, it)
             setShowDialog(false)
         },
         onBuyItem = {
+            viewModel.soundManager.playSound(SoundManager.CURSOR_SOUND_RESOURCE_ID)
             val amount = quantity.toIntOrNull() ?: 1
             val cost = itemToBuy!!.cost * amount
 
@@ -171,12 +182,14 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
                 setShowDialog(false)
             }
         },
-        onDismiss = { setShowDialog(false) },
+        onDismiss = {
+            viewModel.soundManager.playSound(SoundManager.POPUP_CLOSE_SOUND_RESOURCE_ID)
+            setShowDialog(false)
+        },
         viewModel = viewModel,
         inventoryData = inventoryData,
         setQuantity = setQuantity,
-
-        )
+    )
 }
 
 @Composable
@@ -190,7 +203,6 @@ fun CategoryScreen(
     inventoryData: InventoryData,
     page: Int
 ) {
-
     val bitcoinBalance = inventoryData.bitcoins
 
     Box(
@@ -213,8 +225,14 @@ fun CategoryScreen(
                 ShopItemButtons(
                     item = item,
                     isSelected = isSelected,
-                    onBuyClick = { onBuyClick(item) },
-                    onApplyClick = { onApplyClick(item) },
+                    onBuyClick = {
+                        viewModel.soundManager.playSound(SoundManager.POPUP_OPEN_SOUND_RESOURCE_ID)
+                        onBuyClick(item)
+                    },
+                    onApplyClick = {
+                        viewModel.soundManager.playSound(SoundManager.POPUP_OPEN_SOUND_RESOURCE_ID)
+                        onApplyClick(item)
+                    },
                     itemAmount = itemAmount
                 )
             }

@@ -41,7 +41,6 @@ import com.example.idle_game.util.SoundManager
 fun StartView(
     viewModel: StartViewModel = hiltViewModel()
 ) {
-    val soundManager = viewModel.soundManager
     val viewState = viewModel.viewState.collectAsState()
     var isClicked by remember { mutableStateOf(false) }
     // Scale-animation when coin is clicked
@@ -86,7 +85,7 @@ fun StartView(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() },
                     onClick = {
-                        soundManager.playSound(SoundManager.CURSOR_SOUND_RESOURCE_ID)
+                        viewModel.soundManager.playSound(SoundManager.CURSOR_SOUND_RESOURCE_ID)
                         viewModel.coinClick()
                         isClicked = !isClicked
                     }

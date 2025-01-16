@@ -13,13 +13,21 @@ class SoundManager @Inject constructor(
     private val soundResourceIds = mutableMapOf<Int, Int>()
 
     companion object {
-        val BUTTON_CLICK_SOUND_RESOURCE_ID = R.raw.cancel
+        val CANCEL_SOUND_RESOURCE_ID = R.raw.cancel
         val CURSOR_SOUND_RESOURCE_ID = R.raw.cursor
+        val ERROR_SOUND_RESOURCE_ID = R.raw.error
+        val POPUP_CLOSE_SOUND_RESOURCE_ID = R.raw.popup_close
+        val POPUP_OPEN_SOUND_RESOURCE_ID = R.raw.popup_open
+        val SWIPE_SOUND_RESOURCE_ID = R.raw.swipe
     }
 
     fun initializeSoundEffects(context: Context) {
         loadSound(context, CURSOR_SOUND_RESOURCE_ID)
-        loadSound(context, BUTTON_CLICK_SOUND_RESOURCE_ID)
+        loadSound(context, CANCEL_SOUND_RESOURCE_ID)
+        loadSound(context, ERROR_SOUND_RESOURCE_ID)
+        loadSound(context, POPUP_CLOSE_SOUND_RESOURCE_ID)
+        loadSound(context, POPUP_OPEN_SOUND_RESOURCE_ID)
+        loadSound(context, SWIPE_SOUND_RESOURCE_ID)
     }
 
     private fun loadSound(context: Context, soundResourceId: Int) {
