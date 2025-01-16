@@ -1,13 +1,17 @@
 package com.example.idle_game.ui.views.models
 
+import android.content.Context
+import android.media.SoundPool
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import com.example.idle_game.R
 import com.example.idle_game.data.repositories.GameRepository
 import com.example.idle_game.data.workers.NotWorker
 import com.example.idle_game.ui.views.states.StartViewState
+import com.example.idle_game.util.SoundManager
 import com.example.idle_game.util.shortBigNumbers
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -20,7 +24,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StartViewModel @Inject constructor(
-    private val gameRepository: GameRepository
+    private val gameRepository: GameRepository,
+    val soundManager: SoundManager
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(StartViewState())
@@ -29,7 +34,6 @@ class StartViewModel @Inject constructor(
     private var showShorted: Boolean = false
     private var coins: Long = 0
     private var coinsPerSec: Long = 0
-
 
     private fun toDisplay(value: Number): String {
         return if (showShorted) {

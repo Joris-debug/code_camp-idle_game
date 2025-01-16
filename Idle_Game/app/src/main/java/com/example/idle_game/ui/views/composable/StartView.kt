@@ -29,29 +29,30 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.R
+import com.example.idle_game.util.SoundManager
 
 @Composable
 fun StartView(
     viewModel: StartViewModel = hiltViewModel()
 ) {
+    val soundManager = viewModel.soundManager
     val viewState = viewModel.viewState.collectAsState()
     var isClicked by remember { mutableStateOf(false) }
-
     // Scale-animation when coin is clicked
     val scale by animateFloatAsState(
         targetValue = if (isClicked) 1.05f else 1f,
         animationSpec = tween(durationMillis = 50)
     )
-    LaunchedEffect (isClicked) {
+    LaunchedEffect(isClicked) {
         kotlinx.coroutines.delay(50)
         isClicked = false
     }
-
 
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -85,6 +86,7 @@ fun StartView(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() },
                     onClick = {
+                        soundManager.playSound(SoundManager.CURSOR_SOUND_RESOURCE_ID)
                         viewModel.coinClick()
                         isClicked = !isClicked
                     }

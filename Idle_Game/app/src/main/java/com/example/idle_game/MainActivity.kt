@@ -11,6 +11,7 @@ import com.example.idle_game.ui.theme.AppTheme
 import com.example.idle_game.ui.views.composable.Idle_GameLauncher
 import com.example.idle_game.ui.views.composable.LoadingScreenView
 import com.example.idle_game.ui.views.composable.LoginView
+import com.example.idle_game.util.SoundManager
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
