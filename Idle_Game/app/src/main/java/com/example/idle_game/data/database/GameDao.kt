@@ -46,6 +46,9 @@ interface GameDao {
     """)
     suspend fun issueBitcoins(bitcoins: Long)
 
+    @Query("""UPDATE inventorydata SET issued_bitcoins = :bitcoins""")
+    suspend fun setIssuedBitcoins(bitcoins: Long)
+
     @Query("UPDATE inventorydata SET hackers_lvl_1 = hackers_lvl_1 + :amount")
     suspend fun addNewHacker(amount: Int)
 

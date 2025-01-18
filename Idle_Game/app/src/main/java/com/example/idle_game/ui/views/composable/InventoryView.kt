@@ -173,7 +173,7 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
         },
         onBuyItem = {
             viewModel.soundManager.playSound(SoundManager.CURSOR_SOUND_RESOURCE_ID)
-            val amount = quantity.toIntOrNull() ?: 1
+            val amount = quantity.toIntOrNull() ?: 0
             val cost = itemToBuy!!.cost * amount
 
             if (cost <= inventoryData.bitcoins) {
@@ -323,27 +323,37 @@ fun ShowDialog(
             }
 
             "Kaufen" -> {
-                val amount = quantity.toIntOrNull() ?: 1
+                val amount = quantity.toLongOrNull() ?: 0
                 val cost = itemToBuy.cost * amount
 
                 if (cost <= inventoryData.bitcoins) {
-                    QuantityDialog(
-                        message = dialogMessage,
-                        title = dialogTitle,
-                        quantity = quantity,
-                        onQuantityChange = onQuantityChange,
-                        onConfirm = onBuyItem,
-                        onDismiss = {
-                            onDismiss()
-                        },
-                        itemToBuy = itemToBuy,
-                        inventoryData = inventoryData,
-                        setQuantity = setQuantity,
-                    )
+                    if (!viewModel.checkQuantity(itemToBuy, amount, inventoryData)) {
+                        InsufficientFundsDialog(
+                            onDismiss = onDismiss,
+                            setQuantity = setQuantity,
+                            "Ist das nicht ein bisschen zu viel? Die maximale Anzahl an Items ist: \n ${Int.MAX_VALUE} \n Übertreib es nicht!"
+                        )
+                    } else {
+                        QuantityDialog(
+                            message = dialogMessage,
+                            title = dialogTitle,
+                            quantity = quantity,
+                            onQuantityChange = onQuantityChange,
+                            onConfirm = onBuyItem,
+                            onDismiss = {
+                                onDismiss()
+                            },
+                            itemToBuy = itemToBuy,
+                            inventoryData = inventoryData,
+                            setQuantity = setQuantity,
+                            viewModel = viewModel
+                        )
+                    }
                 } else {
                     InsufficientFundsDialog(
                         onDismiss = onDismiss,
-                        setQuantity = setQuantity
+                        setQuantity = setQuantity,
+                        "Du hast nicht genug BTC, um dieses Item zu kaufen. Bitte versuche es später nochmal."
                     )
                 }
             }
@@ -356,16 +366,17 @@ fun ShowDialog(
 fun InsufficientFundsDialog(
     onDismiss: () -> Unit,
     setQuantity: (String) -> Unit,
+    reason: String
 ) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Nicht genug BTC") },
+        title = { Text(text = "Fehler") },
         text = {
-            Text("Du hast nicht genug BTC, um dieses Item zu kaufen. Bitte versuche es später nochmal.")
+            Text(reason)
         },
         confirmButton = {
-            TextButton(onClick = { setQuantity("1") }) {
+            TextButton(onClick = { setQuantity("0") }) {
                 Text("OK")
             }
         }
@@ -548,6 +559,7 @@ fun QuantityDialog(
     itemToBuy: ShopData?,
     inventoryData: InventoryData,
     setQuantity: (String) -> Unit,
+    viewModel: InventoryViewModel
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -571,12 +583,20 @@ fun QuantityDialog(
                 Text("Bestätigen")
             }
 
-            val amount = quantity.toIntOrNull() ?: 1
+            val amount = quantity.toLongOrNull() ?: 0
             val cost = itemToBuy!!.cost * amount
             if (cost > inventoryData.bitcoins) {
                 InsufficientFundsDialog(
                     onDismiss = onDismiss,
-                    setQuantity = setQuantity
+                    setQuantity = setQuantity,
+                    "Du hast nicht genug BTC, um dieses Item zu kaufen. Bitte versuche es später nochmal."
+                )
+            }
+            if (!viewModel.checkQuantity(itemToBuy, amount, inventoryData)) {
+                InsufficientFundsDialog(
+                    onDismiss = onDismiss,
+                    setQuantity = setQuantity,
+                    "Ist das nicht ein bisschen zu viel? Die maximale Anzahl an Items ist: \n ${Int.MAX_VALUE} \n Übertreib es nicht!"
                 )
             }
         },
@@ -597,7 +617,6 @@ fun ApplyDialog(
     onDismiss: () -> Unit,
     viewModel: InventoryViewModel
 ) {
-
     var isBoostActive by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         isBoostActive = viewModel.gameRepository.isBoostActive()
