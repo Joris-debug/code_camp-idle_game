@@ -1,4 +1,4 @@
-package com.example.idle_game.data.workers
+package com.example.idle_game.worker
 
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
@@ -36,11 +36,10 @@ class NotWorker(appContext: Context, workerParams: WorkerParameters) :
         val notification = NotificationCompat.Builder(applicationContext, notificationChannelId)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Not your Keys not your coin!")
-            .setContentText("SChnell übertrage deine Bitcoins auf deine Cold-Wallet bevor sie verloren gehen!")
+            .setContentText("Schnell übertrage deine Bitcoins auf dein Cold-Wallet bevor sie verloren gehen!")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
 
         notificationManager.notify(1, notification)
     }
-
 }

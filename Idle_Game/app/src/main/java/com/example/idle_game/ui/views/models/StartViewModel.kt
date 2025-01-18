@@ -2,12 +2,9 @@ package com.example.idle_game.ui.views.models
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
-import androidx.work.WorkRequest
 import com.example.idle_game.data.repositories.GameRepository
-import com.example.idle_game.data.workers.NotWorker
 import com.example.idle_game.ui.views.states.StartViewState
+import com.example.idle_game.util.SoundManager
 import com.example.idle_game.util.shortBigNumbers
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -15,12 +12,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class StartViewModel @Inject constructor(
-    private val gameRepository: GameRepository
+    private val gameRepository: GameRepository,
+    val soundManager: SoundManager
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(StartViewState())
@@ -29,7 +26,6 @@ class StartViewModel @Inject constructor(
     private var showShorted: Boolean = false
     private var coins: Long = 0
     private var coinsPerSec: Long = 0
-
 
     private fun toDisplay(value: Number): String {
         return if (showShorted) {
@@ -137,13 +133,4 @@ class StartViewModel @Inject constructor(
             addCoins(clickedCoins)
         }
     }
-
-    private fun scheduleNotWorker(delayMinutes: Long, workManager: WorkManager) {
-        val workRequest: WorkRequest = OneTimeWorkRequest.Builder(NotWorker::class.java)
-            .setInitialDelay(delayMinutes, TimeUnit.MINUTES)
-            .build()
-
-        workManager.enqueue(workRequest)
-    }
-
 }

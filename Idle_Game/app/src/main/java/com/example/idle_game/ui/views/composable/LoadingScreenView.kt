@@ -74,6 +74,5 @@ fun LoadingScreenView(
                 modifier = Modifier.padding(all = 40.dp)
             )
         }
-
     }
 }
