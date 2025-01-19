@@ -21,6 +21,7 @@ import com.example.idle_game.R
 import com.example.idle_game.ui.views.composable.ScoreBoardView
 import com.example.idle_game.ui.views.composable.StartView
 import com.example.idle_game.ui.views.composable.BluetoothView
+import com.example.idle_game.util.SoundManager
 
 @Composable
 fun NavigationGraph(
@@ -49,12 +50,13 @@ fun NavigationGraph(
 }
 
 @Composable
-fun BottomBar(navController: NavController) {
-    BottomAppBar() {
+fun BottomBar(navController: NavController, soundManager: SoundManager) {
+    BottomAppBar {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
         NavigationBarItem(selected = currentRoute == "StartView", onClick = {
+            soundManager.playSound(SoundManager.SWIPE_SOUND_RESOURCE_ID)
             navController.navigate("StartView") {
                 navController.graph.startDestinationRoute?.let { screenRoute ->
                     popUpTo(screenRoute) {
@@ -67,6 +69,7 @@ fun BottomBar(navController: NavController) {
         }, icon = { Icon(Icons.Default.Home, contentDescription = "Start")})
 
         NavigationBarItem(selected = currentRoute == "InventoryView", onClick = {
+            soundManager.playSound(SoundManager.SWIPE_SOUND_RESOURCE_ID)
             navController.navigate("InventoryView") {
                 navController.graph.startDestinationRoute?.let { screenRoute ->
                     popUpTo(screenRoute) {
@@ -79,6 +82,7 @@ fun BottomBar(navController: NavController) {
         }, icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Inventory")})
 
         NavigationBarItem(selected = currentRoute == "ScoreBoardView", onClick = {
+            soundManager.playSound(SoundManager.SWIPE_SOUND_RESOURCE_ID)
             navController.navigate("ScoreBoardView") {
                 navController.graph.startDestinationRoute?.let { screenRoute ->
                     popUpTo(screenRoute) {

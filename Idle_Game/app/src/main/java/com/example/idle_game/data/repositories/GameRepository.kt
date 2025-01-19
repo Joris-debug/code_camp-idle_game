@@ -25,12 +25,6 @@ class GameRepository(
     private val shopDataFlow = gameDao.getShop()
     private val scoreBoardDataFlow = gameDao.getScoreBoard()
 
-    companion object {
-        const val LOW_BOOST_ID = 1
-        const val MEDIUM_BOOST_ID = 2
-        const val HIGH_BOOST_ID = 3
-    }
-
     fun getPlayerDataFlow(): Flow<PlayerData> {
         return playerDataFlow
     }
@@ -47,7 +41,7 @@ class GameRepository(
         return scoreBoardDataFlow
     }
 
-    suspend fun signUp(username: String, password: String, onFailure: () -> Unit = {}) {
+    suspend fun signUp(username: String, password: String, onFailure: () -> Unit = {}): Boolean {
         val userCredentialsRequest = UserCredentialsRequest(
             username = username,
             password = password
@@ -64,12 +58,14 @@ class GameRepository(
                 gameDao.insertPlayer(playerData)
                 createNewInventory()
             }
+            return true
         } catch (e: HttpException) {
             onFailure()
+            return false
         }
     }
 
-    suspend fun signIn(username: String, password: String, onFailure: () -> Unit = {}) {
+    suspend fun signIn(username: String, password: String, onFailure: () -> Unit = {}): Boolean {
         if (gameDao.getPlayersCount() != 0) { // Check for existing db entry
             if (gameDao.getPlayer().first().username != username) {
                 createNewInventory()
@@ -93,8 +89,10 @@ class GameRepository(
                     createNewInventory()
                 }
             }
+            return true
         } catch (e: HttpException) {
             onFailure()
+            return false
         }
     }
 
@@ -109,7 +107,7 @@ class GameRepository(
     }
 
     // Makes a server request and gets a new access_token
-    suspend fun login(onFailure: () -> Unit = {}) {
+    suspend fun login(onFailure: () -> Unit = {}): Boolean {
         val playerData = playerDataFlow.first()
         try {
             val resp = api.login(playerData.refreshToken)
@@ -117,8 +115,10 @@ class GameRepository(
             if (accessToken != null) {
                 gameDao.updateAccessToken(accessToken)
             }
+            return true
         } catch (e: Exception) {
             onFailure()
+            return false
         }
     }
 
@@ -581,5 +581,11 @@ class GameRepository(
                 addUpgradeLvl5(-1)
             }
         }
+    }
+
+    companion object {
+        const val LOW_BOOST_ID = 1
+        const val MEDIUM_BOOST_ID = 2
+        const val HIGH_BOOST_ID = 3
     }
 }

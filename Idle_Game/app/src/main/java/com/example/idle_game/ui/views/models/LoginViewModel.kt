@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.repositories.GameRepository
 import com.example.idle_game.ui.views.states.LoginViewState
+import com.example.idle_game.util.SoundManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -13,18 +15,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val gameRepository: GameRepository
+    private val gameRepository: GameRepository,
+    val soundManager: SoundManager
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(LoginViewState())
     val viewState: StateFlow<LoginViewState> get() = _viewState
-
-    companion object {
-        const val ALLOWED_CHARS_NAME =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-        const val ALLOWED_CHARS_PASSWORD =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,+-_/&!?"
-        const val MAX_INPUT_LENGTH = 20
-    }
 
     fun checkInput(input: String, username: Boolean): String {
         var errorString = ""
@@ -33,8 +28,8 @@ class LoginViewModel @Inject constructor(
         if (input.length > MAX_INPUT_LENGTH) {
             correctedString = input.substring(0, MAX_INPUT_LENGTH)
             errorString = "Maximal $MAX_INPUT_LENGTH Zeichen!"
-        } else if(input.length < MAX_INPUT_LENGTH) {
-            if(_viewState.value.errorMessage.startsWith("Maximal $MAX_INPUT_LENGTH Zeichen!")) {
+        } else if (input.length < MAX_INPUT_LENGTH) {
+            if (_viewState.value.errorMessage.startsWith("Maximal $MAX_INPUT_LENGTH Zeichen!")) {
                 _viewState.value =
                     _viewState.value.copy(errorMessage = "")
             }
@@ -74,14 +69,12 @@ class LoginViewModel @Inject constructor(
                 _viewState.value =
                     _viewState.value.copy(errorMessage = "Username darf nicht leer sein!")
             } else {
-                var success = true
-                gameRepository.signIn(username, password, { success = false })
+                var success = gameRepository.signIn(username, password)
                 if (!success) {
-                    gameRepository.signUp(
+                    success = gameRepository.signUp(
                         username,
                         password,
                         {
-                            success = false
                             _viewState.value =
                                 _viewState.value.copy(
                                     errorMessage = "Benutzername bereits vergeben oder Passwort ungültig"
@@ -90,11 +83,24 @@ class LoginViewModel @Inject constructor(
                     )
                 }
 
-                gameRepository.login({ success = false })
                 if (success) {
-                    onLoginSuccess()
+                    do {
+                        delay(100)
+                        success = gameRepository.login()
+                        if (success) {
+                            onLoginSuccess()
+                        }
+                    } while (!success)
                 }
             }
         }
+    }
+
+    companion object {
+        const val ALLOWED_CHARS_NAME =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        const val ALLOWED_CHARS_PASSWORD =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,+-_/&!?"
+        const val MAX_INPUT_LENGTH = 20
     }
 }
