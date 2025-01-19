@@ -239,10 +239,9 @@ class GameRepository(
         if (bitcoins <= 0) {
             return
         }
-        if(inventoryDataFlow.first().bitcoins + bitcoins < 0){
-            gameDao.addBitcoins(Long.MAX_VALUE - inventoryDataFlow.first().bitcoins)
-        } else {
-            gameDao.addBitcoins(bitcoins)
+        gameDao.addBitcoins(bitcoins)
+        if (inventoryDataFlow.first().bitcoins < 0) {
+            gameDao.setBitcoins(Long.MAX_VALUE)
         }
     }
 
@@ -250,11 +249,9 @@ class GameRepository(
         if (inventoryDataFlow.first().bitcoins < bitcoins) {
             return
         }
-        if(inventoryDataFlow.first().issuedBitcoins + bitcoins < 0){
-            gameDao.addBitcoins(-1 * bitcoins)
+        gameDao.issueBitcoins(bitcoins)
+        if (inventoryDataFlow.first().issuedBitcoins < 0) {
             gameDao.setIssuedBitcoins(Long.MAX_VALUE)
-        } else {
-            gameDao.issueBitcoins(bitcoins)
         }
     }
 
@@ -264,17 +261,23 @@ class GameRepository(
 
     // Adds new lvl 1 hackers to the inventory
     private suspend fun addNewHacker(amount: Int) {
-        gameDao.addNewHacker(amount = amount)
+        if (inventoryDataFlow.first().hackersLvl1 + amount > 0) {
+            gameDao.addNewHacker(amount = amount)
+        }
     }
 
     // Adds new lvl 1 crypto miners to the inventory
     private suspend fun addNewCryptoMiner(amount: Int) {
-        gameDao.addNewCryptoMiner(amount = amount)
+        if (inventoryDataFlow.first().cryptoMinersLvl1 + amount > 0) {
+            gameDao.addNewCryptoMiner(amount = amount)
+        }
     }
 
     // Adds new lvl 1 botnets to the inventory
     private suspend fun addNewBotnet(amount: Int) {
-        gameDao.addNewBotnet(amount = amount)
+        if (inventoryDataFlow.first().botnetsLvl1 + amount > 0) {
+            gameDao.addNewBotnet(amount = amount)
+        }
     }
 
     // Uses a level k upgrade on a level k-1 hacker, if both exist
@@ -410,41 +413,83 @@ class GameRepository(
     }
 
     private suspend fun addUpgradeLvl2(amount: Int) {
+        if (amount <= 0) {
+            return
+        }
         val upgrades = inventoryDataFlow.first().upgradeLvl2
         gameDao.updateLvl2Upgrades(upgrades + amount)
+        if (inventoryDataFlow.first().upgradeLvl2 < 0) {
+            gameDao.updateLvl2Upgrades(Int.MAX_VALUE)
+        }
     }
 
     private suspend fun addUpgradeLvl3(amount: Int) {
+        if (amount <= 0) {
+            return
+        }
         val upgrades = inventoryDataFlow.first().upgradeLvl3
         gameDao.updateLvl3Upgrades(upgrades + amount)
+        if (inventoryDataFlow.first().upgradeLvl3 < 0) {
+            gameDao.updateLvl3Upgrades(Int.MAX_VALUE)
+        }
     }
 
     private suspend fun addUpgradeLvl4(amount: Int) {
+        if (amount <= 0) {
+            return
+        }
         val upgrades = inventoryDataFlow.first().upgradeLvl4
         gameDao.updateLvl4Upgrades(upgrades + amount)
+        if (inventoryDataFlow.first().upgradeLvl4 < 0) {
+            gameDao.updateLvl4Upgrades(Int.MAX_VALUE)
+        }
     }
 
     private suspend fun addUpgradeLvl5(amount: Int) {
+        if (amount <= 0) {
+            return
+        }
         val upgrades = inventoryDataFlow.first().upgradeLvl5
         gameDao.updateLvl5Upgrades(upgrades + amount)
+        if (inventoryDataFlow.first().upgradeLvl5 < 0) {
+            gameDao.updateLvl5Upgrades(Int.MAX_VALUE)
+        }
     }
 
     // Adds new low boosts to the inventory
     private suspend fun addLowBoost(amount: Int) {
+        if (amount <= 0) {
+            return
+        }
         val boosts = inventoryDataFlow.first().lowBoosts
         gameDao.updateLowBoosts(boosts + amount)
+        if (inventoryDataFlow.first().lowBoosts < 0) {
+            gameDao.updateLowBoosts(Int.MAX_VALUE)
+        }
     }
 
     // Adds new medium boosts to the inventory
     private suspend fun addMediumBoost(amount: Int) {
+        if (amount <= 0) {
+            return
+        }
         val boosts = inventoryDataFlow.first().mediumBoosts
         gameDao.updateMediumBoosts(boosts + amount)
+        if (inventoryDataFlow.first().mediumBoosts < 0) {
+            gameDao.updateMediumBoosts(Int.MAX_VALUE)
+        }
     }
 
     // Adds new high boosts to the inventory
     private suspend fun addHighBoost(amount: Int) {
+        if (amount <= 0) {
+            return
+        }
         val boosts = inventoryDataFlow.first().highBoosts
         gameDao.updateHighBoosts(boosts + amount)
+        if (inventoryDataFlow.first().highBoosts < 0) {
+            gameDao.updateHighBoosts(Int.MAX_VALUE)
+        }
     }
 
     // Activates a single low boost

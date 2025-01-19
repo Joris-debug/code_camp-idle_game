@@ -39,6 +39,9 @@ interface GameDao {
     @Query("UPDATE inventorydata SET bitcoins = bitcoins + :bitcoins")
     suspend fun addBitcoins(bitcoins: Long)
 
+    @Query("UPDATE inventorydata SET bitcoins = :bitcoins")
+    suspend fun setBitcoins(bitcoins: Long)
+
     @Query("""
     UPDATE inventorydata
     SET bitcoins = bitcoins - :bitcoins,
