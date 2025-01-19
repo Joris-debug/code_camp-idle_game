@@ -417,9 +417,8 @@ class GameRepository(
             return
         }
         val upgrades = inventoryDataFlow.first().upgradeLvl2
-        gameDao.updateLvl2Upgrades(upgrades + amount)
-        if (inventoryDataFlow.first().upgradeLvl2 < 0) {
-            gameDao.updateLvl2Upgrades(Int.MAX_VALUE)
+        if (upgrades + amount > 0) {
+            gameDao.updateLvl2Upgrades(upgrades + amount)
         }
     }
 
@@ -428,9 +427,8 @@ class GameRepository(
             return
         }
         val upgrades = inventoryDataFlow.first().upgradeLvl3
-        gameDao.updateLvl3Upgrades(upgrades + amount)
-        if (inventoryDataFlow.first().upgradeLvl3 < 0) {
-            gameDao.updateLvl3Upgrades(Int.MAX_VALUE)
+        if (upgrades + amount > 0) {
+            gameDao.updateLvl3Upgrades(upgrades + amount)
         }
     }
 
@@ -439,9 +437,8 @@ class GameRepository(
             return
         }
         val upgrades = inventoryDataFlow.first().upgradeLvl4
-        gameDao.updateLvl4Upgrades(upgrades + amount)
-        if (inventoryDataFlow.first().upgradeLvl4 < 0) {
-            gameDao.updateLvl4Upgrades(Int.MAX_VALUE)
+        if (upgrades + amount > 0) {
+            gameDao.updateLvl4Upgrades(upgrades + amount)
         }
     }
 
@@ -450,9 +447,8 @@ class GameRepository(
             return
         }
         val upgrades = inventoryDataFlow.first().upgradeLvl5
-        gameDao.updateLvl5Upgrades(upgrades + amount)
-        if (inventoryDataFlow.first().upgradeLvl5 < 0) {
-            gameDao.updateLvl5Upgrades(Int.MAX_VALUE)
+        if (upgrades + amount > 0) {
+            gameDao.updateLvl5Upgrades(upgrades + amount)
         }
     }
 
@@ -461,10 +457,9 @@ class GameRepository(
         if (amount <= 0) {
             return
         }
-        val boosts = inventoryDataFlow.first().lowBoosts
-        gameDao.updateLowBoosts(boosts + amount)
-        if (inventoryDataFlow.first().lowBoosts < 0) {
-            gameDao.updateLowBoosts(Int.MAX_VALUE)
+        val upgrades = inventoryDataFlow.first().lowBoosts
+        if (upgrades + amount > 0) {
+            gameDao.updateLowBoosts(upgrades + amount)
         }
     }
 
@@ -473,10 +468,9 @@ class GameRepository(
         if (amount <= 0) {
             return
         }
-        val boosts = inventoryDataFlow.first().mediumBoosts
-        gameDao.updateMediumBoosts(boosts + amount)
-        if (inventoryDataFlow.first().mediumBoosts < 0) {
-            gameDao.updateMediumBoosts(Int.MAX_VALUE)
+        val upgrades = inventoryDataFlow.first().mediumBoosts
+        if (upgrades + amount > 0) {
+            gameDao.updateMediumBoosts(upgrades + amount)
         }
     }
 
@@ -485,10 +479,9 @@ class GameRepository(
         if (amount <= 0) {
             return
         }
-        val boosts = inventoryDataFlow.first().highBoosts
-        gameDao.updateHighBoosts(boosts + amount)
-        if (inventoryDataFlow.first().highBoosts < 0) {
-            gameDao.updateHighBoosts(Int.MAX_VALUE)
+        val upgrades = inventoryDataFlow.first().highBoosts
+        if (upgrades + amount > 0) {
+            gameDao.updateHighBoosts(upgrades + amount)
         }
     }
 
