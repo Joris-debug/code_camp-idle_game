@@ -182,9 +182,14 @@ class GameRepository(
             }
 
             val inventoryData = inventoryDataFlow.first()
+            val score: Long = inventoryData.bitcoins + inventoryData.issuedBitcoins
             val setScoreRequest = SetScoreRequest(
                 username = playerData.username,
-                score = inventoryData.bitcoins + inventoryData.issuedBitcoins
+                score = if (score >= 0) {
+                    score
+                } else {
+                    Long.MAX_VALUE
+                }
             )
             try {
                 api.postScore(
@@ -235,6 +240,9 @@ class GameRepository(
             return
         }
         gameDao.addBitcoins(bitcoins)
+        if (inventoryDataFlow.first().bitcoins < 0) {
+            gameDao.setBitcoins(Long.MAX_VALUE)
+        }
     }
 
     suspend fun issueBitcoins(bitcoins: Long) {
@@ -242,6 +250,9 @@ class GameRepository(
             return
         }
         gameDao.issueBitcoins(bitcoins)
+        if (inventoryDataFlow.first().issuedBitcoins < 0) {
+            gameDao.setIssuedBitcoins(Long.MAX_VALUE)
+        }
     }
 
     suspend fun setMiningTimestamp(timestamp: Long) {
@@ -250,17 +261,23 @@ class GameRepository(
 
     // Adds new lvl 1 hackers to the inventory
     private suspend fun addNewHacker(amount: Int) {
-        gameDao.addNewHacker(amount = amount)
+        if (inventoryDataFlow.first().hackersLvl1 + amount > 0) {
+            gameDao.addNewHacker(amount = amount)
+        }
     }
 
     // Adds new lvl 1 crypto miners to the inventory
     private suspend fun addNewCryptoMiner(amount: Int) {
-        gameDao.addNewCryptoMiner(amount = amount)
+        if (inventoryDataFlow.first().cryptoMinersLvl1 + amount > 0) {
+            gameDao.addNewCryptoMiner(amount = amount)
+        }
     }
 
     // Adds new lvl 1 botnets to the inventory
     private suspend fun addNewBotnet(amount: Int) {
-        gameDao.addNewBotnet(amount = amount)
+        if (inventoryDataFlow.first().botnetsLvl1 + amount > 0) {
+            gameDao.addNewBotnet(amount = amount)
+        }
     }
 
     // Uses a level k upgrade on a level k-1 hacker, if both exist
@@ -279,24 +296,28 @@ class GameRepository(
                     gameDao.setHackers(hLvl1 - 1, hLvl2 + 1, hLvl3, hLvl4, hLvl5)
                 }
             }
+
             2 -> {
                 val upgrades = inventory.upgradeLvl3
                 if (hLvl2 > 0 && upgrades > 0) {
                     gameDao.setHackers(hLvl1, hLvl2 - 1, hLvl3 + 1, hLvl4, hLvl5)
                 }
             }
+
             3 -> {
                 val upgrades = inventory.upgradeLvl4
                 if (hLvl3 > 0 && upgrades > 0) {
                     gameDao.setHackers(hLvl1, hLvl2, hLvl3 - 1, hLvl4 + 1, hLvl5)
                 }
             }
+
             4 -> {
                 val upgrades = inventory.upgradeLvl5
                 if (hLvl4 > 0 && upgrades > 0) {
                     gameDao.setHackers(hLvl1, hLvl2, hLvl3, hLvl4 - 1, hLvl5 + 1)
                 }
             }
+
             else -> {
                 println("Invalid upgrade level: $upgradeLvl")
             }
@@ -319,24 +340,28 @@ class GameRepository(
                     gameDao.setCryptoMiners(cmLvl1 - 1, cmLvl2 + 1, cmLvl3, cmLvl4, cmLvl5)
                 }
             }
+
             2 -> {
                 val upgrades = inventory.upgradeLvl3
                 if (cmLvl2 > 0 && upgrades > 0) {
                     gameDao.setCryptoMiners(cmLvl1, cmLvl2 - 1, cmLvl3 + 1, cmLvl4, cmLvl5)
                 }
             }
+
             3 -> {
                 val upgrades = inventory.upgradeLvl4
                 if (cmLvl3 > 0 && upgrades > 0) {
                     gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3 - 1, cmLvl4 + 1, cmLvl5)
                 }
             }
+
             4 -> {
                 val upgrades = inventory.upgradeLvl5
                 if (cmLvl4 > 0 && upgrades > 0) {
                     gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3, cmLvl4 - 1, cmLvl5 + 1)
                 }
             }
+
             else -> {
                 println("Invalid upgrade level: $upgradeLvl")
             }
@@ -359,24 +384,28 @@ class GameRepository(
                     gameDao.setBotnets(bLvl1 - 1, bLvl2 + 1, bLvl3, bLvl4, bLvl5)
                 }
             }
+
             2 -> {
                 val upgrades = inventory.upgradeLvl3
                 if (bLvl2 > 0 && upgrades > 0) {
                     gameDao.setBotnets(bLvl1, bLvl2 - 1, bLvl3 + 1, bLvl4, bLvl5)
                 }
             }
+
             3 -> {
                 val upgrades = inventory.upgradeLvl4
                 if (bLvl3 > 0 && upgrades > 0) {
                     gameDao.setBotnets(bLvl1, bLvl2, bLvl3 - 1, bLvl4 + 1, bLvl5)
                 }
             }
+
             4 -> {
                 val upgrades = inventory.upgradeLvl5
                 if (bLvl4 > 0 && upgrades > 0) {
                     gameDao.setBotnets(bLvl1, bLvl2, bLvl3, bLvl4 - 1, bLvl5 + 1)
                 }
             }
+
             else -> {
                 println("Invalid upgrade level: $upgradeLvl")
             }
@@ -384,41 +413,76 @@ class GameRepository(
     }
 
     private suspend fun addUpgradeLvl2(amount: Int) {
+        if (amount <= 0) {
+            return
+        }
         val upgrades = inventoryDataFlow.first().upgradeLvl2
-        gameDao.updateLvl2Upgrades(upgrades + amount)
+        if (upgrades + amount > 0) {
+            gameDao.updateLvl2Upgrades(upgrades + amount)
+        }
     }
 
     private suspend fun addUpgradeLvl3(amount: Int) {
+        if (amount <= 0) {
+            return
+        }
         val upgrades = inventoryDataFlow.first().upgradeLvl3
-        gameDao.updateLvl3Upgrades(upgrades + amount)
+        if (upgrades + amount > 0) {
+            gameDao.updateLvl3Upgrades(upgrades + amount)
+        }
     }
 
     private suspend fun addUpgradeLvl4(amount: Int) {
+        if (amount <= 0) {
+            return
+        }
         val upgrades = inventoryDataFlow.first().upgradeLvl4
-        gameDao.updateLvl4Upgrades(upgrades + amount)
+        if (upgrades + amount > 0) {
+            gameDao.updateLvl4Upgrades(upgrades + amount)
+        }
     }
 
     private suspend fun addUpgradeLvl5(amount: Int) {
+        if (amount <= 0) {
+            return
+        }
         val upgrades = inventoryDataFlow.first().upgradeLvl5
-        gameDao.updateLvl5Upgrades(upgrades + amount)
+        if (upgrades + amount > 0) {
+            gameDao.updateLvl5Upgrades(upgrades + amount)
+        }
     }
 
     // Adds new low boosts to the inventory
     private suspend fun addLowBoost(amount: Int) {
-        val boosts = inventoryDataFlow.first().lowBoosts
-        gameDao.updateLowBoosts(boosts + amount)
+        if (amount <= 0) {
+            return
+        }
+        val upgrades = inventoryDataFlow.first().lowBoosts
+        if (upgrades + amount > 0) {
+            gameDao.updateLowBoosts(upgrades + amount)
+        }
     }
 
     // Adds new medium boosts to the inventory
     private suspend fun addMediumBoost(amount: Int) {
-        val boosts = inventoryDataFlow.first().mediumBoosts
-        gameDao.updateMediumBoosts(boosts + amount)
+        if (amount <= 0) {
+            return
+        }
+        val upgrades = inventoryDataFlow.first().mediumBoosts
+        if (upgrades + amount > 0) {
+            gameDao.updateMediumBoosts(upgrades + amount)
+        }
     }
 
     // Adds new high boosts to the inventory
     private suspend fun addHighBoost(amount: Int) {
-        val boosts = inventoryDataFlow.first().highBoosts
-        gameDao.updateHighBoosts(boosts + amount)
+        if (amount <= 0) {
+            return
+        }
+        val upgrades = inventoryDataFlow.first().highBoosts
+        if (upgrades + amount > 0) {
+            gameDao.updateHighBoosts(upgrades + amount)
+        }
     }
 
     // Activates a single low boost
@@ -526,9 +590,11 @@ class GameRepository(
                     "Hacker" -> {
                         upgradeHacker(1)
                     }
+
                     "Miner" -> {
                         upgradeCryptoMiner(1)
                     }
+
                     "BotNet" -> {
                         upgradeBotnet(1)
                     }
@@ -541,9 +607,11 @@ class GameRepository(
                     "Hacker" -> {
                         upgradeHacker(2)
                     }
+
                     "Miner" -> {
                         upgradeCryptoMiner(2)
                     }
+
                     "BotNet" -> {
                         upgradeBotnet(2)
                     }
@@ -556,9 +624,11 @@ class GameRepository(
                     "Hacker" -> {
                         upgradeHacker(3)
                     }
+
                     "Miner" -> {
                         upgradeCryptoMiner(3)
                     }
+
                     "BotNet" -> {
                         upgradeBotnet(3)
                     }
@@ -571,9 +641,11 @@ class GameRepository(
                     "Hacker" -> {
                         upgradeHacker(4)
                     }
+
                     "Miner" -> {
                         upgradeCryptoMiner(4)
                     }
+
                     "BotNet" -> {
                         upgradeBotnet(4)
                     }

@@ -49,6 +49,11 @@ class InventoryViewModel @Inject constructor(
         }
     }
 
+    //Checks for the 'itemToBuy'-amount to not overflow
+    fun checkQuantity(itemToBuy: ShopData, amount: Long, inventoryData: InventoryData): Boolean {
+        return getAmountOfItems(itemToBuy, inventoryData) + amount <= Int.MAX_VALUE
+    }
+
     fun buyItem(itemToBuy: ShopData, amount: Int) {
         viewModelScope.launch {
             gameRepository.buyItem(itemToBuy, amount)
@@ -67,3 +72,4 @@ class InventoryViewModel @Inject constructor(
         }
     }
 }
+

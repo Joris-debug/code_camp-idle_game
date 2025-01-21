@@ -27,6 +27,32 @@ class StartViewModel @Inject constructor(
     private var coins: Long = 0
     private var coinsPerSec: Long = 0
 
+    init {
+        viewModelScope.launch { // Coroutine for passive income
+            val millisPerSec: Long = 1000
+            gameRepository.updateShop()
+            _viewState.value =
+                _viewState.value.copy(coins = toDisplay(inventoryFlow.first().bitcoins))
+
+            while (true) { // Stops with end of coroutine lifecycle
+                coins = inventoryFlow.first().bitcoins
+                val lastTimestamp = inventoryFlow.first().lastMiningTimestamp
+                val duration = (System.currentTimeMillis() - lastTimestamp) / millisPerSec
+                // ^ Get the duration in seconds ^
+                /*
+                * Why do I calculate the duration in every iteration?
+                * A: The thread or even the entire app could freeze because of external factors,
+                * which would lead to an incorrect coin count after responding again
+                */
+                gameRepository.setMiningTimestamp(lastTimestamp + duration * millisPerSec)
+                // ^ Ensure the timestamp is incremented in 1-second intervals only ^
+                addCoins(getPassiveCoinsPerSecond() * duration)
+                delay(millisPerSec)
+            }
+        }
+    }
+
+
     private fun toDisplay(value: Number): String {
         return if (showShorted) {
             shortBigNumbers(value.toLong())
@@ -54,21 +80,22 @@ class StartViewModel @Inject constructor(
         val multUpgrade4 = gameRepository.getUpgradeData(4)!!.multiplier!!
         val multUpgrade5 = gameRepository.getUpgradeData(5)!!.multiplier!!
 
-        val passiveCoinsPerSec: Long = (inventory.hackersLvl1 * hacker.unitPerSec!! +
-                inventory.hackersLvl2 * hacker.unitPerSec * multUpgrade2 +
-                inventory.hackersLvl3 * hacker.unitPerSec * multUpgrade3 +
-                inventory.hackersLvl4 * hacker.unitPerSec * multUpgrade4 +
-                inventory.hackersLvl5 * hacker.unitPerSec * multUpgrade5 +
-                inventory.cryptoMinersLvl1 * miner.unitPerSec!! +
-                inventory.cryptoMinersLvl2 * miner.unitPerSec * multUpgrade2 +
-                inventory.cryptoMinersLvl3 * miner.unitPerSec * multUpgrade3 +
-                inventory.cryptoMinersLvl4 * miner.unitPerSec * multUpgrade4 +
-                inventory.cryptoMinersLvl5 * miner.unitPerSec * multUpgrade5 +
-                inventory.botnetsLvl1 * botnet.unitPerSec!! +
-                inventory.botnetsLvl2 * botnet.unitPerSec * multUpgrade2 +
-                inventory.botnetsLvl3 * botnet.unitPerSec * multUpgrade3 +
-                inventory.botnetsLvl4 * botnet.unitPerSec * multUpgrade4 +
-                inventory.botnetsLvl5 * botnet.unitPerSec * multUpgrade5
+        val passiveCoinsPerSec: Long = (
+                1L * inventory.hackersLvl1 * hacker.unitPerSec!! +
+                inventory.hackersLvl2 * multUpgrade2 * hacker.unitPerSec +
+                inventory.hackersLvl3 * multUpgrade3 * hacker.unitPerSec +
+                inventory.hackersLvl4 * multUpgrade4 * hacker.unitPerSec +
+                inventory.hackersLvl5 * multUpgrade5 * hacker.unitPerSec +
+                1L * inventory.cryptoMinersLvl1 * miner.unitPerSec!! +
+                inventory.cryptoMinersLvl2 * multUpgrade2 * miner.unitPerSec +
+                inventory.cryptoMinersLvl3 * multUpgrade3 * miner.unitPerSec +
+                inventory.cryptoMinersLvl4 * multUpgrade4 * miner.unitPerSec +
+                inventory.cryptoMinersLvl5 * multUpgrade5 * miner.unitPerSec +
+                1L * inventory.botnetsLvl1 * botnet.unitPerSec!! +
+                inventory.botnetsLvl2 * multUpgrade2 * botnet.unitPerSec +
+                inventory.botnetsLvl3 * multUpgrade3 * botnet.unitPerSec +
+                inventory.botnetsLvl4 * multUpgrade4 * botnet.unitPerSec +
+                inventory.botnetsLvl5 * multUpgrade5 * botnet.unitPerSec
                 ).toLong()
         _viewState.value = _viewState.value.copy(coinsPerSec = toDisplay(passiveCoinsPerSec))
         coinsPerSec = passiveCoinsPerSec
@@ -79,39 +106,14 @@ class StartViewModel @Inject constructor(
     private fun addCoins(newCoins: Long) {
         viewModelScope.launch {
             val inventory = inventoryFlow.first()
+            gameRepository.addBitcoins(newCoins)
+            coins = gameRepository.getInventoryDataFlow().first().bitcoins
             _viewState.value = _viewState.value.copy(
-                coins = toDisplay(coins + newCoins),
+                coins = toDisplay(coins),
                 hackerCount = toDisplay(inventory.hackersLvl1 + inventory.hackersLvl2 + inventory.hackersLvl3 + inventory.hackersLvl4 + inventory.hackersLvl5),
                 minerCount = toDisplay(inventory.cryptoMinersLvl1 + inventory.cryptoMinersLvl2 + inventory.cryptoMinersLvl3 + inventory.cryptoMinersLvl4 + inventory.cryptoMinersLvl5),
                 botnetCount = toDisplay(inventory.botnetsLvl1 + inventory.botnetsLvl2 + inventory.botnetsLvl3 + inventory.botnetsLvl4 + inventory.botnetsLvl5)
             )
-            coins += newCoins
-            gameRepository.addBitcoins(newCoins)
-        }
-    }
-
-    init {
-        viewModelScope.launch { // Coroutine for passive income
-            val millisPerSec: Long = 1000
-            gameRepository.updateShop()
-            _viewState.value =
-                _viewState.value.copy(coins = toDisplay(inventoryFlow.first().bitcoins))
-
-            while (true) { // Stops with end of coroutine lifecycle
-                coins = inventoryFlow.first().bitcoins
-                val lastTimestamp = inventoryFlow.first().lastMiningTimestamp
-                val duration = (System.currentTimeMillis() - lastTimestamp) / millisPerSec
-                // ^ Get the duration in seconds ^
-                /*
-                * Why do I calculate the duration in every iteration?
-                * A: The thread or even the entire app could freeze because of external factors,
-                * which would lead to an incorrect coin count after responding again
-                */
-                gameRepository.setMiningTimestamp(lastTimestamp + duration * millisPerSec)
-                // ^ Ensure the timestamp is incremented in 1-second intervals only ^
-                addCoins(getPassiveCoinsPerSecond() * duration)
-                delay(millisPerSec)
-            }
         }
     }
 
