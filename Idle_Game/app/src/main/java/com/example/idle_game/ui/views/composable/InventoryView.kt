@@ -647,6 +647,48 @@ fun ShopItemButtons(
                 )
             }
         }
+        var quantityLvl1 = 0
+        var quantityLvl2 = 0
+        var quantityLvl3 = 0
+        var quantityLvl4 = 0
+        var quantityLvl5 = 0
+
+        when(item.name){
+            "low passive" -> {
+                quantityLvl1 = viewState.amountHackerLvl1
+                quantityLvl2 = viewState.amountHackerLvl2
+                quantityLvl3 = viewState.amountHackerLvl3
+                quantityLvl4 = viewState.amountHackerLvl4
+                quantityLvl5 = viewState.amountHackerLvl5
+            }
+            "medium passive" -> {
+                quantityLvl1 = viewState.amountMinerLvl1
+                quantityLvl2 = viewState.amountMinerLvl2
+                quantityLvl3 = viewState.amountMinerLvl3
+                quantityLvl4 = viewState.amountMinerLvl4
+                quantityLvl5 = viewState.amountMinerLvl5
+            }
+            "high passive" -> {
+                quantityLvl1 = viewState.amountBotNetLvl1
+                quantityLvl2 = viewState.amountBotNetLvl2
+                quantityLvl3 = viewState.amountBotNetLvl3
+                quantityLvl4 = viewState.amountBotNetLvl4
+                quantityLvl5 = viewState.amountBotNetLvl5
+            }
+        }
+
+        if (isSpecialItem) {
+            Column(
+                modifier = Modifier
+                    .padding(start = 16.dp)
+            ) {
+                Text(text = "Lvl1 $quantityLvl1")
+                Text(text = "Lvl2 $quantityLvl2")
+                Text(text = "Lvl3 $quantityLvl3")
+                Text(text = "Lvl4 $quantityLvl4")
+                Text(text = "Lvl5 $quantityLvl5")
+            }
+        }
 
         Spacer(modifier = Modifier.width(16.dp))
 

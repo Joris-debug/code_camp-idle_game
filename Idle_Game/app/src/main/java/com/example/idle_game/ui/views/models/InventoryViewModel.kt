@@ -103,16 +103,19 @@ class InventoryViewModel @Inject constructor(
                 amountHackerLvl2 = gameRepository.getInventoryDataFlow().first().hackersLvl2,
                 amountHackerLvl3 = gameRepository.getInventoryDataFlow().first().hackersLvl3,
                 amountHackerLvl4 = gameRepository.getInventoryDataFlow().first().hackersLvl4,
+                amountHackerLvl5 = gameRepository.getInventoryDataFlow().first().hackersLvl5,
 
                 amountMinerLvl1 = gameRepository.getInventoryDataFlow().first().cryptoMinersLvl1,
                 amountMinerLvl2 = gameRepository.getInventoryDataFlow().first().cryptoMinersLvl2,
                 amountMinerLvl3 = gameRepository.getInventoryDataFlow().first().cryptoMinersLvl3,
                 amountMinerLvl4 = gameRepository.getInventoryDataFlow().first().cryptoMinersLvl4,
+                amountMinerLvl5 = gameRepository.getInventoryDataFlow().first().cryptoMinersLvl5,
 
                 amountBotNetLvl1 = gameRepository.getInventoryDataFlow().first().botnetsLvl1,
                 amountBotNetLvl2 = gameRepository.getInventoryDataFlow().first().botnetsLvl2,
                 amountBotNetLvl3 = gameRepository.getInventoryDataFlow().first().botnetsLvl3,
                 amountBotNetLvl4 = gameRepository.getInventoryDataFlow().first().botnetsLvl4,
+                amountBotNetLvl5 = gameRepository.getInventoryDataFlow().first().botnetsLvl5,
             )
         }
     }

@@ -14,19 +14,19 @@ data class InventoryViewState(
     val amountUpgradeLvl3: Int = 0,
     val amountUpgradeLvl4: Int = 0,
     val amountUpgradeLvl5: Int = 0,
-
     val amountHackerLvl1: Int = 0,
     val amountHackerLvl2: Int = 0,
     val amountHackerLvl3: Int = 0,
     val amountHackerLvl4: Int = 0,
-
+    val amountHackerLvl5: Int = 0,
     val amountMinerLvl1: Int = 0,
     val amountMinerLvl2: Int = 0,
     val amountMinerLvl3: Int = 0,
     val amountMinerLvl4: Int = 0,
-
+    val amountMinerLvl5: Int = 0,
     val amountBotNetLvl1: Int = 0,
     val amountBotNetLvl2: Int = 0,
     val amountBotNetLvl3: Int = 0,
-    val amountBotNetLvl4: Int = 0
+    val amountBotNetLvl4: Int = 0,
+    val amountBotNetLvl5: Int = 0
     )

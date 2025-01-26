@@ -35,8 +35,8 @@ class NotificationWorker(appContext: Context, workerParams: WorkerParameters) :
 
         val notification = NotificationCompat.Builder(applicationContext, notificationChannelId)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("Not your Keys not your coin!")
-            .setContentText("SChnell übertrage deine Bitcoins auf deine Cold-Wallet bevor sie verloren gehen!")
+            .setContentTitle("Du hast wieder BTC verdient!")
+            .setContentText("Komm zurück ins Spiel, um neue Items freizuschalten!")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
 
