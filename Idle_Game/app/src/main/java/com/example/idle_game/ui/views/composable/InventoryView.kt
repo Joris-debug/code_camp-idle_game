@@ -430,6 +430,7 @@ fun InsufficientFundsDialog(
         confirmButton = {
             TextButton(onClick = {
                 setQuantity("1")
+                onDismiss()
             }) {
                 Text("OK")
             }
