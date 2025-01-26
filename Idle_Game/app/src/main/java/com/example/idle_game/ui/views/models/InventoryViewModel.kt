@@ -69,7 +69,7 @@ class InventoryViewModel @Inject constructor(
         viewModelScope.launch {
             gameRepository.updateShop()
             _viewState.value = _viewState.value.copy(shopData = gameRepository.getShopDataFlow())
-            //_viewState.value = _viewState.value.copy(inventoryData = gameRepository.getInventoryDataFlow())
+            _viewState.value = _viewState.value.copy(inventoryData = gameRepository.getInventoryDataFlow())
         }
     }
 
