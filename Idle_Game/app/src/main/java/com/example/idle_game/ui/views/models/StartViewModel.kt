@@ -141,7 +141,7 @@ class StartViewModel @Inject constructor(
                     coinsPerSec = toDisplay(coinsPerSec + clickedCoins)
                 )
             coinsPerSec += clickedCoins
-            addCoins(clickedCoins + 100000)
+            addCoins(clickedCoins)
         }
     }
 
