@@ -1,5 +1,6 @@
 package com.example.idle_game.ui.views.composable
 
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -11,8 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.work.WorkManager
 import com.example.idle_game.ui.views.models.StartViewModel
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,9 +28,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,11 +40,11 @@ import com.example.idle_game.R
 
 @Composable
 fun StartView(
-    workManager: WorkManager = WorkManager.getInstance(LocalContext.current),
     viewModel: StartViewModel = hiltViewModel()
 ) {
     val viewState = viewModel.viewState.collectAsState()
     var isClicked by remember { mutableStateOf(false) }
+
 
     // Scale-animation when coin is clicked
     val scale by animateFloatAsState(
@@ -79,6 +80,17 @@ fun StartView(
                 )
             }
         }
+
+        Text(
+            text = if (viewState.value.activeBoost > 0) {
+                "Boost Aktiv: ${getBoostName(viewState.value.activeBoost)}"
+            } else {
+                "Kein Boost aktiv"
+            },
+            style = TextStyle(color = Color.Black),
+            textAlign = TextAlign.Center
+        )
+
         Image(
             painter = painterResource(id = R.drawable.bitcoin), "Klicken für Bitcoins",
             modifier = Modifier
@@ -120,6 +132,15 @@ fun StartView(
                 )
             }
         }
+    }
+}
+
+fun getBoostName(boostType: Int): String {
+    return when (boostType) {
+        1 -> "low boost"
+        2 -> "medium boost"
+        3 -> "high boost"
+        else -> ""
     }
 }
 

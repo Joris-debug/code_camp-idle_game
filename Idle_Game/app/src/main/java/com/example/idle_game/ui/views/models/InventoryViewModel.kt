@@ -18,17 +18,15 @@ class InventoryViewModel @Inject constructor(
     val gameRepository: GameRepository
 ) : ViewModel() {
 
-    private val _uiStateFlow = MutableStateFlow(InventoryViewState())
-    val uiStateFlow: StateFlow<InventoryViewState> = _uiStateFlow
-
-    private val shopData = gameRepository.getShopDataFlow()
-    private val inventoryData = gameRepository.getInventoryDataFlow()
+    private val _viewState = MutableStateFlow(InventoryViewState())
+    val viewState: StateFlow<InventoryViewState> = _viewState
 
     init {
+        initState()
         viewModelScope.launch {
-            gameRepository.updateShop()
-            _uiStateFlow.value = _uiStateFlow.value.copy(shopData = shopData)
-            _uiStateFlow.value = _uiStateFlow.value.copy(inventoryData = inventoryData)
+            while (true) {
+                fetchBoost()
+            }
         }
     }
 
@@ -65,5 +63,18 @@ class InventoryViewModel @Inject constructor(
         viewModelScope.launch {
             gameRepository.issueBitcoins(cost)
         }
+    }
+
+    fun initState(){
+        viewModelScope.launch {
+            gameRepository.updateShop()
+            _viewState.value = _viewState.value.copy(shopData = gameRepository.getShopDataFlow())
+            //_viewState.value = _viewState.value.copy(inventoryData = gameRepository.getInventoryDataFlow())
+        }
+    }
+
+    private suspend fun fetchBoost(){
+        _viewState.value = _viewState.value.copy(activeBoost = gameRepository.getInventoryDataFlow().first().activeBoostType)
+        gameRepository.isBoostActive()
     }
 }

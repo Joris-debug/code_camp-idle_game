@@ -1,6 +1,7 @@
 package com.example.idle_game.data.repositories
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.api.models.ItemResponse
 import com.example.idle_game.api.models.ScoreResponse
@@ -540,6 +541,7 @@ class GameRepository(
                     }
                 }
                 addUpgradeLvl2(-1)
+                Log.e("Upgrade", "Check")
             }
 
             "upgrade lvl 3" -> {

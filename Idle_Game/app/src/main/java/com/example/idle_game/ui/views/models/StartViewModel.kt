@@ -1,12 +1,13 @@
 package com.example.idle_game.ui.views.models
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import androidx.work.WorkRequest
 import com.example.idle_game.data.repositories.GameRepository
-import com.example.idle_game.data.workers.NotWorker
+import com.example.idle_game.data.workers.NotificationWorker
 import com.example.idle_game.ui.views.states.StartViewState
 import com.example.idle_game.util.shortBigNumbers
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StartViewModel @Inject constructor(
-    private val gameRepository: GameRepository
+    private val gameRepository: GameRepository,
+    private val workManager: WorkManager
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(StartViewState())
@@ -49,7 +51,7 @@ class StartViewModel @Inject constructor(
     }
 
     private suspend fun getPassiveCoinsPerSecond(): Long {
-        val inventory = inventoryFlow.first();
+        val inventory = inventoryFlow.first()
         val hacker = gameRepository.getHackerShopData()
         val miner = gameRepository.getCryptoMinerShopData()
         val botnet = gameRepository.getBotnetShopData()
@@ -101,7 +103,11 @@ class StartViewModel @Inject constructor(
             _viewState.value =
                 _viewState.value.copy(coins = toDisplay(inventoryFlow.first().bitcoins))
 
+            scheduleNotificationWorker(workManager)
+
             while (true) { // Stops with end of coroutine lifecycle
+                fetchBoost()
+
                 coins = inventoryFlow.first().bitcoins
                 val lastTimestamp = inventoryFlow.first().lastMiningTimestamp
                 val duration = (System.currentTimeMillis() - lastTimestamp) / millisPerSec
@@ -114,6 +120,7 @@ class StartViewModel @Inject constructor(
                 gameRepository.setMiningTimestamp(lastTimestamp + duration * millisPerSec)
                 // ^ Ensure the timestamp is incremented in 1-second intervals only ^
                 addCoins(getPassiveCoinsPerSecond() * duration)
+
                 delay(millisPerSec)
             }
         }
@@ -134,16 +141,24 @@ class StartViewModel @Inject constructor(
                     coinsPerSec = toDisplay(coinsPerSec + clickedCoins)
                 )
             coinsPerSec += clickedCoins
-            addCoins(clickedCoins)
+            addCoins(clickedCoins + 100000)
         }
     }
 
-    private fun scheduleNotWorker(delayMinutes: Long, workManager: WorkManager) {
-        val workRequest: WorkRequest = OneTimeWorkRequest.Builder(NotWorker::class.java)
-            .setInitialDelay(delayMinutes, TimeUnit.MINUTES)
+    private fun scheduleNotificationWorker(workManager: WorkManager) {
+        val immediateWorkRequest = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
             .build()
+        workManager.enqueue(immediateWorkRequest)
 
-        workManager.enqueue(workRequest)
+        val periodicWorkRequest = PeriodicWorkRequest.Builder(NotificationWorker::class.java, 15, TimeUnit.MINUTES)
+            .build()
+        workManager.enqueue(periodicWorkRequest)
+    }
+
+    private suspend fun fetchBoost(){
+        _viewState.value =
+            _viewState.value.copy(activeBoost = inventoryFlow.first().activeBoostType)
+        gameRepository.isBoostActive()
     }
 
 }

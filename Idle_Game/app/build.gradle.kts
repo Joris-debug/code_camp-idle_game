@@ -9,11 +9,11 @@ plugins {
 
 android {
     namespace = "com.example.idle_game"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.idle_game"
-        minSdk = 29
+        minSdk = 33
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"

@@ -26,10 +26,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,7 +52,7 @@ import com.google.accompanist.pager.*
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
-    val viewState = viewModel.uiStateFlow.collectAsState().value
+    val viewState = viewModel.viewState.collectAsState().value
     val shopDataList = viewState.shopData.collectAsState(initial = emptyList()).value
     val inventoryData = viewState.inventoryData.collectAsState(initial = InventoryData()).value
     val selectedItem = viewState.selectedItem
@@ -60,6 +62,8 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
     val (itemToBuy, setItemToBuy) = remember { mutableStateOf<ShopData?>(null) }
     val (dialogMessage, setDialogMessage) = remember { mutableStateOf("") }
     val (dialogTitle, setDialogTitle) = remember { mutableStateOf("") }
+    val (showInputDialog, setShowInputDialog) = remember { mutableStateOf(false) }
+    val (useOn, setUseOn) = remember { mutableStateOf("") }
 
     //State for quantity input
     val (quantity, setQuantity) = remember { mutableStateOf("1") }
@@ -68,6 +72,7 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
     val upgradeItems = shopDataList.filter { it.name.contains("upgrade", ignoreCase = true) }
     val boostItems = shopDataList.filter { it.name.contains("boost", ignoreCase = true) }
     val passiveItems = shopDataList.filter { it.name.contains("passive", ignoreCase = true) }
+
 
     // Set up the HorizontalPager for swiping between screens
     HorizontalPager(
@@ -125,9 +130,10 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
 
             2 -> {
                 // Boost Items Screen
+                val title = if (viewState.activeBoost > 0) "Boosts (Aktiv)" else "Boosts (Inaktiv)"
                 CategoryScreen(
                     items = boostItems,
-                    title = "Boosts",
+                    title = title,
                     selectedItem = selectedItem,
                     onBuyClick = { item ->
                         setItemToBuy(item)
@@ -143,7 +149,7 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
                     },
                     viewModel = viewModel,
                     inventoryData = inventoryData,
-                    page = page
+                    page = page,
                 )
             }
         }
@@ -158,8 +164,13 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
         quantity = quantity,
         onQuantityChange = setQuantity,
         onUseItem = {
-            viewModel.useItem(itemToBuy!!, it)
-            setShowDialog(false)
+            if (it == "") {
+                viewModel.useItem(itemToBuy!!, it)
+                setShowDialog(false)
+            } else {
+                setUseOn(it)
+                setShowInputDialog(true)
+            }
         },
         onBuyItem = {
             val amount = quantity.toIntOrNull() ?: 1
@@ -177,6 +188,72 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
         setQuantity = setQuantity,
 
         )
+
+    ShowUpgradesInputDialog(
+        showDialog = showInputDialog,
+        onDismiss = { setShowInputDialog(false) },
+        onConfirm = { input ->
+            val quantity = input.toIntOrNull()
+            if (quantity != null && itemToBuy != null) {
+                for(i in 1..quantity){
+                    viewModel.useItem(itemToBuy, useOn)
+                }
+                viewModel.initState()
+            }
+            setShowInputDialog(false)
+        },
+        useOn = useOn
+    )
+}
+
+
+//For showing InputDialog for custom Amount of Upgrades
+@Composable
+fun ShowUpgradesInputDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+    useOn: String
+) {
+    if (showDialog) {
+        var inputText by remember { mutableStateOf("1") }
+
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = {
+                Text(text = "$useOn upgraden")
+            },
+            text = {
+                Column {
+                    Text(text = "Menge der Upgrades, die auf $useOn angewendet werden sollen:")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextField(
+                        value = inputText,
+                        onValueChange = { newValue ->
+                            if (newValue.all { it.isDigit() }) {
+                                inputText = newValue
+                            }
+                        },
+                        placeholder = { Text("Zahl eingeben") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onConfirm(inputText)
+                    onDismiss()
+                }) {
+                    Text("Confirm")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -188,10 +265,13 @@ fun CategoryScreen(
     onApplyClick: (ShopData) -> Unit,
     viewModel: InventoryViewModel,
     inventoryData: InventoryData,
-    page: Int
+    page: Int,
 ) {
 
     val bitcoinBalance = inventoryData.bitcoins
+    val itemAmounts = remember(items, inventoryData) {
+        items.map { mutableIntStateOf(viewModel.getAmountOfItems(it, inventoryData)) }
+    }
 
     Box(
         modifier = Modifier
@@ -207,9 +287,10 @@ fun CategoryScreen(
         ) {
             Text(text = title)
 
-            items.forEach { item ->
+            items.forEachIndexed { index, item ->
                 val isSelected = item == selectedItem
-                val itemAmount = viewModel.getAmountOfItems(item, inventoryData)
+                val itemAmount = itemAmounts[index].intValue
+
                 ShopItemButtons(
                     item = item,
                     isSelected = isSelected,
@@ -333,7 +414,7 @@ fun ShowDialog(
     }
 }
 
-//Dialog that appears if user has to little BTC
+//Dialog that appears if user has not enough BTC
 @Composable
 fun InsufficientFundsDialog(
     onDismiss: () -> Unit,
@@ -347,7 +428,9 @@ fun InsufficientFundsDialog(
             Text("Du hast nicht genug BTC, um dieses Item zu kaufen. Bitte versuche es später nochmal.")
         },
         confirmButton = {
-            TextButton(onClick = { setQuantity("1") }) {
+            TextButton(onClick = {
+                setQuantity("1")
+            }) {
                 Text("OK")
             }
         }
@@ -456,8 +539,9 @@ fun ApplyOnDialog(
 fun ShopItemButtons(
     item: ShopData,
     isSelected: Boolean,
-    itemAmount: Int, onBuyClick: () -> Unit,
-    onApplyClick: () -> Unit
+    itemAmount: Int,
+    onBuyClick: () -> Unit,
+    onApplyClick: () -> Unit,
 ) {
 
     val buttonBackground =
