@@ -146,10 +146,6 @@ class StartViewModel @Inject constructor(
     }
 
     private fun scheduleNotificationWorker(workManager: WorkManager) {
-        val immediateWorkRequest = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
-            .build()
-        workManager.enqueue(immediateWorkRequest)
-
         val periodicWorkRequest = PeriodicWorkRequest.Builder(NotificationWorker::class.java, 15, TimeUnit.MINUTES)
             .build()
         workManager.enqueue(periodicWorkRequest)

@@ -135,7 +135,7 @@ fun StartView(
     }
 }
 
-fun getBoostName(boostType: Int): String {
+private fun getBoostName(boostType: Int): String {
     return when (boostType) {
         1 -> "low boost"
         2 -> "medium boost"

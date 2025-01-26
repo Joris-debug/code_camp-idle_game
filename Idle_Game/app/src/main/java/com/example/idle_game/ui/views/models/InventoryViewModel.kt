@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 
 @HiltViewModel
@@ -22,10 +23,14 @@ class InventoryViewModel @Inject constructor(
     val viewState: StateFlow<InventoryViewState> = _viewState
 
     init {
+        val millisPerSec: Long = 1000
         initState()
         viewModelScope.launch {
             while (true) {
-                fetchBoost()
+                fetchActualBoost()
+                fetchQuantityUpgrades()
+                fetchQuantityProducer()
+                delay(millisPerSec)
             }
         }
     }
@@ -53,9 +58,9 @@ class InventoryViewModel @Inject constructor(
         }
     }
 
-    fun useItem(itemToBuy: ShopData, useOn: String) {
+    fun useItem(itemToBuy: ShopData, useOn: String, quantity: Int) {
         viewModelScope.launch {
-            gameRepository.useItem(itemToBuy, useOn)
+            gameRepository.useItem(itemToBuy, useOn, quantity)
         }
     }
 
@@ -65,7 +70,7 @@ class InventoryViewModel @Inject constructor(
         }
     }
 
-    fun initState(){
+    private fun initState(){
         viewModelScope.launch {
             gameRepository.updateShop()
             _viewState.value = _viewState.value.copy(shopData = gameRepository.getShopDataFlow())
@@ -73,8 +78,42 @@ class InventoryViewModel @Inject constructor(
         }
     }
 
-    private suspend fun fetchBoost(){
+    private suspend fun fetchActualBoost(){
         _viewState.value = _viewState.value.copy(activeBoost = gameRepository.getInventoryDataFlow().first().activeBoostType)
         gameRepository.isBoostActive()
+    }
+
+    private fun fetchQuantityUpgrades(){
+        viewModelScope.launch {
+            gameRepository.getInventoryDataFlow().collect { inventoryData ->
+                _viewState.value = _viewState.value.copy(
+                    amountUpgradeLvl2 = inventoryData.upgradeLvl2,
+                    amountUpgradeLvl3 = inventoryData.upgradeLvl3,
+                    amountUpgradeLvl4 = inventoryData.upgradeLvl4,
+                    amountUpgradeLvl5 = inventoryData.upgradeLvl5
+                )
+            }
+        }
+    }
+
+    private fun fetchQuantityProducer(){
+        viewModelScope.launch {
+            _viewState.value = _viewState.value.copy(
+                amountHackerLvl1 = gameRepository.getInventoryDataFlow().first().hackersLvl1,
+                amountHackerLvl2 = gameRepository.getInventoryDataFlow().first().hackersLvl2,
+                amountHackerLvl3 = gameRepository.getInventoryDataFlow().first().hackersLvl3,
+                amountHackerLvl4 = gameRepository.getInventoryDataFlow().first().hackersLvl4,
+
+                amountMinerLvl1 = gameRepository.getInventoryDataFlow().first().cryptoMinersLvl1,
+                amountMinerLvl2 = gameRepository.getInventoryDataFlow().first().cryptoMinersLvl2,
+                amountMinerLvl3 = gameRepository.getInventoryDataFlow().first().cryptoMinersLvl3,
+                amountMinerLvl4 = gameRepository.getInventoryDataFlow().first().cryptoMinersLvl4,
+
+                amountBotNetLvl1 = gameRepository.getInventoryDataFlow().first().botnetsLvl1,
+                amountBotNetLvl2 = gameRepository.getInventoryDataFlow().first().botnetsLvl2,
+                amountBotNetLvl3 = gameRepository.getInventoryDataFlow().first().botnetsLvl3,
+                amountBotNetLvl4 = gameRepository.getInventoryDataFlow().first().botnetsLvl4,
+            )
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.idle_game.ui.views.composable
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.ShopData
 import com.example.idle_game.ui.views.models.InventoryViewModel
+import com.example.idle_game.ui.views.states.InventoryViewState
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.*
 
@@ -100,7 +102,8 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
                     },
                     viewModel = viewModel,
                     inventoryData = inventoryData,
-                    page = page
+                    page = page,
+                    viewState = viewState
                 )
             }
 
@@ -124,13 +127,15 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
                     },
                     viewModel = viewModel,
                     inventoryData = inventoryData,
-                    page = page
+                    page = page,
+                    viewState = viewState
                 )
             }
 
             2 -> {
                 // Boost Items Screen
-                val title = if (viewState.activeBoost > 0) "Boosts (${getBoostName(viewState.activeBoost)} aktiv)" else "Boosts (Inaktiv)"
+                val title =
+                    if (viewState.activeBoost > 0) "Boosts (${getBoostName(viewState.activeBoost)} aktiv)" else "Boosts (Inaktiv)"
                 CategoryScreen(
                     items = boostItems,
                     title = title,
@@ -150,6 +155,7 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
                     viewModel = viewModel,
                     inventoryData = inventoryData,
                     page = page,
+                    viewState = viewState
                 )
             }
         }
@@ -165,7 +171,7 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
         onQuantityChange = setQuantity,
         onUseItem = {
             if (it == "") {
-                viewModel.useItem(itemToBuy!!, it)
+                viewModel.useItem(itemToBuy!!, it, 0)
                 setShowDialog(false)
             } else {
                 setUseOn(it)
@@ -186,35 +192,25 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
         viewModel = viewModel,
         inventoryData = inventoryData,
         setQuantity = setQuantity,
-
-        )
+        viewState = viewState,
+    )
 
     ShowUpgradesInputDialog(
         showDialog = showInputDialog,
         onDismiss = { setShowInputDialog(false) },
         onConfirm = { input ->
             val quantity = input.toIntOrNull()
+            Log.e("Anzahl:", quantity.toString())
             if (quantity != null && itemToBuy != null) {
-                for(i in 1..quantity){
-                    viewModel.useItem(itemToBuy, useOn)
-                }
-                viewModel.initState()
+                viewModel.useItem(itemToBuy, useOn, quantity)
             }
             setShowInputDialog(false)
         },
-        useOn = useOn
+        useOn = useOn,
+        viewState = viewState,
+        itemToBuy = itemToBuy
     )
-
-    fun getBoostName(boostType: Int): String {
-        return when (boostType) {
-            1 -> "low boost"
-            2 -> "medium boost"
-            3 -> "high boost"
-            else -> ""
-        }
-    }
 }
-
 
 //For showing InputDialog for custom Amount of Upgrades
 @Composable
@@ -222,7 +218,9 @@ fun ShowUpgradesInputDialog(
     showDialog: Boolean,
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit,
-    useOn: String
+    useOn: String,
+    viewState: InventoryViewState,
+    itemToBuy: ShopData?
 ) {
     if (showDialog) {
         var inputText by remember { mutableStateOf("1") }
@@ -236,10 +234,59 @@ fun ShowUpgradesInputDialog(
                 Column {
                     Text(text = "Menge der Upgrades, die auf $useOn angewendet werden sollen:")
                     Spacer(modifier = Modifier.height(8.dp))
-                    TextField(
+                    OutlinedTextField(
                         value = inputText,
+                        label = { Text("Menge") },
                         onValueChange = { newValue ->
-                            if (newValue.all { it.isDigit() }) {
+                            var maxQuantityProducer = 0
+                            var maxQuantityUpgrades = 0
+                            when (itemToBuy!!.name) {
+                                "upgrade lvl 2" -> {
+                                    maxQuantityUpgrades = viewState.amountUpgradeLvl2
+                                    when (useOn) {
+                                        "Hacker" -> maxQuantityProducer = viewState.amountHackerLvl1
+                                        "Miner" -> maxQuantityProducer = viewState.amountMinerLvl1
+                                        "BotNet" -> maxQuantityProducer = viewState.amountBotNetLvl1
+                                    }
+                                }
+
+                                "upgrade lvl 3" -> {
+                                    maxQuantityUpgrades = viewState.amountUpgradeLvl3
+                                    when (useOn) {
+                                        "Hacker" -> maxQuantityProducer = viewState.amountHackerLvl2
+                                        "Miner" -> maxQuantityProducer = viewState.amountMinerLvl2
+                                        "BotNet" -> maxQuantityProducer = viewState.amountBotNetLvl2
+                                    }
+                                }
+
+                                "upgrade lvl 4" -> {
+                                    maxQuantityUpgrades = viewState.amountUpgradeLvl4
+                                    when (useOn) {
+                                        "Hacker" -> maxQuantityProducer = viewState.amountHackerLvl3
+                                        "Miner" -> maxQuantityProducer = viewState.amountMinerLvl3
+                                        "BotNet" -> maxQuantityProducer = viewState.amountBotNetLvl3
+                                    }
+                                }
+
+                                "upgrade lvl 5" -> {
+                                    maxQuantityUpgrades = viewState.amountUpgradeLvl5
+                                    when (useOn) {
+                                        "Hacker" -> maxQuantityProducer = viewState.amountHackerLvl4
+                                        "Miner" -> maxQuantityProducer = viewState.amountMinerLvl4
+                                        "BotNet" -> maxQuantityProducer = viewState.amountBotNetLvl4
+                                    }
+                                }
+                            }
+
+                            var maxUpgrades = 0
+                            maxUpgrades = if (maxQuantityUpgrades <= maxQuantityProducer) {
+                                maxQuantityUpgrades
+                            } else {
+                                maxQuantityProducer
+                            }
+
+                            if (newValue.all { it.isDigit() } && (newValue.toIntOrNull()
+                                    ?: 0) <= maxUpgrades) {
                                 inputText = newValue
                             }
                         },
@@ -253,12 +300,12 @@ fun ShowUpgradesInputDialog(
                     onConfirm(inputText)
                     onDismiss()
                 }) {
-                    Text("Confirm")
+                    Text("Anwenden")
                 }
             },
             dismissButton = {
                 TextButton(onClick = onDismiss) {
-                    Text("Cancel")
+                    Text("Abbrechen")
                 }
             }
         )
@@ -275,6 +322,7 @@ fun CategoryScreen(
     viewModel: InventoryViewModel,
     inventoryData: InventoryData,
     page: Int,
+    viewState: InventoryViewState
 ) {
 
     val bitcoinBalance = inventoryData.bitcoins
@@ -305,7 +353,8 @@ fun CategoryScreen(
                     isSelected = isSelected,
                     onBuyClick = { onBuyClick(item) },
                     onApplyClick = { onApplyClick(item) },
-                    itemAmount = itemAmount
+                    itemAmount = itemAmount,
+                    viewState = viewState
                 )
             }
         }
@@ -365,6 +414,8 @@ fun ShowDialog(
     viewModel: InventoryViewModel,
     inventoryData: InventoryData,
     setQuantity: (String) -> Unit,
+    viewState: InventoryViewState
+
 ) {
     if (showDialog && itemToBuy != null) {
         when (dialogTitle) {
@@ -372,23 +423,29 @@ fun ShowDialog(
                 if (itemToBuy.name.startsWith("upgrade lvl")) {
                     ApplyOnDialog(
                         title = dialogTitle,
-                        onHackerClick = { onUseItem("Hacker") },
-                        onBotNetClick = { onUseItem("BotNet") },
-                        onMinerClick = { onUseItem("Miner") },
-                        onDismiss = {
+                        onHackerClick = {
+                            onUseItem("Hacker")
                             onDismiss()
                         },
+                        onBotNetClick = {
+                            onUseItem("BotNet")
+                            onDismiss()
+                        },
+                        onMinerClick = {
+                            onUseItem("Miner")
+                            onDismiss()
+                        },
+                        onDismiss = onDismiss,
                         inventoryData = inventoryData,
-                        itemToBuy = itemToBuy
+                        itemToBuy = itemToBuy,
+                        viewState = viewState
                     )
                 } else {
                     ApplyDialog(
                         message = dialogMessage,
                         title = dialogTitle,
                         onConfirm = { onUseItem("") },
-                        onDismiss = {
-                            onDismiss()
-                        },
+                        onDismiss = onDismiss,
                         viewModel = viewModel,
                     )
                 }
@@ -428,7 +485,7 @@ fun ShowDialog(
 fun InsufficientFundsDialog(
     onDismiss: () -> Unit,
     setQuantity: (String) -> Unit,
-    ) {
+) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -456,7 +513,8 @@ fun ApplyOnDialog(
     onMinerClick: () -> Unit,
     onDismiss: () -> Unit,
     inventoryData: InventoryData,
-    itemToBuy: ShopData?
+    itemToBuy: ShopData?,
+    viewState: InventoryViewState
 ) {
     var enoughHacker = false
     var enoughMiner = false
@@ -467,9 +525,9 @@ fun ApplyOnDialog(
 
     when (itemToBuy?.name) {
         "upgrade lvl 2" -> {
-            availableHackers = inventoryData.hackersLvl1
-            availableMiner = inventoryData.cryptoMinersLvl1
-            availableBotNets = inventoryData.botnetsLvl1
+            availableHackers = viewState.amountHackerLvl1
+            availableMiner = viewState.amountMinerLvl1
+            availableBotNets = viewState.amountBotNetLvl1
 
             enoughHacker = availableHackers > 0
             enoughMiner = availableMiner > 0
@@ -477,9 +535,9 @@ fun ApplyOnDialog(
         }
 
         "upgrade lvl 3" -> {
-            availableHackers = inventoryData.hackersLvl2
-            availableMiner = inventoryData.cryptoMinersLvl2
-            availableBotNets = inventoryData.botnetsLvl2
+            availableHackers = viewState.amountHackerLvl2
+            availableMiner = viewState.amountMinerLvl2
+            availableBotNets = viewState.amountBotNetLvl2
 
             enoughHacker = availableHackers > 0
             enoughMiner = availableMiner > 0
@@ -487,9 +545,9 @@ fun ApplyOnDialog(
         }
 
         "upgrade lvl 4" -> {
-            availableHackers = inventoryData.hackersLvl3
-            availableMiner = inventoryData.cryptoMinersLvl3
-            availableBotNets = inventoryData.botnetsLvl3
+            availableHackers = viewState.amountHackerLvl3
+            availableMiner = viewState.amountMinerLvl3
+            availableBotNets = viewState.amountBotNetLvl3
 
             enoughHacker = availableHackers > 0
             enoughMiner = availableMiner > 0
@@ -497,9 +555,9 @@ fun ApplyOnDialog(
         }
 
         "upgrade lvl 5" -> {
-            availableHackers = inventoryData.hackersLvl4
-            availableMiner = inventoryData.cryptoMinersLvl4
-            availableBotNets = inventoryData.botnetsLvl4
+            availableHackers = viewState.amountHackerLvl4
+            availableMiner = viewState.amountMinerLvl4
+            availableBotNets = viewState.amountBotNetLvl4
 
             enoughHacker = availableHackers > 0
             enoughMiner = availableMiner > 0
@@ -538,7 +596,7 @@ fun ApplyOnDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("Abbrechen")
             }
         }
     )
@@ -552,6 +610,7 @@ fun ShopItemButtons(
     itemAmount: Int,
     onBuyClick: () -> Unit,
     onApplyClick: () -> Unit,
+    viewState: InventoryViewState
 ) {
 
     val buttonBackground =
@@ -603,8 +662,17 @@ fun ShopItemButtons(
 
                 enabled = itemAmount > 0
             ) {
+                Log.e("Item: ", item.name)
+                val text = when (item.name) {
+                    "upgrade lvl 2" -> "Anwenden (${viewState.amountUpgradeLvl2})"
+                    "upgrade lvl 3" -> "Anwenden (${viewState.amountUpgradeLvl3})"
+                    "upgrade lvl 4" -> "Anwenden (${viewState.amountUpgradeLvl4})"
+                    "upgrade lvl 5" -> "Anwenden (${viewState.amountUpgradeLvl5})"
+                    else -> "Anwenden(${itemAmount})"
+
+                }
                 Text(
-                    text = "Anwenden ($itemAmount)",
+                    text = text,
                     fontSize = 10.sp
                 )
             }
@@ -633,7 +701,11 @@ fun QuantityDialog(
                 Text(text = message)
                 OutlinedTextField(
                     value = quantity,
-                    onValueChange = onQuantityChange,
+                    onValueChange = { newValue ->
+                        if (newValue.all { it.isDigit() }) {
+                            onQuantityChange(newValue)
+                        }
+                    },
                     label = { Text("Menge") },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier
@@ -644,7 +716,7 @@ fun QuantityDialog(
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Bestätigen")
+                Text("Kaufen")
             }
 
             val amount = quantity.toIntOrNull() ?: 1
@@ -706,5 +778,14 @@ fun ApplyDialog(
             }
         }
     )
+}
+
+private fun getBoostName(boostType: Int): String {
+    return when (boostType) {
+        1 -> "low boost"
+        2 -> "medium boost"
+        3 -> "high boost"
+        else -> ""
+    }
 }
 

@@ -271,7 +271,7 @@ class GameRepository(
     }
 
     // Uses a level k upgrade on a level k-1 hacker, if both exist
-    private suspend fun upgradeHacker(upgradeLvl: Int) {
+    private suspend fun upgradeHacker(upgradeLvl: Int,quantity: Int) {
         val inventory = inventoryDataFlow.first()
         val hLvl1 = inventory.hackersLvl1
         val hLvl2 = inventory.hackersLvl2
@@ -282,26 +282,26 @@ class GameRepository(
         when (upgradeLvl) {
             1 -> {
                 val upgrades = inventory.upgradeLvl2
-                if (hLvl1 > 0 && upgrades > 0) {
-                    gameDao.setHackers(hLvl1 - 1, hLvl2 + 1, hLvl3, hLvl4, hLvl5)
+                if (hLvl1 >= quantity && upgrades > quantity) {
+                    gameDao.setHackers(hLvl1 - quantity, hLvl2 + quantity, hLvl3, hLvl4, hLvl5)
                 }
             }
             2 -> {
                 val upgrades = inventory.upgradeLvl3
-                if (hLvl2 > 0 && upgrades > 0) {
-                    gameDao.setHackers(hLvl1, hLvl2 - 1, hLvl3 + 1, hLvl4, hLvl5)
+                if (hLvl2 >= quantity && upgrades >= quantity) {
+                    gameDao.setHackers(hLvl1, hLvl2 - quantity, hLvl3 + quantity, hLvl4, hLvl5)
                 }
             }
             3 -> {
                 val upgrades = inventory.upgradeLvl4
-                if (hLvl3 > 0 && upgrades > 0) {
-                    gameDao.setHackers(hLvl1, hLvl2, hLvl3 - 1, hLvl4 + 1, hLvl5)
+                if (hLvl3 >= quantity && upgrades >= quantity) {
+                    gameDao.setHackers(hLvl1, hLvl2, hLvl3 - quantity, hLvl4 + quantity, hLvl5)
                 }
             }
             4 -> {
                 val upgrades = inventory.upgradeLvl5
-                if (hLvl4 > 0 && upgrades > 0) {
-                    gameDao.setHackers(hLvl1, hLvl2, hLvl3, hLvl4 - 1, hLvl5 + 1)
+                if (hLvl4 >= quantity && upgrades >= quantity) {
+                    gameDao.setHackers(hLvl1, hLvl2, hLvl3, hLvl4 - quantity, hLvl5 + quantity)
                 }
             }
             else -> {
@@ -311,7 +311,7 @@ class GameRepository(
     }
 
     // Uses a level k upgrade on a level k-1 crypto miner, if both exist
-    private suspend fun upgradeCryptoMiner(upgradeLvl: Int) {
+    private suspend fun upgradeCryptoMiner(upgradeLvl: Int, quantity: Int) {
         val inventory = inventoryDataFlow.first()
         val cmLvl1 = inventory.cryptoMinersLvl1
         val cmLvl2 = inventory.cryptoMinersLvl2
@@ -322,26 +322,26 @@ class GameRepository(
         when (upgradeLvl) {
             1 -> {
                 val upgrades = inventory.upgradeLvl2
-                if (cmLvl1 > 0 && upgrades > 0) {
-                    gameDao.setCryptoMiners(cmLvl1 - 1, cmLvl2 + 1, cmLvl3, cmLvl4, cmLvl5)
+                if (cmLvl1 >= quantity && upgrades >= quantity) {
+                    gameDao.setCryptoMiners(cmLvl1 - quantity, cmLvl2 + quantity, cmLvl3, cmLvl4, cmLvl5)
                 }
             }
             2 -> {
                 val upgrades = inventory.upgradeLvl3
-                if (cmLvl2 > 0 && upgrades > 0) {
-                    gameDao.setCryptoMiners(cmLvl1, cmLvl2 - 1, cmLvl3 + 1, cmLvl4, cmLvl5)
+                if (cmLvl2 >= quantity && upgrades >= quantity) {
+                    gameDao.setCryptoMiners(cmLvl1, cmLvl2 - quantity, cmLvl3 + quantity, cmLvl4, cmLvl5)
                 }
             }
             3 -> {
                 val upgrades = inventory.upgradeLvl4
-                if (cmLvl3 > 0 && upgrades > 0) {
-                    gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3 - 1, cmLvl4 + 1, cmLvl5)
+                if (cmLvl3 >= quantity && upgrades >= quantity) {
+                    gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3 - quantity, cmLvl4 + quantity, cmLvl5)
                 }
             }
             4 -> {
                 val upgrades = inventory.upgradeLvl5
-                if (cmLvl4 > 0 && upgrades > 0) {
-                    gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3, cmLvl4 - 1, cmLvl5 + 1)
+                if (cmLvl4 >= quantity && upgrades >= quantity) {
+                    gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3, cmLvl4 - quantity, cmLvl5 + quantity)
                 }
             }
             else -> {
@@ -351,7 +351,7 @@ class GameRepository(
     }
 
     // Uses a level k upgrade on a level k-1 botnet, if both exist
-    private suspend fun upgradeBotnet(upgradeLvl: Int) {
+    private suspend fun upgradeBotnet(upgradeLvl: Int, quantity: Int) {
         val inventory = inventoryDataFlow.first()
         val bLvl1 = inventory.botnetsLvl1
         val bLvl2 = inventory.botnetsLvl2
@@ -362,26 +362,26 @@ class GameRepository(
         when (upgradeLvl) {
             1 -> {
                 val upgrades = inventory.upgradeLvl2
-                if (bLvl1 > 0 && upgrades > 0) {
-                    gameDao.setBotnets(bLvl1 - 1, bLvl2 + 1, bLvl3, bLvl4, bLvl5)
+                if (bLvl1 >= quantity && upgrades >= quantity) {
+                    gameDao.setBotnets(bLvl1 - quantity, bLvl2 + quantity, bLvl3, bLvl4, bLvl5)
                 }
             }
             2 -> {
                 val upgrades = inventory.upgradeLvl3
-                if (bLvl2 > 0 && upgrades > 0) {
-                    gameDao.setBotnets(bLvl1, bLvl2 - 1, bLvl3 + 1, bLvl4, bLvl5)
+                if (bLvl2 >= quantity && upgrades >= quantity) {
+                    gameDao.setBotnets(bLvl1, bLvl2 - quantity, bLvl3 + quantity, bLvl4, bLvl5)
                 }
             }
             3 -> {
                 val upgrades = inventory.upgradeLvl4
-                if (bLvl3 > 0 && upgrades > 0) {
-                    gameDao.setBotnets(bLvl1, bLvl2, bLvl3 - 1, bLvl4 + 1, bLvl5)
+                if (bLvl3 >= quantity && upgrades >= quantity) {
+                    gameDao.setBotnets(bLvl1, bLvl2, bLvl3 - quantity, bLvl4 + quantity, bLvl5)
                 }
             }
             4 -> {
                 val upgrades = inventory.upgradeLvl5
-                if (bLvl4 > 0 && upgrades > 0) {
-                    gameDao.setBotnets(bLvl1, bLvl2, bLvl3, bLvl4 - 1, bLvl5 + 1)
+                if (bLvl4 >= quantity && upgrades >= quantity) {
+                    gameDao.setBotnets(bLvl1, bLvl2, bLvl3, bLvl4 - quantity, bLvl5 + quantity)
                 }
             }
             else -> {
@@ -519,7 +519,7 @@ class GameRepository(
     }
 
     // Updating database after using items
-    suspend fun useItem(item: ShopData, useOn: String) {
+    suspend fun useItem(item: ShopData, useOn: String, quantity: Int) {
         if (!isBoostActive()) {
             when (item.name) {
                 "low Boost" -> activateLowBoost()
@@ -531,62 +531,61 @@ class GameRepository(
             "upgrade lvl 2" -> {
                 when (useOn) {
                     "Hacker" -> {
-                        upgradeHacker(1)
+                        upgradeHacker(1,quantity)
                     }
                     "Miner" -> {
-                        upgradeCryptoMiner(1)
+                        upgradeCryptoMiner(1,quantity)
                     }
                     "BotNet" -> {
-                        upgradeBotnet(1)
+                        upgradeBotnet(1,quantity)
                     }
                 }
-                addUpgradeLvl2(-1)
-                Log.e("Upgrade", "Check")
+                addUpgradeLvl2(-quantity)
             }
 
             "upgrade lvl 3" -> {
                 when (useOn) {
                     "Hacker" -> {
-                        upgradeHacker(2)
+                        upgradeHacker(2, quantity)
                     }
                     "Miner" -> {
-                        upgradeCryptoMiner(2)
+                        upgradeCryptoMiner(2, quantity)
                     }
                     "BotNet" -> {
-                        upgradeBotnet(2)
+                        upgradeBotnet(2, quantity)
                     }
                 }
-                addUpgradeLvl3(-1)
+                addUpgradeLvl3(-quantity)
             }
 
             "upgrade lvl 4" -> {
                 when (useOn) {
                     "Hacker" -> {
-                        upgradeHacker(3)
+                        upgradeHacker(3, quantity)
                     }
                     "Miner" -> {
-                        upgradeCryptoMiner(3)
+                        upgradeCryptoMiner(3, quantity)
                     }
                     "BotNet" -> {
-                        upgradeBotnet(3)
+                        upgradeBotnet(3, quantity)
                     }
                 }
-                addUpgradeLvl4(-1)
+                addUpgradeLvl4(-quantity)
             }
 
             "upgrade lvl 5" -> {
                 when (useOn) {
                     "Hacker" -> {
-                        upgradeHacker(4)
+                        upgradeHacker(4, quantity)
                     }
                     "Miner" -> {
-                        upgradeCryptoMiner(4)
+                        upgradeCryptoMiner(4, quantity)
                     }
                     "BotNet" -> {
-                        upgradeBotnet(4)
+                        upgradeBotnet(4, quantity)
                     }
                 }
-                addUpgradeLvl5(-1)
+                addUpgradeLvl5(-quantity)
             }
         }
     }
