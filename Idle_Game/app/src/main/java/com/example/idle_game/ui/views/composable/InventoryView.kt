@@ -130,7 +130,7 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
 
             2 -> {
                 // Boost Items Screen
-                val title = if (viewState.activeBoost > 0) "Boosts (Aktiv)" else "Boosts (Inaktiv)"
+                val title = if (viewState.activeBoost > 0) "Boosts (${getBoostName(viewState.activeBoost)} aktiv)" else "Boosts (Inaktiv)"
                 CategoryScreen(
                     items = boostItems,
                     title = title,
@@ -204,6 +204,15 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
         },
         useOn = useOn
     )
+
+    fun getBoostName(boostType: Int): String {
+        return when (boostType) {
+            1 -> "low boost"
+            2 -> "medium boost"
+            3 -> "high boost"
+            else -> ""
+        }
+    }
 }
 
 
@@ -698,3 +707,4 @@ fun ApplyDialog(
         }
     )
 }
+
