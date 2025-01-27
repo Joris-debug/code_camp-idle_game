@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.idle_game"
-        minSdk = 29
+        minSdk = 31
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -65,6 +65,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.hilt.common)
+
+    implementation("androidx.activity:activity-ktx:1.7.0")
 
     // room
     implementation(libs.androidx.room.common)
