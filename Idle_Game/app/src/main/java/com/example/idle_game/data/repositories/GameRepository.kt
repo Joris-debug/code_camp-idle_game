@@ -1,7 +1,6 @@
 package com.example.idle_game.data.repositories
 
 import android.content.SharedPreferences
-import android.util.Log
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.api.models.ItemResponse
 import com.example.idle_game.api.models.ScoreResponse
@@ -271,7 +270,7 @@ class GameRepository(
     }
 
     // Uses a level k upgrade on a level k-1 hacker, if both exist
-    private suspend fun upgradeHacker(upgradeLvl: Int,quantity: Int) {
+    private suspend fun upgradeHacker(upgradeLvl: Int, quantity: Int) {
         val inventory = inventoryDataFlow.first()
         val hLvl1 = inventory.hackersLvl1
         val hLvl2 = inventory.hackersLvl2
@@ -282,7 +281,7 @@ class GameRepository(
         when (upgradeLvl) {
             1 -> {
                 val upgrades = inventory.upgradeLvl2
-                if (hLvl1 >= quantity && upgrades > quantity) {
+                if (hLvl1 >= quantity && upgrades >= quantity) {
                     gameDao.setHackers(hLvl1 - quantity, hLvl2 + quantity, hLvl3, hLvl4, hLvl5)
                 }
             }

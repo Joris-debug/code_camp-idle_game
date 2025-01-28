@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.example.idle_game"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.idle_game"
