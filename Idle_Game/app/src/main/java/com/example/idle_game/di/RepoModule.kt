@@ -75,10 +75,4 @@ class RepoModule {
             context, GameDatabase::class.java, "gamedatabase"
         ).fallbackToDestructiveMigration().build()
     }
-
-    @Provides
-    fun provideWorkManager(@ApplicationContext applicationContext: Context): WorkManager {
-        return WorkManager.getInstance(applicationContext)
-    }
-
 }

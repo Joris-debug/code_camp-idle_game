@@ -10,7 +10,7 @@ import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.components.SingletonComponent
 
 @HiltAndroidApp
-class MainApplication: Application(), Configuration.Provider {
+class MainApplication : Application(), Configuration.Provider {
 
     @EntryPoint
     @InstallIn(SingletonComponent::class)
@@ -18,11 +18,15 @@ class MainApplication: Application(), Configuration.Provider {
         fun workerFactory(): HiltWorkerFactory
     }
 
-    override val workManagerConfiguration = Configuration.Builder()
+    private val customWorkManagerConfiguration = Configuration.Builder()
         .setWorkerFactory(EntryPoints.get(this, HiltWorkerFactoryEntryPoint::class.java).workerFactory())
         .build()
 
     override fun onCreate() {
         super.onCreate()
+    }
+
+    override fun getWorkManagerConfiguration(): Configuration {
+        return customWorkManagerConfiguration
     }
 }

@@ -1,6 +1,5 @@
 package com.example.idle_game.ui.views.composable
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -200,7 +198,6 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
         onDismiss = { setShowInputDialog(false) },
         onConfirm = { input ->
             val quantity = input.toIntOrNull()
-            Log.e("Anzahl:", quantity.toString())
             if (quantity != null && itemToBuy != null) {
                 viewModel.useItem(itemToBuy, useOn, quantity)
             }
@@ -277,9 +274,7 @@ fun ShowUpgradesInputDialog(
                                     }
                                 }
                             }
-
-                            var maxUpgrades = 0
-                            maxUpgrades = if (maxQuantityUpgrades <= maxQuantityProducer) {
+                            val maxUpgrades: Int = if (maxQuantityUpgrades <= maxQuantityProducer) {
                                 maxQuantityUpgrades
                             } else {
                                 maxQuantityProducer
@@ -436,7 +431,6 @@ fun ShowDialog(
                             onDismiss()
                         },
                         onDismiss = onDismiss,
-                        inventoryData = inventoryData,
                         itemToBuy = itemToBuy,
                         viewState = viewState
                     )
@@ -512,7 +506,6 @@ fun ApplyOnDialog(
     onBotNetClick: () -> Unit,
     onMinerClick: () -> Unit,
     onDismiss: () -> Unit,
-    inventoryData: InventoryData,
     itemToBuy: ShopData?,
     viewState: InventoryViewState
 ) {
@@ -704,7 +697,6 @@ fun ShopItemButtons(
 
                 enabled = itemAmount > 0
             ) {
-                Log.e("Item: ", item.name)
                 val text = when (item.name) {
                     "upgrade lvl 2" -> "Anwenden (${viewState.amountUpgradeLvl2})"
                     "upgrade lvl 3" -> "Anwenden (${viewState.amountUpgradeLvl3})"

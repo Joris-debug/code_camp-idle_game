@@ -413,43 +413,26 @@ class GameRepository(
     }
 
     private suspend fun addUpgradeLvl2(amount: Int) {
-        if (amount <= 0) {
-            return
-        }
         val upgrades = inventoryDataFlow.first().upgradeLvl2
-        if (upgrades + amount > 0) {
-            gameDao.updateLvl2Upgrades(upgrades + amount)
-        }
+        gameDao.updateLvl2Upgrades(upgrades + amount)
+
     }
 
     private suspend fun addUpgradeLvl3(amount: Int) {
-        if (amount <= 0) {
-            return
-        }
         val upgrades = inventoryDataFlow.first().upgradeLvl3
-        if (upgrades + amount > 0) {
-            gameDao.updateLvl3Upgrades(upgrades + amount)
-        }
+        gameDao.updateLvl3Upgrades(upgrades + amount)
+
     }
 
     private suspend fun addUpgradeLvl4(amount: Int) {
-        if (amount <= 0) {
-            return
-        }
         val upgrades = inventoryDataFlow.first().upgradeLvl4
-        if (upgrades + amount > 0) {
-            gameDao.updateLvl4Upgrades(upgrades + amount)
-        }
+        gameDao.updateLvl4Upgrades(upgrades + amount)
+
     }
 
     private suspend fun addUpgradeLvl5(amount: Int) {
-        if (amount <= 0) {
-            return
-        }
         val upgrades = inventoryDataFlow.first().upgradeLvl5
-        if (upgrades + amount > 0) {
-            gameDao.updateLvl5Upgrades(upgrades + amount)
-        }
+        gameDao.updateLvl5Upgrades(upgrades + amount)
     }
 
     // Adds new low boosts to the inventory
