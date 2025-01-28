@@ -28,11 +28,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -91,19 +89,36 @@ fun StartView(
                 delay(1000L)
             }
         }
+        val text = if (remainingTime > 0) {
+            val seconds = (remainingTime / 1000) % 60
+            val minutes = (remainingTime / (1000 * 60)) % 60
+            "$minutes:%02d".format(seconds)
+        } else {
+            "Kein Boost aktiv"
+        }
 
-        Text(
-            text = if (remainingTime > 0) {
-                val seconds = (remainingTime / 1000) % 60
-                val minutes = (remainingTime / (1000 * 60)) % 60
-                "${getBoostName(viewState.value.activeBoost)} aktiv: $minutes:%02d".format(seconds)
-            } else {
-                "Kein Boost aktiv"
-            },
-            style = TextStyle(color = Color.Black),
-            textAlign = TextAlign.Center
-        )
+        val boostIcon: Int? = when (viewState.value.activeBoost) {
+            1 -> {
+                R.drawable.low_boost
+            }
+            2 -> {
+                R.drawable.medium_boost
+            }
+            3 -> {
+                R.drawable.high_boost
+            }
+            else -> {
+                null
+            }
+        }
 
+        boostIcon?.let {
+            PassiveBox(
+                painterResource(id = it),
+                "Information",
+                text
+            )
+        }
 
         Image(
             painter = painterResource(id = R.drawable.bitcoin), "Klicken für Bitcoins",
@@ -147,15 +162,6 @@ fun StartView(
                 )
             }
         }
-    }
-}
-
-private fun getBoostName(boostType: Int): String {
-    return when (boostType) {
-        1 -> "low boost"
-        2 -> "medium boost"
-        3 -> "high boost"
-        else -> ""
     }
 }
 
