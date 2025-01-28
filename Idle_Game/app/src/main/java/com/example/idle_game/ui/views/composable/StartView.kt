@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.R
 import com.example.idle_game.util.SoundManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun StartView(
@@ -80,15 +83,28 @@ fun StartView(
             }
         }
 
+        var remainingTime by remember { mutableLongStateOf(0L) }
+
+        LaunchedEffect(viewState.value.boostActiveUntil) {
+            while (true) {
+                val currentTime = System.currentTimeMillis()
+                remainingTime = (viewState.value.boostActiveUntil - currentTime).coerceAtLeast(0L)
+                delay(1000L)
+            }
+        }
+
         Text(
-            text = if (viewState.value.activeBoost > 0) {
-                "Boost Aktiv: ${getBoostName(viewState.value.activeBoost)}"
+            text = if (remainingTime > 0) {
+                val seconds = (remainingTime / 1000) % 60
+                val minutes = (remainingTime / (1000 * 60)) % 60
+                "${getBoostName(viewState.value.activeBoost)} aktiv: $minutes:%02d".format(seconds)
             } else {
                 "Kein Boost aktiv"
             },
             style = TextStyle(color = Color.Black),
             textAlign = TextAlign.Center
         )
+
 
         Image(
             painter = painterResource(id = R.drawable.bitcoin), "Klicken für Bitcoins",

@@ -1,6 +1,7 @@
 package com.example.idle_game.data.repositories
 
 import android.content.SharedPreferences
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.api.models.ItemResponse
 import com.example.idle_game.api.models.ScoreResponse

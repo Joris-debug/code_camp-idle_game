@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StartViewModel @Inject constructor(
-    private val gameRepository: GameRepository,
+    val gameRepository: GameRepository,
     val soundManager: SoundManager,
     private val workManager: WorkManager
 ) : ViewModel() {
@@ -150,7 +150,10 @@ class StartViewModel @Inject constructor(
 
     private suspend fun fetchBoost(){
         _viewState.value =
-            _viewState.value.copy(activeBoost = inventoryFlow.first().activeBoostType)
+            _viewState.value.copy(
+                activeBoost = inventoryFlow.first().activeBoostType,
+                boostActiveUntil = inventoryFlow.first().boostActiveUntil
+            )
         gameRepository.isBoostActive()
     }
 

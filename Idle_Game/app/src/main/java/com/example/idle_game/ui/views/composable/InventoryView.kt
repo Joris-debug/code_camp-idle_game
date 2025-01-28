@@ -1,5 +1,6 @@
 package com.example.idle_game.ui.views.composable
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,7 +49,9 @@ import com.example.idle_game.ui.views.models.InventoryViewModel
 import com.example.idle_game.ui.views.states.InventoryViewState
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.*
+import kotlinx.coroutines.delay
 
+@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
@@ -136,11 +139,30 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
 
             2 -> {
                 // Boost Items Screen
-                val title =
-                    if ((viewState.inventoryData?.activeBoostType ?: 0) > 0) "Boosts (${viewState.inventoryData?.let {
-                        getBoostName(
-                            it.activeBoostType)
-                    }} aktiv)" else "Boosts (Inaktiv)"
+                val title = if ((viewState.inventoryData?.activeBoostType ?: 0) > 0) {
+                    val boostName = viewState.inventoryData?.let { getBoostName(it.activeBoostType) }
+                    val remainingTime = remember { mutableStateOf("") }
+
+                    // Calculate the remaining time and update the state
+                    LaunchedEffect(viewState.inventoryData?.boostActiveUntil) {
+                        val endTime = viewState.inventoryData?.boostActiveUntil ?: 0L
+                        while (System.currentTimeMillis() < endTime) {
+                            val timeLeft = endTime - System.currentTimeMillis()
+                            val minutes = (timeLeft / 60000) % 60
+                            val seconds = (timeLeft / 1000) % 60
+                            remainingTime.value = String.format("%02d:%02d", minutes, seconds)
+                            delay(1000L) // Update every second
+                        }
+                        remainingTime.value = "Abgelaufen"
+                    }
+
+                    "Boosts ($boostName aktiv - ${remainingTime.value})"
+                } else {
+                    "Boosts (Inaktiv)"
+                }
+
+
+
                 if (inventoryData != null) {
                     CategoryScreen(
                         items = boostItems,
