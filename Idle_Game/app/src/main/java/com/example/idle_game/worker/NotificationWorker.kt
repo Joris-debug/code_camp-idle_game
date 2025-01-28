@@ -1,4 +1,4 @@
-package com.example.idle_game.data.workers
+package com.example.idle_game.worker
 
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
@@ -43,5 +43,4 @@ class NotificationWorker(appContext: Context, workerParams: WorkerParameters) :
 
         notificationManager.notify(1, notification)
     }
-
 }

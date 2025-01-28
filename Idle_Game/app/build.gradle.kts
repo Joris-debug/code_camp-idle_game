@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.idle_game"
-        minSdk = 33
+        minSdk = 29
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.navigation.compose)
+    implementation("androidx.hilt:hilt-work:1.2.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

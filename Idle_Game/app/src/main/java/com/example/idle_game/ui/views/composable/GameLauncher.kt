@@ -7,11 +7,12 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.example.idle_game.ui.navigation.BottomBar
 import com.example.idle_game.ui.navigation.NavigationGraph
+import com.example.idle_game.util.SoundManager
 
 @Composable
-fun Idle_GameLauncher(navController: NavHostController) {
+fun Idle_GameLauncher(navController: NavHostController, soundManager: SoundManager) {
     Scaffold(
-        bottomBar = { BottomBar(navController) }
+        bottomBar = { BottomBar(navController, soundManager) }
     ) { innerPadding ->
         NavigationGraph(
             modifier = Modifier.padding(innerPadding),

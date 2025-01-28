@@ -1,15 +1,14 @@
 package com.example.idle_game.ui.views.models
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.example.idle_game.data.repositories.GameRepository
-import com.example.idle_game.data.workers.NotificationWorker
 import com.example.idle_game.ui.views.states.StartViewState
+import com.example.idle_game.util.SoundManager
 import com.example.idle_game.util.shortBigNumbers
+import com.example.idle_game.worker.NotificationWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class StartViewModel @Inject constructor(
     private val gameRepository: GameRepository,
+    val soundManager: SoundManager,
     private val workManager: WorkManager
 ) : ViewModel() {
 
@@ -102,12 +102,10 @@ class StartViewModel @Inject constructor(
             gameRepository.updateShop()
             _viewState.value =
                 _viewState.value.copy(coins = toDisplay(inventoryFlow.first().bitcoins))
-
             scheduleNotificationWorker(workManager)
 
             while (true) { // Stops with end of coroutine lifecycle
                 fetchBoost()
-
                 coins = inventoryFlow.first().bitcoins
                 val lastTimestamp = inventoryFlow.first().lastMiningTimestamp
                 val duration = (System.currentTimeMillis() - lastTimestamp) / millisPerSec
@@ -120,7 +118,6 @@ class StartViewModel @Inject constructor(
                 gameRepository.setMiningTimestamp(lastTimestamp + duration * millisPerSec)
                 // ^ Ensure the timestamp is incremented in 1-second intervals only ^
                 addCoins(getPassiveCoinsPerSecond() * duration)
-
                 delay(millisPerSec)
             }
         }

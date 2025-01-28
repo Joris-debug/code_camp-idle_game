@@ -1,5 +1,4 @@
 package com.example.idle_game.ui.views.models
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.database.models.InventoryData

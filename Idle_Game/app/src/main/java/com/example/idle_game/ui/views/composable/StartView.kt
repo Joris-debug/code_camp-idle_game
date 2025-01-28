@@ -1,6 +1,5 @@
 package com.example.idle_game.ui.views.composable
 
-import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -37,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.R
+import com.example.idle_game.util.SoundManager
 
 @Composable
 fun StartView(
@@ -49,13 +49,12 @@ fun StartView(
     // Scale-animation when coin is clicked
     val scale by animateFloatAsState(
         targetValue = if (isClicked) 1.05f else 1f,
-        animationSpec = tween(durationMillis = 50)
+        animationSpec = tween(durationMillis = 50), label = ""
     )
-    LaunchedEffect (isClicked) {
+    LaunchedEffect(isClicked) {
         kotlinx.coroutines.delay(50)
         isClicked = false
     }
-
 
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -100,6 +99,7 @@ fun StartView(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() },
                     onClick = {
+                        viewModel.soundManager.playSound(SoundManager.CURSOR_SOUND_RESOURCE_ID)
                         viewModel.coinClick()
                         isClicked = !isClicked
                     }
