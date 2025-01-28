@@ -39,7 +39,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.R
 import com.example.idle_game.util.SoundManager
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 
 @Composable
 fun StartView(
@@ -55,7 +54,7 @@ fun StartView(
         animationSpec = tween(durationMillis = 50), label = ""
     )
     LaunchedEffect(isClicked) {
-        kotlinx.coroutines.delay(50)
+        delay(50)
         isClicked = false
     }
 
