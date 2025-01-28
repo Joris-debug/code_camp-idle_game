@@ -20,10 +20,8 @@ class InventoryViewModel @Inject constructor(
     val viewState: StateFlow<InventoryViewState> = _viewState
 
     init {
-        initState()
-        fetchActualBoost()
-        fetchQuantityUpgrades()
-        fetchQuantityProducer()
+        initShop()
+        fetchInventory()
     }
 
     //Get amount of certain items
@@ -61,58 +59,18 @@ class InventoryViewModel @Inject constructor(
         }
     }
 
-    private fun initState(){
+    private fun initShop(){
         viewModelScope.launch {
             gameRepository.updateShop()
             _viewState.value = _viewState.value.copy(shopData = gameRepository.getShopDataFlow())
-            _viewState.value = _viewState.value.copy(inventoryData = gameRepository.getInventoryDataFlow())
         }
     }
 
-    private fun fetchActualBoost() {
+    private fun fetchInventory() {
         viewModelScope.launch {
             gameRepository.getInventoryDataFlow().collect { inventoryData ->
                 _viewState.value = _viewState.value.copy(
-                    activeBoost = inventoryData.activeBoostType
-                )
-                gameRepository.isBoostActive()
-            }
-        }
-    }
-
-    private fun fetchQuantityUpgrades() {
-        viewModelScope.launch {
-            gameRepository.getInventoryDataFlow()
-                .collect { inventoryData ->
-                    _viewState.value = _viewState.value.copy(
-                        amountUpgradeLvl2 = inventoryData.upgradeLvl2,
-                        amountUpgradeLvl3 = inventoryData.upgradeLvl3,
-                        amountUpgradeLvl4 = inventoryData.upgradeLvl4,
-                        amountUpgradeLvl5 = inventoryData.upgradeLvl5
-                    )
-                }
-        }
-    }
-
-    private fun fetchQuantityProducer() {
-        viewModelScope.launch {
-            gameRepository.getInventoryDataFlow().collect { inventoryData ->
-                _viewState.value = _viewState.value.copy(
-                    amountHackerLvl1 = inventoryData.hackersLvl1,
-                    amountHackerLvl2 = inventoryData.hackersLvl2,
-                    amountHackerLvl3 = inventoryData.hackersLvl3,
-                    amountHackerLvl4 = inventoryData.hackersLvl4,
-                    amountHackerLvl5 = inventoryData.hackersLvl5,
-                    amountMinerLvl1 = inventoryData.cryptoMinersLvl1,
-                    amountMinerLvl2 = inventoryData.cryptoMinersLvl2,
-                    amountMinerLvl3 = inventoryData.cryptoMinersLvl3,
-                    amountMinerLvl4 = inventoryData.cryptoMinersLvl4,
-                    amountMinerLvl5 = inventoryData.cryptoMinersLvl5,
-                    amountBotNetLvl1 = inventoryData.botnetsLvl1,
-                    amountBotNetLvl2 = inventoryData.botnetsLvl2,
-                    amountBotNetLvl3 = inventoryData.botnetsLvl3,
-                    amountBotNetLvl4 = inventoryData.botnetsLvl4,
-                    amountBotNetLvl5 = inventoryData.botnetsLvl5,
+                    inventoryData = inventoryData
                 )
             }
         }

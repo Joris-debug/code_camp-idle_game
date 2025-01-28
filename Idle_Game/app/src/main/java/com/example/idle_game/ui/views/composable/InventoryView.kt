@@ -54,7 +54,7 @@ import com.google.accompanist.pager.*
 fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
     val viewState = viewModel.viewState.collectAsState().value
     val shopDataList = viewState.shopData.collectAsState(initial = emptyList()).value
-    val inventoryData = viewState.inventoryData.collectAsState(initial = InventoryData()).value
+    val inventoryData = viewState.inventoryData
     val selectedItem = viewState.selectedItem
 
     //State for showing the confirmation dialog
@@ -82,116 +82,127 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
         when (page) {
             0 -> {
                 // Passive Items Screen
-                CategoryScreen(
-                    items = passiveItems,
-                    title = "Erzeuger (Werden automatisch angewendet)",
-                    selectedItem = selectedItem,
-                    onBuyClick = { item ->
-                        setItemToBuy(item)
-                        setShowDialog(true)
-                        setDialogTitle("Kaufen")
-                        setDialogMessage("Willst du wirklich ${item.name} für ${item.cost} kaufen?")
-                    },
-                    onApplyClick = { item ->
-                        setItemToBuy(item)
-                        setShowDialog(true)
-                        setDialogTitle("Anwenden")
-                        setDialogMessage("Willst du wirklich ${item.name} anwenden?")
-                    },
-                    viewModel = viewModel,
-                    inventoryData = inventoryData,
-                    page = page,
-                    viewState = viewState
-                )
+                if (inventoryData != null) {
+                    CategoryScreen(
+                        items = passiveItems,
+                        title = "Erzeuger (Werden automatisch angewendet)",
+                        selectedItem = selectedItem,
+                        onBuyClick = { item ->
+                            setItemToBuy(item)
+                            setShowDialog(true)
+                            setDialogTitle("Kaufen")
+                            setDialogMessage("Willst du wirklich ${item.name} für ${item.cost} kaufen?")
+                        },
+                        onApplyClick = { item ->
+                            setItemToBuy(item)
+                            setShowDialog(true)
+                            setDialogTitle("Anwenden")
+                            setDialogMessage("Willst du wirklich ${item.name} anwenden?")
+                        },
+                        viewModel = viewModel,
+                        inventoryData = inventoryData,
+                        page = page,
+                        viewState = viewState
+                    )
+                }
             }
 
             1 -> {
                 // Upgrade Items Screen
-                CategoryScreen(
-                    items = upgradeItems,
-                    title = "Upgrades",
-                    selectedItem = selectedItem,
-                    onBuyClick = { item ->
-                        setItemToBuy(item)
-                        setShowDialog(true)
-                        setDialogTitle("Kaufen")
-                        setDialogMessage("Willst du wirklich ${item.name} für ${item.cost} kaufen?")
-                    },
-                    onApplyClick = { item ->
-                        setItemToBuy(item)
-                        setShowDialog(true)
-                        setDialogTitle("Anwenden")
-                        setDialogMessage("Willst du wirklich ${item.name} anwenden?")
-                    },
-                    viewModel = viewModel,
-                    inventoryData = inventoryData,
-                    page = page,
-                    viewState = viewState
-                )
+                if (inventoryData != null) {
+                    CategoryScreen(
+                        items = upgradeItems,
+                        title = "Upgrades",
+                        selectedItem = selectedItem,
+                        onBuyClick = { item ->
+                            setItemToBuy(item)
+                            setShowDialog(true)
+                            setDialogTitle("Kaufen")
+                            setDialogMessage("Willst du wirklich ${item.name} für ${item.cost} kaufen?")
+                        },
+                        onApplyClick = { item ->
+                            setItemToBuy(item)
+                            setShowDialog(true)
+                            setDialogTitle("Anwenden")
+                            setDialogMessage("Willst du wirklich ${item.name} anwenden?")
+                        },
+                        viewModel = viewModel,
+                        inventoryData = inventoryData,
+                        page = page,
+                        viewState = viewState
+                    )
+                }
             }
 
             2 -> {
                 // Boost Items Screen
                 val title =
-                    if (viewState.activeBoost > 0) "Boosts (${getBoostName(viewState.activeBoost)} aktiv)" else "Boosts (Inaktiv)"
-                CategoryScreen(
-                    items = boostItems,
-                    title = title,
-                    selectedItem = selectedItem,
-                    onBuyClick = { item ->
-                        setItemToBuy(item)
-                        setShowDialog(true)
-                        setDialogTitle("Kaufen")
-                        setDialogMessage("Willst du wirklich ${item.name} für ${item.cost} kaufen?")
-                    },
-                    onApplyClick = { item ->
-                        setItemToBuy(item)
-                        setShowDialog(true)
-                        setDialogTitle("Anwenden")
-                        setDialogMessage("Willst du wirklich ${item.name} anwenden?")
-                    },
-                    viewModel = viewModel,
-                    inventoryData = inventoryData,
-                    page = page,
-                    viewState = viewState
-                )
+                    if ((viewState.inventoryData?.activeBoostType ?: 0) > 0) "Boosts (${viewState.inventoryData?.let {
+                        getBoostName(
+                            it.activeBoostType)
+                    }} aktiv)" else "Boosts (Inaktiv)"
+                if (inventoryData != null) {
+                    CategoryScreen(
+                        items = boostItems,
+                        title = title,
+                        selectedItem = selectedItem,
+                        onBuyClick = { item ->
+                            setItemToBuy(item)
+                            setShowDialog(true)
+                            setDialogTitle("Kaufen")
+                            setDialogMessage("Willst du wirklich ${item.name} für ${item.cost} kaufen?")
+                        },
+                        onApplyClick = { item ->
+                            setItemToBuy(item)
+                            setShowDialog(true)
+                            setDialogTitle("Anwenden")
+                            setDialogMessage("Willst du wirklich ${item.name} anwenden?")
+                        },
+                        viewModel = viewModel,
+                        inventoryData = inventoryData,
+                        page = page,
+                        viewState = viewState
+                    )
+                }
             }
         }
     }
 
     //Dialog that pops up when you want to buy or use an item
-    ShowDialog(
-        showDialog = showDialog,
-        dialogTitle = dialogTitle,
-        dialogMessage = dialogMessage,
-        itemToBuy = itemToBuy,
-        quantity = quantity,
-        onQuantityChange = setQuantity,
-        onUseItem = {
-            if (it == "") {
-                viewModel.useItem(itemToBuy!!, it, 0)
-                setShowDialog(false)
-            } else {
-                setUseOn(it)
-                setShowInputDialog(true)
-            }
-        },
-        onBuyItem = {
-            val amount = quantity.toIntOrNull() ?: 1
-            val cost = itemToBuy!!.cost * amount
+    if (inventoryData != null) {
+        ShowDialog(
+            showDialog = showDialog,
+            dialogTitle = dialogTitle,
+            dialogMessage = dialogMessage,
+            itemToBuy = itemToBuy,
+            quantity = quantity,
+            onQuantityChange = setQuantity,
+            onUseItem = {
+                if (it == "") {
+                    viewModel.useItem(itemToBuy!!, it, 0)
+                    setShowDialog(false)
+                } else {
+                    setUseOn(it)
+                    setShowInputDialog(true)
+                }
+            },
+            onBuyItem = {
+                val amount = quantity.toIntOrNull() ?: 1
+                val cost = itemToBuy!!.cost * amount
 
-            if (cost <= inventoryData.bitcoins) {
-                viewModel.buyItem(itemToBuy, amount)
-                viewModel.updateBitcoinBalance(cost.toLong())
-                setShowDialog(false)
-            }
-        },
-        onDismiss = { setShowDialog(false) },
-        viewModel = viewModel,
-        inventoryData = inventoryData,
-        setQuantity = setQuantity,
-        viewState = viewState,
-    )
+                if (cost <= inventoryData.bitcoins) {
+                            viewModel.buyItem(itemToBuy, amount)
+                            viewModel.updateBitcoinBalance(cost.toLong())
+                            setShowDialog(false)
+                        }
+            },
+            onDismiss = { setShowDialog(false) },
+            viewModel = viewModel,
+            inventoryData = inventoryData,
+            setQuantity = setQuantity,
+            viewState = viewState,
+        )
+    }
 
     ShowUpgradesInputDialog(
         showDialog = showInputDialog,
@@ -239,38 +250,38 @@ fun ShowUpgradesInputDialog(
                             var maxQuantityUpgrades = 0
                             when (itemToBuy!!.name) {
                                 "upgrade lvl 2" -> {
-                                    maxQuantityUpgrades = viewState.amountUpgradeLvl2
+                                    maxQuantityUpgrades = viewState.inventoryData?.upgradeLvl2 ?: 0
                                     when (useOn) {
-                                        "Hacker" -> maxQuantityProducer = viewState.amountHackerLvl1
-                                        "Miner" -> maxQuantityProducer = viewState.amountMinerLvl1
-                                        "BotNet" -> maxQuantityProducer = viewState.amountBotNetLvl1
+                                        "Hacker" -> maxQuantityProducer = viewState.inventoryData?.hackersLvl1 ?:0
+                                        "Miner"  -> maxQuantityProducer = viewState.inventoryData?.cryptoMinersLvl1 ?:0
+                                        "BotNet" -> maxQuantityProducer = viewState.inventoryData?.botnetsLvl1 ?:0
                                     }
                                 }
 
                                 "upgrade lvl 3" -> {
-                                    maxQuantityUpgrades = viewState.amountUpgradeLvl3
+                                    maxQuantityUpgrades = viewState.inventoryData?.upgradeLvl3 ?: 0
                                     when (useOn) {
-                                        "Hacker" -> maxQuantityProducer = viewState.amountHackerLvl2
-                                        "Miner" -> maxQuantityProducer = viewState.amountMinerLvl2
-                                        "BotNet" -> maxQuantityProducer = viewState.amountBotNetLvl2
+                                        "Hacker" -> maxQuantityProducer = viewState.inventoryData?.hackersLvl2 ?:0
+                                        "Miner"  -> maxQuantityProducer = viewState.inventoryData?.cryptoMinersLvl2 ?:0
+                                        "BotNet" -> maxQuantityProducer = viewState.inventoryData?.botnetsLvl2 ?:0
                                     }
                                 }
 
                                 "upgrade lvl 4" -> {
-                                    maxQuantityUpgrades = viewState.amountUpgradeLvl4
+                                    maxQuantityUpgrades = viewState.inventoryData?.upgradeLvl4 ?: 0
                                     when (useOn) {
-                                        "Hacker" -> maxQuantityProducer = viewState.amountHackerLvl3
-                                        "Miner" -> maxQuantityProducer = viewState.amountMinerLvl3
-                                        "BotNet" -> maxQuantityProducer = viewState.amountBotNetLvl3
+                                        "Hacker" -> maxQuantityProducer = viewState.inventoryData?.hackersLvl3 ?:0
+                                        "Miner"  -> maxQuantityProducer = viewState.inventoryData?.cryptoMinersLvl3 ?:0
+                                        "BotNet" -> maxQuantityProducer = viewState.inventoryData?.botnetsLvl3 ?:0
                                     }
                                 }
 
                                 "upgrade lvl 5" -> {
-                                    maxQuantityUpgrades = viewState.amountUpgradeLvl5
+                                    maxQuantityUpgrades = viewState.inventoryData?.upgradeLvl5 ?: 0
                                     when (useOn) {
-                                        "Hacker" -> maxQuantityProducer = viewState.amountHackerLvl4
-                                        "Miner" -> maxQuantityProducer = viewState.amountMinerLvl4
-                                        "BotNet" -> maxQuantityProducer = viewState.amountBotNetLvl4
+                                        "Hacker" -> maxQuantityProducer = viewState.inventoryData?.hackersLvl4 ?:0
+                                        "Miner"  -> maxQuantityProducer = viewState.inventoryData?.cryptoMinersLvl4 ?:0
+                                        "BotNet" -> maxQuantityProducer = viewState.inventoryData?.botnetsLvl4 ?:0
                                     }
                                 }
                             }
@@ -518,9 +529,9 @@ fun ApplyOnDialog(
 
     when (itemToBuy?.name) {
         "upgrade lvl 2" -> {
-            availableHackers = viewState.amountHackerLvl1
-            availableMiner = viewState.amountMinerLvl1
-            availableBotNets = viewState.amountBotNetLvl1
+            availableHackers = viewState.inventoryData?.hackersLvl1 ?: 0
+            availableMiner = viewState.inventoryData?.cryptoMinersLvl1 ?: 0
+            availableBotNets = viewState.inventoryData?.botnetsLvl1 ?: 0
 
             enoughHacker = availableHackers > 0
             enoughMiner = availableMiner > 0
@@ -528,9 +539,9 @@ fun ApplyOnDialog(
         }
 
         "upgrade lvl 3" -> {
-            availableHackers = viewState.amountHackerLvl2
-            availableMiner = viewState.amountMinerLvl2
-            availableBotNets = viewState.amountBotNetLvl2
+            availableHackers = viewState.inventoryData?.hackersLvl2 ?: 0
+            availableMiner = viewState.inventoryData?.cryptoMinersLvl2 ?: 0
+            availableBotNets = viewState.inventoryData?.botnetsLvl2 ?: 0
 
             enoughHacker = availableHackers > 0
             enoughMiner = availableMiner > 0
@@ -538,9 +549,9 @@ fun ApplyOnDialog(
         }
 
         "upgrade lvl 4" -> {
-            availableHackers = viewState.amountHackerLvl3
-            availableMiner = viewState.amountMinerLvl3
-            availableBotNets = viewState.amountBotNetLvl3
+            availableHackers = viewState.inventoryData?.hackersLvl3 ?: 0
+            availableMiner = viewState.inventoryData?.cryptoMinersLvl3 ?: 0
+            availableBotNets = viewState.inventoryData?.botnetsLvl3 ?: 0
 
             enoughHacker = availableHackers > 0
             enoughMiner = availableMiner > 0
@@ -548,9 +559,9 @@ fun ApplyOnDialog(
         }
 
         "upgrade lvl 5" -> {
-            availableHackers = viewState.amountHackerLvl4
-            availableMiner = viewState.amountMinerLvl4
-            availableBotNets = viewState.amountBotNetLvl4
+            availableHackers = viewState.inventoryData?.hackersLvl4 ?: 0
+            availableMiner = viewState.inventoryData?.cryptoMinersLvl4 ?: 0
+            availableBotNets = viewState.inventoryData?.botnetsLvl4 ?: 0
 
             enoughHacker = availableHackers > 0
             enoughMiner = availableMiner > 0
@@ -648,25 +659,25 @@ fun ShopItemButtons(
 
         when(item.name){
             "low passive" -> {
-                quantityLvl1 = viewState.amountHackerLvl1
-                quantityLvl2 = viewState.amountHackerLvl2
-                quantityLvl3 = viewState.amountHackerLvl3
-                quantityLvl4 = viewState.amountHackerLvl4
-                quantityLvl5 = viewState.amountHackerLvl5
+                quantityLvl1 = viewState.inventoryData?.hackersLvl1 ?: 0
+                quantityLvl2 = viewState.inventoryData?.hackersLvl2 ?: 0
+                quantityLvl3 = viewState.inventoryData?.hackersLvl3 ?: 0
+                quantityLvl4 = viewState.inventoryData?.hackersLvl4 ?: 0
+                quantityLvl5 = viewState.inventoryData?.hackersLvl5 ?: 0
             }
             "medium passive" -> {
-                quantityLvl1 = viewState.amountMinerLvl1
-                quantityLvl2 = viewState.amountMinerLvl2
-                quantityLvl3 = viewState.amountMinerLvl3
-                quantityLvl4 = viewState.amountMinerLvl4
-                quantityLvl5 = viewState.amountMinerLvl5
+                quantityLvl1 = viewState.inventoryData?.cryptoMinersLvl1 ?: 0
+                quantityLvl2 = viewState.inventoryData?.cryptoMinersLvl2 ?: 0
+                quantityLvl3 = viewState.inventoryData?.cryptoMinersLvl3 ?: 0
+                quantityLvl4 = viewState.inventoryData?.cryptoMinersLvl4 ?: 0
+                quantityLvl5 = viewState.inventoryData?.cryptoMinersLvl5 ?: 0
             }
             "high passive" -> {
-                quantityLvl1 = viewState.amountBotNetLvl1
-                quantityLvl2 = viewState.amountBotNetLvl2
-                quantityLvl3 = viewState.amountBotNetLvl3
-                quantityLvl4 = viewState.amountBotNetLvl4
-                quantityLvl5 = viewState.amountBotNetLvl5
+                quantityLvl1 = viewState.inventoryData?.botnetsLvl1 ?: 0
+                quantityLvl2 = viewState.inventoryData?.botnetsLvl2 ?: 0
+                quantityLvl3 = viewState.inventoryData?.botnetsLvl3 ?: 0
+                quantityLvl4 = viewState.inventoryData?.botnetsLvl4 ?: 0
+                quantityLvl5 = viewState.inventoryData?.botnetsLvl5 ?: 0
             }
         }
 
@@ -698,10 +709,10 @@ fun ShopItemButtons(
                 enabled = itemAmount > 0
             ) {
                 val text = when (item.name) {
-                    "upgrade lvl 2" -> "Anwenden (${viewState.amountUpgradeLvl2})"
-                    "upgrade lvl 3" -> "Anwenden (${viewState.amountUpgradeLvl3})"
-                    "upgrade lvl 4" -> "Anwenden (${viewState.amountUpgradeLvl4})"
-                    "upgrade lvl 5" -> "Anwenden (${viewState.amountUpgradeLvl5})"
+                    "upgrade lvl 2" -> "Anwenden (${viewState.inventoryData?.upgradeLvl2})"
+                    "upgrade lvl 3" -> "Anwenden (${viewState.inventoryData?.upgradeLvl3})"
+                    "upgrade lvl 4" -> "Anwenden (${viewState.inventoryData?.upgradeLvl4})"
+                    "upgrade lvl 5" -> "Anwenden (${viewState.inventoryData?.upgradeLvl5})"
                     else -> "Anwenden(${itemAmount})"
 
                 }
