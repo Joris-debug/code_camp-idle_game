@@ -15,7 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.idle_game.ui.views.composable.InventoryView
+import com.example.idle_game.ui.views.composable.inventory.InventoryView
 import com.example.idle_game.R
 import com.example.idle_game.ui.views.composable.ScoreBoardView
 import com.example.idle_game.ui.views.composable.StartView

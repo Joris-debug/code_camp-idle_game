@@ -56,7 +56,11 @@ fun StartView(
         isClicked = false
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -89,10 +93,12 @@ fun StartView(
                 delay(1000L)
             }
         }
+
         val text = if (remainingTime > 0) {
-            val seconds = (remainingTime / 1000) % 60
+            val hours = (remainingTime / (1000 * 60 * 60)) % 24
             val minutes = (remainingTime / (1000 * 60)) % 60
-            "$minutes:%02d".format(seconds)
+            val seconds = (remainingTime / 1000) % 60
+            "%02d:%02d:%02d".format(hours, minutes, seconds)
         } else {
             "Kein Boost aktiv"
         }

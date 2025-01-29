@@ -1,5 +1,5 @@
 // UpgradesInputDialog.kt
-package com.example.idle_game.ui.views.composable
+package com.example.idle_game.ui.views.composable.inventory
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
