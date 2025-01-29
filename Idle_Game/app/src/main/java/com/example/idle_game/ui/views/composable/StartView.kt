@@ -1,5 +1,7 @@
 package com.example.idle_game.ui.views.composable
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -19,6 +21,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,6 +32,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
@@ -35,15 +40,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.R
+import com.example.idle_game.ui.views.models.BluetoothDialogModel
 import com.example.idle_game.util.SoundManager
 import kotlinx.coroutines.delay
 
+
+@SuppressLint("MissingPermission")
 @Composable
 fun StartView(
-    viewModel: StartViewModel = hiltViewModel()
+    viewModel: StartViewModel = hiltViewModel(),
+    bluetoothDialogModel: BluetoothDialogModel = hiltViewModel()
 ) {
     val viewState = viewModel.viewState.collectAsState()
     var isClicked by remember { mutableStateOf(false) }
+    var showBluetoothDialog by remember { mutableStateOf(false) }
 
 
     // Scale-animation when coin is clicked
@@ -125,6 +135,50 @@ fun StartView(
                 text
             )
         }
+
+
+
+
+
+
+
+
+        // Bluetooth Dialog Button
+        Button(
+            onClick = { showBluetoothDialog = true },
+            modifier = Modifier
+                .padding(16.dp)
+                .background(Color.Blue),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+        ) {
+            Text("Send BTC", color = Color.White)
+        }
+
+        // Bluetooth Dialog Display
+        if (showBluetoothDialog) {
+            BluetoothDialog(
+                onDismiss = { showBluetoothDialog = false },
+                onScan = {
+                    bluetoothDialogModel.startScanning()
+                },
+                onDeviceSelected = { device ->
+                    Log.d("Bluetooth", "Gerät ausgewählt: ${device.name}")
+                }
+            )
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         Image(
             painter = painterResource(id = R.drawable.bitcoin), "Klicken für Bitcoins",
