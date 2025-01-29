@@ -66,7 +66,7 @@ fun BluetoothDialog(
                         }
                     }
                     is BluetoothState.Disabled -> {
-                        Text("Bluetooth ist deaktiviert. Bitte aktiviere Bluetooth in den Smartphone Einstellungen, um fortzufahren.")
+                        viewModel.activateBluetoothConnection { onDismiss() }
                     }
                     is BluetoothState.Unavailable -> {
                         Text("Dieses Gerät unterstützt kein Bluetooth.")

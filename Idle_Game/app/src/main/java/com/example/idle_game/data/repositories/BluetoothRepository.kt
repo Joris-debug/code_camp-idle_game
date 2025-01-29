@@ -82,7 +82,6 @@ class BluetoothRepository @Inject constructor(
     }
 
     // Returns true if the app has obtained all runtime permissions
-    @RequiresApi(Build.VERSION_CODES.S)
     private fun checkBluetoothPermissions(): Boolean {
         val bluetoothConnectPermission = ActivityCompat.checkSelfPermission(
             context,
@@ -102,7 +101,6 @@ class BluetoothRepository @Inject constructor(
         return bluetoothConnectPermission && bluetoothScanPermission && bluetoothAdvertisePermission
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission")
     fun getPairedDevices(): Set<BluetoothDevice> {
         if (!checkBluetoothPermissions()) {
@@ -112,7 +110,6 @@ class BluetoothRepository @Inject constructor(
         return bluetoothAdapter?.bondedDevices ?: setOf()
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission")
     private fun createServerSocket() {
         if (!checkBluetoothPermissions()) {
@@ -124,7 +121,6 @@ class BluetoothRepository @Inject constructor(
             bluetoothAdapter?.listenUsingInsecureRfcommWithServiceRecord(SERVICE_NAME, SERVICE_UUID)
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission")
     private fun createClientSocket(device: BluetoothDevice) {
         if (!checkBluetoothPermissions()) {
@@ -135,7 +131,6 @@ class BluetoothRepository @Inject constructor(
         socket = device.createRfcommSocketToServiceRecord(SERVICE_UUID)
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
     suspend fun listenOnServerSocket() {
         if (serverSocket == null) {
             createServerSocket()
@@ -174,7 +169,6 @@ class BluetoothRepository @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission")
     suspend fun connectFromClientSocket(device: BluetoothDevice) {
         if (!checkBluetoothPermissions()) {
@@ -245,7 +239,6 @@ class BluetoothRepository @Inject constructor(
     }
 
     // Call this method to shut down the connection.
-    @RequiresApi(Build.VERSION_CODES.S)
     fun closeConnection() {
         if (!checkBluetoothPermissions()) {
             return
@@ -258,7 +251,6 @@ class BluetoothRepository @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission")
     fun startScanning() {
         if(!checkBluetoothPermissions()) {
@@ -272,7 +264,6 @@ class BluetoothRepository @Inject constructor(
     }
 
     // Only for debugging, activities are not supposed to be started here
-    @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission")
     fun enableBluetoothConnection() {
         if (!isBluetoothEnabled()) {
@@ -283,11 +274,11 @@ class BluetoothRepository @Inject constructor(
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             enableBtIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(enableBtIntent)
+            bluetooth.adapter.isEnabled
         }
     }
 
     // Only for debugging, activities are not supposed to be started here
-    @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission")
     fun enableBluetoothDiscoverability() {
         if (isBluetoothEnabled()) {
@@ -304,7 +295,6 @@ class BluetoothRepository @Inject constructor(
     }
 
     // Start scanning for nearby Bluetooth devices
-    @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission")
     fun startBluetoothScan() {
         if (!checkBluetoothPermissions()) {
@@ -320,7 +310,6 @@ class BluetoothRepository @Inject constructor(
     }
 
     // Stop Bluetooth discovery after scanning
-    @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission")
     fun stopScanning() {
         if (checkBluetoothPermissions() && bluetooth.adapter.isDiscovering) {

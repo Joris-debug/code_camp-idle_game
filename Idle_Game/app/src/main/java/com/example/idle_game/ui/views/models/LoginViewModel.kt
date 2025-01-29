@@ -1,5 +1,6 @@
 package com.example.idle_game.ui.views.models
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.repositories.GameRepository
@@ -70,6 +71,7 @@ class LoginViewModel @Inject constructor(
                     _viewState.value.copy(errorMessage = "Username darf nicht leer sein!")
             } else {
                 var success = gameRepository.signIn(username, password)
+                Log.e("Success", "true")
                 if (!success) {
                     success = gameRepository.signUp(
                         username,
