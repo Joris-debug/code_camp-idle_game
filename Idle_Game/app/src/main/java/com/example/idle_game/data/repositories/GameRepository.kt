@@ -238,17 +238,10 @@ class GameRepository(
     }
 
     suspend fun addBitcoins(bitcoins: Long) {
-        if (bitcoins <= 0) {
-            return
-        }
         gameDao.addBitcoins(bitcoins)
         if (inventoryDataFlow.first().bitcoins < 0) {
             gameDao.setBitcoins(Long.MAX_VALUE)
         }
-    }
-
-    suspend fun updateBitcoinAmount(bitcoins: Long) {
-        gameDao.addBitcoins(bitcoins)
     }
 
     suspend fun issueBitcoins(bitcoins: Long) {
@@ -577,7 +570,7 @@ class GameRepository(
             "upgrade lvl 2" -> {
                 when (useOn) {
                     "Hacker" -> {
-                        upgradeHacker(1,quantity)
+                        upgradeHacker(1, quantity)
                     }
 
                     "Miner" -> {

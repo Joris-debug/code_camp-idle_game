@@ -3,7 +3,6 @@ package com.example.idle_game.di
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
-import androidx.work.WorkManager
 import com.example.idle_game.api.CookieInterceptor
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.data.database.GameDatabase

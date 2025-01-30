@@ -32,7 +32,7 @@ class BluetoothRepository @Inject constructor(
     private val bluetoothAdapter: BluetoothAdapter?
         get() = bluetooth.adapter
 
-    var onDevicesUpdated: ((List<BluetoothDevice>) -> Unit)? = null
+    var onPairedDevicesChanged: ((List<BluetoothDevice>) -> Unit)? = null
 
     private val foundDeviceReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -48,7 +48,7 @@ class BluetoothRepository @Inject constructor(
                     }
                     device?.let { dev ->
                         discoveredDevices.add(dev)
-                        onDevicesUpdated?.invoke(discoveredDevices.toList())
+                        onPairedDevicesChanged?.invoke(discoveredDevices.toList())
                     }
                 }
             }
@@ -103,14 +103,12 @@ class BluetoothRepository @Inject constructor(
             return setOf()
         }
 
-        // Holen der gebondeten Geräte
         val pairedDevices = bluetoothAdapter?.bondedDevices ?: setOf()
 
-        // Entfernen der Bindung für jedes gepaarte Gerät
         pairedDevices.forEach { device ->
             try {
                 val method = device.javaClass.getMethod("removeBond")
-                method.invoke(device) // Entfernt das Pairing
+                method.invoke(device)
                 Log.d("forgetAllPairedDevices()", "Gerät entfernt: ${device.name}")
             } catch (e: Exception) {
                 Log.e("forgetAllPairedDevices()", "Fehler beim Entfernen des Geräts ${device.name}", e)
@@ -273,10 +271,17 @@ class BluetoothRepository @Inject constructor(
         }
         try {
             socket?.close()
-            connectionEstablished = false
         } catch (e: IOException) {
-            Log.e("closeConnection()", "Could not close the connect socket", e)
+            Log.e("setSocketsNull", "Error closing socket", e)
         }
+        try {
+            serverSocket?.close()
+        } catch (e: IOException) {
+            Log.e("setSocketsNull", "Error closing serverSocket", e)
+        }
+        socket = null
+        serverSocket = null
+        connectionEstablished = false
     }
 
     @SuppressLint("MissingPermission")
@@ -342,21 +347,5 @@ class BluetoothRepository @Inject constructor(
         if (checkBluetoothPermissions() && bluetooth.adapter.isDiscovering) {
             bluetoothAdapter?.cancelDiscovery()
         }
-    }
-
-    fun setSocketsNull() {
-        try {
-            socket?.close()
-        } catch (e: IOException) {
-            Log.e("setSocketsNull", "Error closing socket", e)
-        }
-        try {
-            serverSocket?.close()
-        } catch (e: IOException) {
-            Log.e("setSocketsNull", "Error closing serverSocket", e)
-        }
-        socket = null
-        serverSocket = null
-        connectionEstablished = false
     }
 }

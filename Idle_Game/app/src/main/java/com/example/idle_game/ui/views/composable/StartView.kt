@@ -203,6 +203,9 @@ fun StartView(
                     bluetoothDialogModel.startScanning()
                 }
             )
+        }
+
+        if(showWaitingDialog){
             WaitingForRequestDialog(
                 onDismiss = onDismiss
             )

@@ -64,7 +64,7 @@ class BluetoothDialogModel @Inject constructor(
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
         context.registerReceiver(bluetoothReceiver, filter)
 
-        bluetoothRepository.onDevicesUpdated = { devices ->
+        bluetoothRepository.onPairedDevicesChanged = { devices ->
             updateDiscoveredDevices(devices)
         }
     }
@@ -124,7 +124,6 @@ class BluetoothDialogModel @Inject constructor(
         bluetoothRepository.cancelListenOnServerSocket()
         bluetoothRepository.forgetAllPairedDevices()
         bluetoothRepository.stopScanning()
-        bluetoothRepository.setSocketsNull()
         _discoveredDevices.value = emptyList()
     }
 
@@ -134,7 +133,7 @@ class BluetoothDialogModel @Inject constructor(
 
     fun updateBitcoinBalance(amount: Long){
         viewModelScope.launch {
-            gameRepository.updateBitcoinAmount(amount)
+            gameRepository.addBitcoins(amount)
         }
     }
 

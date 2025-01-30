@@ -99,7 +99,9 @@ class StartViewModel @Inject constructor(
                 botnetCount = toDisplay(inventory.botnetsLvl1 + inventory.botnetsLvl2 + inventory.botnetsLvl3 + inventory.botnetsLvl4 + inventory.botnetsLvl5)
             )
             coins += newCoins
-            gameRepository.addBitcoins(newCoins)
+            if (newCoins > 0) {
+                gameRepository.addBitcoins(newCoins)
+            }
         }
     }
 
