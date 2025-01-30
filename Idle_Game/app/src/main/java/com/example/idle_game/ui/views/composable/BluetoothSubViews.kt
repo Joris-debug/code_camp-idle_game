@@ -204,6 +204,7 @@ fun ScanDialog(
 
                 Button(
                     onClick = onScanClicked,
+                    enabled = !isLoading
                 ) {
                     Text("Scan starten", color = Color.White)
                 }
@@ -250,7 +251,7 @@ fun BTCInputDialog(
                 )
             }
         }, confirmButton = {
-            TextButton(onClick = {
+            Button(onClick = {
                 onSend(btcAmount)
                 bluetoothDialogModel.closeConnection()
                 onDismiss()

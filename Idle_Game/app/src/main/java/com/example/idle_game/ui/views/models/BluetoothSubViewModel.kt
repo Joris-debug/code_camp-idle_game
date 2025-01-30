@@ -41,7 +41,7 @@ class BluetoothDialogModel @Inject constructor(
     val bluetoothStatus: StateFlow<BluetoothState> = _bluetoothStatus
 
     private val _discoveredDevices = MutableStateFlow<List<BluetoothDevice>>(emptyList())
-    val discoveredDevices: StateFlow<List<BluetoothDevice>> = _discoveredDevices
+    var discoveredDevices: StateFlow<List<BluetoothDevice>> = _discoveredDevices
 
     private var bluetoothReceiver: BroadcastReceiver
 
@@ -125,6 +125,7 @@ class BluetoothDialogModel @Inject constructor(
         bluetoothRepository.forgetAllPairedDevices()
         bluetoothRepository.stopScanning()
         bluetoothRepository.setSocketsNull()
+        _discoveredDevices.value = emptyList()
     }
 
     fun getBitcoinBalance(viewModel: StartViewModel): Long{
