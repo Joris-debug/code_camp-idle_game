@@ -34,6 +34,7 @@ class BluetoothRepository @Inject constructor(
     private val bluetoothAdapter: BluetoothAdapter?
         get() = bluetooth.adapter
 
+    var onDevicesUpdated: ((List<BluetoothDevice>) -> Unit)? = null
 
     private val foundDeviceReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -49,8 +50,8 @@ class BluetoothRepository @Inject constructor(
                     }
                     device?.let { dev ->
                         discoveredDevices.add(dev)
+                        onDevicesUpdated?.invoke(discoveredDevices.toList())
                     }
-                    Log.e("DivesRepo", discoveredDevices.toString())
                 }
             }
         }
@@ -68,12 +69,12 @@ class BluetoothRepository @Inject constructor(
         val SERVICE_UUID: UUID = UUID.nameUUIDFromBytes(SERVICE_NAME.toByteArray())
     }
 
-    fun isConnected(): Boolean {
-        return connectionEstablished
+    fun getSocket(): BluetoothSocket? {
+        return socket
     }
 
-    fun getDiscoveredDevices(): Set<BluetoothDevice> {
-        return discoveredDevices.toSet()
+    fun isConnected(): Boolean {
+        return socket?.isConnected == true
     }
 
     // Returns true if the device has activated bluetooth
@@ -102,12 +103,27 @@ class BluetoothRepository @Inject constructor(
     }
 
     @SuppressLint("MissingPermission")
-    fun getPairedDevices(): Set<BluetoothDevice> {
+    fun forgetAllPairedDevices(): Set<BluetoothDevice> {
         if (!checkBluetoothPermissions()) {
-            Log.d("getPairedDevices()", "Missing permissions")
+            Log.d("forgetAllPairedDevices()", "Missing permissions")
             return setOf()
         }
-        return bluetoothAdapter?.bondedDevices ?: setOf()
+
+        // Holen der gebondeten Geräte
+        val pairedDevices = bluetoothAdapter?.bondedDevices ?: setOf()
+
+        // Entfernen der Bindung für jedes gepaarte Gerät
+        pairedDevices.forEach { device ->
+            try {
+                val method = device.javaClass.getMethod("removeBond")
+                method.invoke(device) // Entfernt das Pairing
+                Log.d("forgetAllPairedDevices()", "Gerät entfernt: ${device.name}")
+            } catch (e: Exception) {
+                Log.e("forgetAllPairedDevices()", "Fehler beim Entfernen des Geräts ${device.name}", e)
+            }
+        }
+
+        return setOf() // Gibt eine leere Menge zurück, da alle Geräte entfernt wurden
     }
 
     @SuppressLint("MissingPermission")
@@ -174,6 +190,24 @@ class BluetoothRepository @Inject constructor(
         if (!checkBluetoothPermissions()) {
             return
         }
+
+        // Check if the device is already paired
+        if (device.bondState != BluetoothDevice.BOND_BONDED) {
+            // Initiate pairing
+            try {
+                val pairingResult = withContext(Dispatchers.IO) {
+                    device.createBond()
+                }
+                if (!pairingResult) {
+                    Log.d("connectFromClientSocket", "Pairing failed")
+                    return
+                }
+            } catch (e: Exception) {
+                Log.d("connectFromClientSocket", "Pairing failed: ${e.message}", e)
+                return
+            }
+        }
+
         if (socket == null) {
             createClientSocket(device)
             if (socket == null) {
@@ -181,6 +215,7 @@ class BluetoothRepository @Inject constructor(
                 return
             }
         }
+
         // Cancel discovery because it otherwise slows down the connection.
         bluetoothAdapter?.cancelDiscovery()
 
@@ -234,7 +269,6 @@ class BluetoothRepository @Inject constructor(
             }
         } catch (e: IOException) {
             Log.e("write(...)", "Error occurred when sending data", e)
-            return
         }
     }
 
@@ -305,7 +339,6 @@ class BluetoothRepository @Inject constructor(
             Log.d("startBluetoothScan():", "Bluetooth is not enabled")
             return
         }
-        Log.e("Start Scanning", "true")
         startScanning()
     }
 
@@ -315,5 +348,21 @@ class BluetoothRepository @Inject constructor(
         if (checkBluetoothPermissions() && bluetooth.adapter.isDiscovering) {
             bluetoothAdapter?.cancelDiscovery()
         }
+    }
+
+    fun setSocketsNull() {
+        try {
+            socket?.close()
+        } catch (e: IOException) {
+            Log.e("setSocketsNull", "Error closing socket", e)
+        }
+        try {
+            serverSocket?.close()
+        } catch (e: IOException) {
+            Log.e("setSocketsNull", "Error closing serverSocket", e)
+        }
+        socket = null
+        serverSocket = null
+        connectionEstablished = false
     }
 }

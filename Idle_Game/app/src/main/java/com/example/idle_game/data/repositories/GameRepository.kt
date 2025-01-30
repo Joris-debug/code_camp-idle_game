@@ -247,6 +247,10 @@ class GameRepository(
         }
     }
 
+    suspend fun updateBitcoinAmount(bitcoins: Long) {
+        gameDao.addBitcoins(bitcoins)
+    }
+
     suspend fun issueBitcoins(bitcoins: Long) {
         if (inventoryDataFlow.first().bitcoins < bitcoins) {
             return

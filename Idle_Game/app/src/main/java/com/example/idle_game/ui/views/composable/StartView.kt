@@ -1,6 +1,7 @@
 package com.example.idle_game.ui.views.composable
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
 import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -21,9 +22,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,6 +42,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.R
 import com.example.idle_game.ui.views.models.BluetoothDialogModel
@@ -54,7 +59,16 @@ fun StartView(
     val viewState = viewModel.viewState.collectAsState()
     var isClicked by remember { mutableStateOf(false) }
     var showBluetoothDialog by remember { mutableStateOf(false) }
+    var showScanWindow by remember { mutableStateOf(false) }
+    var showWaitingDialog by remember { mutableStateOf(false) }
 
+    val onMessageReceived: (String) -> Unit = { message ->
+        Log.e("Received Message", message)
+    }
+
+    val onDismiss: () -> Unit = {
+        showWaitingDialog = false
+    }
 
     // Scale-animation when coin is clicked
     val scale by animateFloatAsState(
@@ -117,12 +131,15 @@ fun StartView(
             1 -> {
                 R.drawable.low_boost
             }
+
             2 -> {
                 R.drawable.medium_boost
             }
+
             3 -> {
                 R.drawable.high_boost
             }
+
             else -> {
                 null
             }
@@ -135,13 +152,6 @@ fun StartView(
                 text
             )
         }
-
-
-
-
-
-
-
 
         // Bluetooth Dialog Button
         Button(
@@ -157,15 +167,42 @@ fun StartView(
         // Bluetooth Dialog Display
         if (showBluetoothDialog) {
             BluetoothDialog(
-                onDismiss = { showBluetoothDialog = false },
-                onScan = {
-                    bluetoothDialogModel.startScanning()
+                onDismiss = {
+                    showBluetoothDialog = false
+                    bluetoothDialogModel.closeConnection()
+                            },
+                onReceive = {
+                    bluetoothDialogModel.listenOnSocketServer()
+                    showWaitingDialog = true
                 },
-                onDeviceSelected = { device ->
-                    Log.d("Bluetooth", "Gerät ausgewählt: ${device.name}")
+                onSend = {
+                    showScanWindow = true
                 }
             )
         }
+
+        //Showing Window for scanning for devices
+        if (showScanWindow) {
+            ScanDialog(
+                onDismiss = {
+                    showScanWindow = false
+                    bluetoothDialogModel.closeConnection()
+                            },
+                onScanClicked = {
+                    bluetoothDialogModel.startScanning()
+                }
+            )
+        }
+
+        if (showWaitingDialog) {
+            WaitingForRequestDialog(
+                onMessageReceived = onMessageReceived,
+                onDismiss = onDismiss
+            )
+        }
+
+
+
 
 
 
@@ -236,6 +273,7 @@ fun PassiveBox(painter: Painter, description: String, count: String) {
         Text(": $count", maxLines = 1)
     }
 }
+
 
 
 
