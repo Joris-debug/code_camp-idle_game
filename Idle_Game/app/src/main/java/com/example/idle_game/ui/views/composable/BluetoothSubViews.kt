@@ -1,7 +1,6 @@
 package com.example.idle_game.ui.views.composable
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 //noinspection UsingMaterialAndMaterial3Libraries
@@ -22,6 +20,7 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.CircularProgressIndicator
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.OutlinedTextField
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Text
@@ -54,7 +53,6 @@ import kotlinx.coroutines.withTimeout
 fun BluetoothDialog(
     onDismiss: () -> Unit,
     bluetoothViewModel: BluetoothDialogModel = hiltViewModel(),
-    viewModel: StartViewModel = hiltViewModel(),
     onReceive: () -> Unit,
     onSend: () -> Unit
 ) {
@@ -134,7 +132,6 @@ fun ScanDialog(
                 if (discoveredDevices.isEmpty()) {
                     Text("Keine Geräte gefunden.")
                 } else {
-
                     LazyColumn {
                         items(discoveredDevices) { device ->
                             Text(
@@ -208,18 +205,18 @@ fun ScanDialog(
                 Button(
                     onClick = onScanClicked,
                 ) {
-                    androidx.compose.material3.Text("Scan starten")
+                    Text("Scan starten", color = Color.White)
                 }
             }
         }, confirmButton = {
-            TextButton(
+            Button(
                 onClick = {
                     onDismiss()
                     bluetoothViewModel.closeConnection()
                           },
                 enabled = !isLoading
             ) {
-                Text("Abbrechen")
+                Text("Abbrechen", color = Color.White)
             }
         })
 }
@@ -261,11 +258,11 @@ fun BTCInputDialog(
                 Text("Senden")
             }
         }, dismissButton = {
-            TextButton(onClick = {
+            Button(onClick = {
                 onDismiss()
                 bluetoothDialogModel.closeConnection()
             }) {
-                Text("Abbrechen")
+                Text("Abbrechen", color = Color.White)
             }
         })
     }
@@ -275,7 +272,6 @@ fun BTCInputDialog(
 @Composable
 fun WaitingForRequestDialog(
     bluetoothViewModel: BluetoothDialogModel = hiltViewModel(),
-    onMessageReceived: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
     CoroutineScope(Dispatchers.Main).launch {
@@ -283,9 +279,7 @@ fun WaitingForRequestDialog(
             if (bluetoothViewModel.isDataAvailable()) {
                 val message = bluetoothViewModel.read()
                 val longValue: Long = message.toLong()
-                Log.e("Anderer Spot", message)
                 bluetoothViewModel.updateBitcoinBalance(longValue)
-                onMessageReceived(message)
                 onDismiss()
                 bluetoothViewModel.closeConnection()
                 break
@@ -309,4 +303,3 @@ fun WaitingForRequestDialog(
                 }
             })
 }
-

@@ -590,7 +590,6 @@ class GameRepository(
                 }
                 addUpgradeLvl2(-quantity)
             }
-
             "upgrade lvl 3" -> {
                 when (useOn) {
                     "Hacker" -> {
@@ -607,7 +606,6 @@ class GameRepository(
                 }
                 addUpgradeLvl3(-quantity)
             }
-
             "upgrade lvl 4" -> {
                 when (useOn) {
                     "Hacker" -> {
@@ -624,7 +622,6 @@ class GameRepository(
                 }
                 addUpgradeLvl4(-quantity)
             }
-
             "upgrade lvl 5" -> {
                 when (useOn) {
                     "Hacker" -> {

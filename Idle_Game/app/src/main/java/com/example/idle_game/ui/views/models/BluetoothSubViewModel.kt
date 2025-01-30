@@ -33,7 +33,7 @@ sealed class BluetoothState {
 @HiltViewModel
 class BluetoothDialogModel @Inject constructor(
     private val bluetoothRepository: BluetoothRepository,
-    public val gameRepository: GameRepository,
+    val gameRepository: GameRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -46,7 +46,6 @@ class BluetoothDialogModel @Inject constructor(
     private var bluetoothReceiver: BroadcastReceiver
 
     init {
-
         checkBluetoothStatus()
         bluetoothReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -62,7 +61,6 @@ class BluetoothDialogModel @Inject constructor(
                 }
             }
         }
-
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
         context.registerReceiver(bluetoothReceiver, filter)
 

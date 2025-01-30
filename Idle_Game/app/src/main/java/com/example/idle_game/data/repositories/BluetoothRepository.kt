@@ -14,7 +14,6 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +25,6 @@ import javax.inject.Inject
 class BluetoothRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    // TODO: handle this error gracefully
     private val bluetooth = context.getSystemService(Context.BLUETOOTH_SERVICE)
             as? BluetoothManager
         ?: throw Exception("Bluetooth is not supported by this device")
@@ -67,10 +65,6 @@ class BluetoothRepository @Inject constructor(
         const val BUFFER_SIZE = 2048
         const val SERVICE_NAME = "CoinCraze"
         val SERVICE_UUID: UUID = UUID.nameUUIDFromBytes(SERVICE_NAME.toByteArray())
-    }
-
-    fun getSocket(): BluetoothSocket? {
-        return socket
     }
 
     fun isConnected(): Boolean {
@@ -123,7 +117,7 @@ class BluetoothRepository @Inject constructor(
             }
         }
 
-        return setOf() // Gibt eine leere Menge zurück, da alle Geräte entfernt wurden
+        return setOf()
     }
 
     @SuppressLint("MissingPermission")
