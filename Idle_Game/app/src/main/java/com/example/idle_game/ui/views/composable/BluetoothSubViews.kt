@@ -296,7 +296,7 @@ fun WaitingForRequestDialog(
             title = { Text("Warten auf Anfragen...") },
             text = { Text("Dein Gerät ist jetzt sichtbar und kann BTC empfangen.") },
             confirmButton = {
-                TextButton(onClick = {
+                Button(onClick = {
                     onDismiss()
                     bluetoothViewModel.closeConnection()
                 }) {

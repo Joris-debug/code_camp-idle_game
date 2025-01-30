@@ -1,6 +1,7 @@
 package com.example.idle_game.ui.views.composable
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -36,6 +37,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -165,6 +167,16 @@ fun StartView(
 
         // Shows Bluetooth Dialog Display
         if (showBluetoothDialog) {
+            val context = LocalContext.current
+            val activity = context as? Activity
+
+            LaunchedEffect(Unit) {
+                activity?.let {
+                    viewModel.checkAndRequestBluetoothPermissions(it)
+                }
+            }
+
+
             BluetoothDialog(
                 onDismiss = {
                     showBluetoothDialog = false

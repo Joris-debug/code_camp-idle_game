@@ -19,18 +19,13 @@ import com.example.idle_game.ui.views.composable.LoginView
 import com.example.idle_game.util.SoundManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import android.Manifest
-import androidx.annotation.RequiresApi
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var soundManager: SoundManager
 
-    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
-        checkAndRequestBluetoothPermissions(this)
-        checkAndRequestNotificationPermission(this)
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
@@ -55,6 +50,7 @@ class MainActivity : ComponentActivity() {
                             viewModel = hiltViewModel(),
                             onSignUpSuccess = { // Sign-up function is also calling login
                                 isSignedUp.value = true
+                                checkAndRequestNotificationPermission(this)
                             }
                         )
                     }
@@ -63,38 +59,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
-    fun checkAndRequestBluetoothPermissions(activity: Activity) {
-        val permissions = listOf(
-            Manifest.permission.BLUETOOTH_CONNECT,
-            Manifest.permission.BLUETOOTH_SCAN,
-            Manifest.permission.BLUETOOTH_ADVERTISE,
-            Manifest.permission.BLUETOOTH_ADMIN,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-
-        )
-
-        val permissionsToRequest = permissions.filter {
-            ContextCompat.checkSelfPermission(activity, it) != PackageManager.PERMISSION_GRANTED
-        }
-
-        if (permissionsToRequest.isNotEmpty()) {
-            ActivityCompat.requestPermissions(activity, permissionsToRequest.toTypedArray(), 1)
-        }
-    }
-
-    fun checkAndRequestNotificationPermission(activity: Activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {  // Android 13 oder höher
+    private fun checkAndRequestNotificationPermission(activity: Activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     activity,
                     android.Manifest.permission.POST_NOTIFICATIONS
                 ) != PackageManager.PERMISSION_GRANTED) {
-                // Berechtigung noch nicht erteilt, daher anfordern
                 ActivityCompat.requestPermissions(
                     activity,
                     arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                    1  // Anfragecode (kannst du nach Bedarf anpassen)
+                    1
                 )
             }
         }

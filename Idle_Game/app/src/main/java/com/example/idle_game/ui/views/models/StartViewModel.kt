@@ -1,5 +1,13 @@
 package com.example.idle_game.ui.views.models
 
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.PeriodicWorkRequest
@@ -31,7 +39,6 @@ class StartViewModel @Inject constructor(
     private var showShorted: Boolean = false
     private var coins: Long = 0
     private var coinsPerSec: Long = 0
-
 
     private fun toDisplay(value: Number): String {
         return if (showShorted) {
@@ -157,4 +164,23 @@ class StartViewModel @Inject constructor(
         gameRepository.isBoostActive()
     }
 
+    fun checkAndRequestBluetoothPermissions(activity: Activity) {
+        val permissions = listOf(
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_ADVERTISE,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+
+        )
+
+        val permissionsToRequest = permissions.filter {
+            ContextCompat.checkSelfPermission(activity, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (permissionsToRequest.isNotEmpty()) {
+            ActivityCompat.requestPermissions(activity, permissionsToRequest.toTypedArray(), 1)
+        }
+    }
 }
