@@ -1,6 +1,7 @@
 package com.example.idle_game.ui.views.composable
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -126,10 +127,10 @@ fun ScanDialog(
         },
         text = {
             Column(modifier = Modifier.padding(16.dp)) {
-                androidx.compose.material3.Text("Gefundene Geräte:")
+                Text("Gefundene Geräte:")
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (discoveredDevices.isEmpty()) {
+                if (discoveredDevices.isEmpty() || discoveredDevices.all {it.name == null}) {
                     Text("Keine Geräte gefunden.")
                 } else {
                     LazyColumn {
@@ -157,6 +158,7 @@ fun ScanDialog(
                                                 showErrorDialog = true
                                             } finally {
                                                 isLoading = false
+
                                             }
                                         }
                                     })
@@ -259,9 +261,7 @@ fun BTCInputDialog(
                     onDismiss()
                     showErrorDialog = true
                 }
-
                 bluetoothDialogModel.closeConnection()
-
             }) {
                 Text("Senden")
             }
