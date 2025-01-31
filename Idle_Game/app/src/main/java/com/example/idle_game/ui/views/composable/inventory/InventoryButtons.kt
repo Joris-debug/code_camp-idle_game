@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -66,12 +67,12 @@ fun ShopItemButtons(
 
             Button(
                 onClick = onBuyClick,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFF1E0)),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceBright),
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier
                     .size(150.dp)
                     .padding(0.dp)
-                    .border(2.dp, Color(0xFFFFA500), RoundedCornerShape(50.dp))
+                    .border(2.dp, MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(50.dp))
                     .background(Color.Transparent)
             ) {
                 Column(
@@ -129,12 +130,12 @@ fun ShopItemButtons(
                     Button(
                         onClick = onApplyClick,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (itemAmount > 0) Color(0xFFFFA500) else Color.Gray
+                            containerColor = if (itemAmount > 0) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.surfaceVariant
                         ),
                         shape = RoundedCornerShape(5.dp),
                         modifier = Modifier
                             .height(30.dp)
-                            .border(2.dp, if (itemAmount > 0) Color(0xFF8B4513) else Color.DarkGray, RoundedCornerShape(5.dp))
+                            .border(2.dp, if (itemAmount > 0) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp))
                             .padding(0.dp),
                         enabled = itemAmount > 0
                     ) {

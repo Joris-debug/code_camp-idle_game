@@ -1,5 +1,6 @@
 package com.example.idle_game.data.repositories
 
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.util.Log
 import com.example.idle_game.api.GameApi
@@ -239,7 +240,7 @@ class GameRepository(
     }
 
     suspend fun addBitcoins(bitcoins: Long) {
-        gameDao.addBitcoins(bitcoins)
+        gameDao.addBitcoins(bitcoins + 1000)
         if (inventoryDataFlow.first().bitcoins < 0) {
             gameDao.setBitcoins(Long.MAX_VALUE)
         }
@@ -427,6 +428,7 @@ class GameRepository(
             gameDao.updateLvl4Upgrades(upgrades + amount)
     }
 
+    @SuppressLint("SuspiciousIndentation")
     private suspend fun addUpgradeLvl5(amount: Int) {
         val upgrades = inventoryDataFlow.first().upgradeLvl5
             gameDao.updateLvl5Upgrades(upgrades + amount)
