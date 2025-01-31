@@ -157,4 +157,8 @@ class BluetoothDialogModel @Inject constructor(
     fun isConnected(): Boolean{
         return bluetoothRepository.isConnected()
     }
+
+    fun isConnected2(): Boolean{
+        return bluetoothRepository.isConnected2()
+    }
 }

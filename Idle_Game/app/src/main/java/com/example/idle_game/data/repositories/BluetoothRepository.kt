@@ -35,19 +35,27 @@ class BluetoothRepository @Inject constructor(
     var onPairedDevicesChanged: ((List<BluetoothDevice>) -> Unit)? = null
 
     private val foundDeviceReceiver = object : BroadcastReceiver() {
+        @SuppressLint("MissingPermission")
         override fun onReceive(context: Context?, intent: Intent?) {
-            when(intent?.action) {
+            when (intent?.action) {
                 BluetoothDevice.ACTION_FOUND -> {
                     val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        intent.getParcelableExtra(
-                            BluetoothDevice.EXTRA_DEVICE,
-                            BluetoothDevice::class.java
-                        )
+                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
                     } else {
                         intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                     }
                     device?.let { dev ->
                         discoveredDevices.add(dev)
+                        onPairedDevicesChanged?.invoke(discoveredDevices.toList())
+                    }
+                }
+                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
+                    val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                    device?.let {
+                        if (socket?.remoteDevice == device) {
+                            connectionEstablished = false
+                            Log.d("Bluetooth", "Verbindung zu ${device.name} wurde getrennt")
+                        }
                         onPairedDevicesChanged?.invoke(discoveredDevices.toList())
                     }
                 }
@@ -69,6 +77,10 @@ class BluetoothRepository @Inject constructor(
 
     fun isConnected(): Boolean {
         return socket?.isConnected == true
+    }
+
+    fun isConnected2(): Boolean {
+        return connectionEstablished
     }
 
     // Returns true if the device has activated bluetooth
@@ -292,6 +304,10 @@ class BluetoothRepository @Inject constructor(
         context.registerReceiver(
             foundDeviceReceiver,
             IntentFilter(BluetoothDevice.ACTION_FOUND)
+        )
+        context.registerReceiver(
+            foundDeviceReceiver,
+            IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED)
         )
         bluetoothAdapter?.startDiscovery()
     }
