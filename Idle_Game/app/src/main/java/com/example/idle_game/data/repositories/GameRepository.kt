@@ -15,6 +15,7 @@ import com.example.idle_game.data.database.models.ShopData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
+import kotlin.math.max
 
 class GameRepository(
     private val api: GameApi,
@@ -413,25 +414,22 @@ class GameRepository(
 
     private suspend fun addUpgradeLvl2(amount: Int) {
         val upgrades = inventoryDataFlow.first().upgradeLvl2
-        gameDao.updateLvl2Upgrades(upgrades + amount)
-
+            gameDao.updateLvl2Upgrades(upgrades + amount)
     }
 
     private suspend fun addUpgradeLvl3(amount: Int) {
         val upgrades = inventoryDataFlow.first().upgradeLvl3
-        gameDao.updateLvl3Upgrades(upgrades + amount)
-
+            gameDao.updateLvl3Upgrades(upgrades + amount)
     }
 
     private suspend fun addUpgradeLvl4(amount: Int) {
         val upgrades = inventoryDataFlow.first().upgradeLvl4
-        gameDao.updateLvl4Upgrades(upgrades + amount)
-
+            gameDao.updateLvl4Upgrades(upgrades + amount)
     }
 
     private suspend fun addUpgradeLvl5(amount: Int) {
         val upgrades = inventoryDataFlow.first().upgradeLvl5
-        gameDao.updateLvl5Upgrades(upgrades + amount)
+            gameDao.updateLvl5Upgrades(upgrades + amount)
     }
 
     // Adds new low boosts to the inventory
@@ -550,10 +548,10 @@ class GameRepository(
             "low passive" -> addNewHacker(amount = amount)
             "medium passive" -> addNewCryptoMiner(amount = amount)
             "high passive" -> addNewBotnet(amount = amount)
-            "upgrade lvl 2" -> addUpgradeLvl2(amount = amount)
-            "upgrade lvl 3" -> addUpgradeLvl3(amount = amount)
-            "upgrade lvl 4" -> addUpgradeLvl4(amount = amount)
-            "upgrade lvl 5" -> addUpgradeLvl5(amount = amount)
+            "upgrade lvl 2" -> addUpgradeLvl2(amount = max(0, amount))
+            "upgrade lvl 3" -> addUpgradeLvl3(amount = max(0, amount))
+            "upgrade lvl 4" -> addUpgradeLvl4(amount = max(0, amount))
+            "upgrade lvl 5" -> addUpgradeLvl5(amount = max(0, amount))
         }
     }
 
