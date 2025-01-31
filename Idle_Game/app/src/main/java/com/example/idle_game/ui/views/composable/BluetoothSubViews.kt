@@ -254,9 +254,7 @@ fun BTCInputDialog(
             }
         }, confirmButton = {
             Button(onClick = {
-                Log.e("Connection", bluetoothDialogModel.isConnected().toString())
-                Log.e("Connection2", bluetoothDialogModel.isConnected2().toString())
-                if(bluetoothDialogModel.isConnected2()) {
+                if(bluetoothDialogModel.isConnected()) {
                     onSend(btcAmount)
                 } else {
                     onDismiss()

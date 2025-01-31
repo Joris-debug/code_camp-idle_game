@@ -76,10 +76,6 @@ class BluetoothRepository @Inject constructor(
     }
 
     fun isConnected(): Boolean {
-        return socket?.isConnected == true
-    }
-
-    fun isConnected2(): Boolean {
         return connectionEstablished
     }
 
