@@ -118,8 +118,10 @@ fun ShowUpgradesInputDialog(
                                 maxQuantityProducer
                             }
 
+                            val safeMaxUpgrades = minOf(maxUpgrades, Int.MAX_VALUE)
+
                             if (newValue.all { it.isDigit() } && (newValue.toIntOrNull()
-                                    ?: 0) <= maxUpgrades) {
+                                    ?: 0) <= safeMaxUpgrades) {
                                 inputText = newValue
                             }
                         },
