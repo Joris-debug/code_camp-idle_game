@@ -240,7 +240,7 @@ class GameRepository(
     }
 
     suspend fun addBitcoins(bitcoins: Long) {
-        gameDao.addBitcoins(bitcoins + 1000)
+        gameDao.addBitcoins(bitcoins)
         if (inventoryDataFlow.first().bitcoins < 0) {
             gameDao.setBitcoins(Long.MAX_VALUE)
         }

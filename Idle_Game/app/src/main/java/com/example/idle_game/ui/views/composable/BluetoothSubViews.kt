@@ -24,7 +24,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.OutlinedTextField
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -168,13 +167,13 @@ fun ScanDialog(
                     Box(
                         modifier = Modifier
                             .wrapContentSize()
-                            .background(Color.Black.copy(alpha = 0.5f))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                             .clickable(enabled = false) {},
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(50.dp),
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -206,7 +205,7 @@ fun ScanDialog(
                     onClick = onScanClicked,
                     enabled = !isLoading
                 ) {
-                    Text("Scan starten", color = Color.White)
+                    Text("Scan starten", color = MaterialTheme.colorScheme.onSurface)
                 }
             }
         }, confirmButton = {
@@ -217,7 +216,7 @@ fun ScanDialog(
                           },
                 enabled = !isLoading
             ) {
-                Text("Abbrechen", color = Color.White)
+                Text("Abbrechen", color = MaterialTheme.colorScheme.onSurface)
             }
         })
 }
@@ -263,7 +262,7 @@ fun BTCInputDialog(
                 onDismiss()
                 bluetoothDialogModel.closeConnection()
             }) {
-                Text("Abbrechen", color = Color.White)
+                Text("Abbrechen", color = MaterialTheme.colorScheme.onSurface)
             }
         })
     }
