@@ -1,7 +1,6 @@
 package com.example.idle_game.ui.views.composable
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
