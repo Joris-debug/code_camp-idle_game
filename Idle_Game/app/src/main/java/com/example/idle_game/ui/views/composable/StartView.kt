@@ -154,7 +154,7 @@ fun StartView(
             modifier = Modifier
                 .height(40.dp)
                 .background(
-                    color = Color(0xFF0082FC),
+                    color = Color.Blue,
                     shape = RoundedCornerShape(14.dp)
                 ),
             colors = ButtonDefaults.buttonColors(
