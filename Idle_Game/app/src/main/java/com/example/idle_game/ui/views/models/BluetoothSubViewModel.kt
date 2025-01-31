@@ -116,7 +116,6 @@ class BluetoothDialogModel @Inject constructor(
     private fun updateDiscoveredDevices(devices: List<BluetoothDevice>) {
         _bluetoothStatus.value = BluetoothState.Devices(devices)
         _discoveredDevices.value = devices
-        Log.e("Devices", _bluetoothStatus.value.toString())
     }
 
     fun closeConnection(){
