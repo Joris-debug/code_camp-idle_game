@@ -17,7 +17,6 @@ import com.example.idle_game.R
 
 class NotificationWorker(appContext: Context, workerParams: WorkerParameters) :
     Worker(appContext, workerParams) {
-
     override fun doWork(): Result {
         if (!isAppInForeground()) {
             sendNotification()
