@@ -35,6 +35,7 @@ class BluetoothRepository @Inject constructor(
     var onPairedDevicesChanged: ((List<BluetoothDevice>) -> Unit)? = null
 
     private val foundDeviceReceiver = object : BroadcastReceiver() {
+        @SuppressLint("MissingPermission")
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 BluetoothDevice.ACTION_FOUND -> {
@@ -104,28 +105,6 @@ class BluetoothRepository @Inject constructor(
     }
 
     @SuppressLint("MissingPermission")
-    fun forgetAllPairedDevices(): Set<BluetoothDevice> {
-        if (!checkBluetoothPermissions()) {
-            Log.d("forgetAllPairedDevices()", "Missing permissions")
-            return setOf()
-        }
-
-        val pairedDevices = bluetoothAdapter?.bondedDevices ?: setOf()
-
-        pairedDevices.forEach { device ->
-            try {
-                val method = device.javaClass.getMethod("removeBond")
-                method.invoke(device)
-                Log.d("forgetAllPairedDevices()", "Gerät entfernt: ${device.name}")
-            } catch (e: Exception) {
-                Log.e("forgetAllPairedDevices()", "Fehler beim Entfernen des Geräts ${device.name}", e)
-            }
-        }
-
-        return setOf()
-    }
-
-    @SuppressLint("MissingPermission")
     private fun createServerSocket() {
         if (!checkBluetoothPermissions()) {
             Log.e("createServerSocket()", "Missing permissions")
@@ -188,23 +167,6 @@ class BluetoothRepository @Inject constructor(
     suspend fun connectFromClientSocket(device: BluetoothDevice) {
         if (!checkBluetoothPermissions()) {
             return
-        }
-
-        // Check if the device is already paired
-        if (device.bondState != BluetoothDevice.BOND_BONDED) {
-            // Initiate pairing
-            try {
-                val pairingResult = withContext(Dispatchers.IO) {
-                    device.createBond()
-                }
-                if (!pairingResult) {
-                    Log.d("connectFromClientSocket", "Pairing failed")
-                    return
-                }
-            } catch (e: Exception) {
-                Log.d("connectFromClientSocket", "Pairing failed: ${e.message}", e)
-                return
-            }
         }
 
         if (socket == null) {

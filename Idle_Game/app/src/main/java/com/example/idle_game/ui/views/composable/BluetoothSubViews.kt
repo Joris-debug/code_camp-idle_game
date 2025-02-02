@@ -198,8 +198,7 @@ fun ScanDialog(
                     onDismiss = { showInputDialog = false },
                     maxBTC = maxBTC,
                     onSend = { amount ->
-                        bluetoothViewModel.write(amount.toString())
-                        bluetoothViewModel.updateBitcoinBalance(-amount)
+                        bluetoothViewModel.sendBitcoin(amount)
                         showInputDialog = false
                     })
 
@@ -214,7 +213,6 @@ fun ScanDialog(
             Button(
                 onClick = {
                     onDismiss()
-                    bluetoothViewModel.closeConnection()
                           },
                 enabled = !isLoading
             ) {
@@ -260,14 +258,12 @@ fun BTCInputDialog(
                     onDismiss()
                     showErrorDialog = true
                 }
-                bluetoothDialogModel.closeConnection()
             }) {
                 Text("Senden")
             }
         }, dismissButton = {
             Button(onClick = {
                 onDismiss()
-                bluetoothDialogModel.closeConnection()
             }) {
                 Text("Abbrechen", color = Color.White)
             }
@@ -295,17 +291,8 @@ fun WaitingForRequestDialog(
     onDismiss: () -> Unit
 ) {
     CoroutineScope(Dispatchers.Main).launch {
-        while (true) {
-            if (bluetoothViewModel.isDataAvailable()) {
-                val message = bluetoothViewModel.read()
-                val longValue: Long = message.toLong()
-                bluetoothViewModel.updateBitcoinBalance(longValue)
-                onDismiss()
-                bluetoothViewModel.closeConnection()
-                break
-            }
-            delay(1000)
-        }
+        bluetoothViewModel.receiveBitcoin()
+        onDismiss()
     }
 
         AlertDialog(
@@ -317,7 +304,6 @@ fun WaitingForRequestDialog(
             confirmButton = {
                 Button(onClick = {
                     onDismiss()
-                    bluetoothViewModel.closeConnection()
                 }) {
                     Text("Abbrechen")
                 }

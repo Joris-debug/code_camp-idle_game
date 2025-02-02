@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.repositories.BluetoothRepository
@@ -120,7 +121,6 @@ class BluetoothDialogModel @Inject constructor(
     fun closeConnection(){
         bluetoothRepository.closeConnection()
         bluetoothRepository.cancelListenOnServerSocket()
-        bluetoothRepository.forgetAllPairedDevices()
         bluetoothRepository.stopScanning()
         _discoveredDevices.value = emptyList()
     }
@@ -129,30 +129,58 @@ class BluetoothDialogModel @Inject constructor(
         return viewModel.viewState.value.coins.toLongOrNull() ?: 0L
     }
 
-    fun updateBitcoinBalance(amount: Long){
+    private fun updateBitcoinBalance(amount: Long){
         viewModelScope.launch {
             gameRepository.addBitcoins(amount)
         }
     }
 
-    fun write(message: String){
-        viewModelScope.launch {
-            bluetoothRepository.write(message)
-        }
-    }
-
-    fun isDataAvailable(): Boolean {
-        return bluetoothRepository.isDataAvailable()
-    }
-
-    fun read(): String {
+    private fun read(): String {
         return runBlocking {
             val deferred = async { bluetoothRepository.read() }
             deferred.await()
         }
     }
 
-    fun isConnected(): Boolean{
+    fun isConnected(): Boolean {
         return bluetoothRepository.isConnected()
+    }
+
+    fun sendBitcoin(amount: Long) {
+        viewModelScope.launch {
+            bluetoothRepository.write(amount.toString())
+            var counter = 0
+            while (!bluetoothRepository.isDataAvailable()) {
+                if (counter >= MAX_WAIT_CYCLES) {
+                    return@launch
+                }
+                delay(WAIT_TIME)
+                counter++
+            }
+            val message = read()
+            if (message == OK_MESSAGE) {
+                updateBitcoinBalance(-amount)
+            }
+        }
+    }
+
+    suspend fun receiveBitcoin() {
+        while (true) {
+            if (bluetoothRepository.isConnected() && bluetoothRepository.isDataAvailable()) {
+                val message = read()
+                val longValue: Long = message.toLong()
+                updateBitcoinBalance(longValue)
+                bluetoothRepository.write(OK_MESSAGE)
+                delay(WAIT_TIME)
+                break
+            }
+            delay(WAIT_TIME)
+        }
+    }
+
+    companion object {
+        const val OK_MESSAGE = "OK"
+        const val WAIT_TIME = 100L
+        const val MAX_WAIT_CYCLES = 50
     }
 }
