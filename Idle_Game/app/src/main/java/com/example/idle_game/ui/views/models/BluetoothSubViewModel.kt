@@ -64,7 +64,7 @@ class BluetoothDialogModel @Inject constructor(
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
         context.registerReceiver(bluetoothReceiver, filter)
 
-        bluetoothRepository.onPairedDevicesChanged = { devices ->
+        bluetoothRepository.setOnPairedDevicesChanged { devices ->
             updateDiscoveredDevices(devices)
         }
     }

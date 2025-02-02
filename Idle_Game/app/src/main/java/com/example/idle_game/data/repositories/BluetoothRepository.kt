@@ -32,7 +32,7 @@ class BluetoothRepository @Inject constructor(
     private val bluetoothAdapter: BluetoothAdapter?
         get() = bluetooth.adapter
 
-    var onPairedDevicesChanged: ((List<BluetoothDevice>) -> Unit)? = null
+    private var onPairedDevicesChanged: ((List<BluetoothDevice>) -> Unit)? = null
 
     private val foundDeviceReceiver = object : BroadcastReceiver() {
         @SuppressLint("MissingPermission")
@@ -69,10 +69,8 @@ class BluetoothRepository @Inject constructor(
     private var socket: BluetoothSocket? = null
     private val readBuffer: ByteArray = ByteArray(BUFFER_SIZE) // Buffer store for the stream
 
-    companion object {
-        const val BUFFER_SIZE = 2048
-        const val SERVICE_NAME = "CoinCraze"
-        val SERVICE_UUID: UUID = UUID.nameUUIDFromBytes(SERVICE_NAME.toByteArray())
+    fun setOnPairedDevicesChanged(callback: (List<BluetoothDevice>) -> Unit) {
+        onPairedDevicesChanged = callback
     }
 
     fun isConnected(): Boolean {
@@ -320,5 +318,11 @@ class BluetoothRepository @Inject constructor(
         if (checkBluetoothPermissions() && bluetooth.adapter.isDiscovering) {
             bluetoothAdapter?.cancelDiscovery()
         }
+    }
+
+    companion object {
+        const val BUFFER_SIZE = 2048
+        const val SERVICE_NAME = "CoinCraze"
+        val SERVICE_UUID: UUID = UUID.nameUUIDFromBytes(SERVICE_NAME.toByteArray())
     }
 }
