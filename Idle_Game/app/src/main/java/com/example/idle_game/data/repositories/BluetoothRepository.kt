@@ -35,7 +35,6 @@ class BluetoothRepository @Inject constructor(
     var onPairedDevicesChanged: ((List<BluetoothDevice>) -> Unit)? = null
 
     private val foundDeviceReceiver = object : BroadcastReceiver() {
-        @SuppressLint("MissingPermission")
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 BluetoothDevice.ACTION_FOUND -> {

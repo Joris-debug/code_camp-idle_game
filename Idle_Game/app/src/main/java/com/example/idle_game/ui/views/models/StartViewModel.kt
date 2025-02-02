@@ -167,11 +167,7 @@ class StartViewModel @Inject constructor(
         val permissions = listOf(
             Manifest.permission.BLUETOOTH_CONNECT,
             Manifest.permission.BLUETOOTH_SCAN,
-            Manifest.permission.BLUETOOTH_ADVERTISE,
-            Manifest.permission.BLUETOOTH_ADMIN,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-
+            Manifest.permission.BLUETOOTH_ADVERTISE
         )
 
         val permissionsToRequest = permissions.filter {
