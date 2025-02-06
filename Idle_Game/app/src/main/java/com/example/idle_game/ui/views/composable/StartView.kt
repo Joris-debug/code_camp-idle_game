@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
@@ -150,17 +148,10 @@ fun StartView(
         Button(
             onClick = { showBluetoothDialog = true },
             modifier = Modifier
-                .height(40.dp)
-                .background(
-                    color = Color.Blue,
-                    shape = RoundedCornerShape(14.dp)
-                ),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent
-            ),
+                .height(40.dp),
             shape = RoundedCornerShape(8.dp)
         ) {
-            Text("Sende BTC", color = Color.White)
+            Text("Sende BTC")
         }
 
         // Shows Bluetooth Dialog Display
@@ -173,7 +164,6 @@ fun StartView(
                     viewModel.checkAndRequestBluetoothPermissions(it)
                 }
             }
-
 
             BluetoothDialog(
                 onDismiss = {
