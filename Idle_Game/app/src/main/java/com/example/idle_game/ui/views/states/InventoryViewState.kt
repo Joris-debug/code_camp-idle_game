@@ -7,6 +7,5 @@ import kotlinx.coroutines.flow.emptyFlow
 
 data class InventoryViewState(
     val shopData: Flow<List<ShopData>> = emptyFlow(),
-    val inventoryData: Flow<InventoryData> = emptyFlow(),
-    val selectedItem: ShopData? = null
-)
+    val inventoryData: InventoryData? = null
+    )

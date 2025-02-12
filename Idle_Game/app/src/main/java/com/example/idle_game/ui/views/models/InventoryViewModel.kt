@@ -1,12 +1,10 @@
 package com.example.idle_game.ui.views.models
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.ShopData
 import com.example.idle_game.data.repositories.GameRepository
 import com.example.idle_game.ui.views.states.InventoryViewState
-import com.example.idle_game.util.SoundManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -15,24 +13,18 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 
 @HiltViewModel
 class InventoryViewModel @Inject constructor(
-    val gameRepository: GameRepository,
-    val soundManager: SoundManager
+    val gameRepository: GameRepository
 ) : ViewModel() {
-    private val _uiStateFlow = MutableStateFlow(InventoryViewState())
-    val uiStateFlow: StateFlow<InventoryViewState> = _uiStateFlow
 
-    private val shopData = gameRepository.getShopDataFlow()
-    private val inventoryData = gameRepository.getInventoryDataFlow()
+    private val _viewState = MutableStateFlow(InventoryViewState())
+    val viewState: StateFlow<InventoryViewState> = _viewState
 
     init {
-        viewModelScope.launch {
-            gameRepository.updateShop()
-            _uiStateFlow.value = _uiStateFlow.value.copy(shopData = shopData)
-            _uiStateFlow.value = _uiStateFlow.value.copy(inventoryData = inventoryData)
-        }
+        initShop()
+        fetchInventory()
     }
 
-    // Get amount of certain items
+    //Get amount of certain items
     fun getAmountOfItems(item: ShopData, inventoryData: InventoryData): Int {
         return when (item.name) {
             "low Boost" -> inventoryData.lowBoosts
@@ -49,20 +41,15 @@ class InventoryViewModel @Inject constructor(
         }
     }
 
-    //Checks for the 'itemToBuy'-amount to not overflow
-    fun checkQuantity(itemToBuy: ShopData, amount: Long, inventoryData: InventoryData): Boolean {
-        return getAmountOfItems(itemToBuy, inventoryData) + amount <= Int.MAX_VALUE
-    }
-
     fun buyItem(itemToBuy: ShopData, amount: Int) {
         viewModelScope.launch {
             gameRepository.buyItem(itemToBuy, amount)
         }
     }
 
-    fun useItem(itemToBuy: ShopData, useOn: String) {
+    fun useItem(itemToBuy: ShopData, useOn: String, quantity: Int) {
         viewModelScope.launch {
-            gameRepository.useItem(itemToBuy, useOn)
+            gameRepository.useItem(itemToBuy, useOn, quantity)
         }
     }
 
@@ -71,5 +58,21 @@ class InventoryViewModel @Inject constructor(
             gameRepository.issueBitcoins(cost)
         }
     }
-}
 
+    private fun initShop(){
+        viewModelScope.launch {
+            gameRepository.updateShop()
+            _viewState.value = _viewState.value.copy(shopData = gameRepository.getShopDataFlow())
+        }
+    }
+
+    private fun fetchInventory() {
+        viewModelScope.launch {
+            gameRepository.getInventoryDataFlow().collect { inventoryData ->
+                _viewState.value = _viewState.value.copy(
+                    inventoryData = inventoryData
+                )
+            }
+        }
+    }
+}

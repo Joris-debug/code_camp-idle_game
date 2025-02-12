@@ -25,7 +25,6 @@ import javax.inject.Inject
 class BluetoothRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    // TODO: handle this error gracefully
     private val bluetooth = context.getSystemService(Context.BLUETOOTH_SERVICE)
             as? BluetoothManager
         ?: throw Exception("Bluetooth is not supported by this device")
@@ -33,20 +32,31 @@ class BluetoothRepository @Inject constructor(
     private val bluetoothAdapter: BluetoothAdapter?
         get() = bluetooth.adapter
 
+    private var onPairedDevicesChanged: ((List<BluetoothDevice>) -> Unit)? = null
+
     private val foundDeviceReceiver = object : BroadcastReceiver() {
+        @SuppressLint("MissingPermission")
         override fun onReceive(context: Context?, intent: Intent?) {
-            when(intent?.action) {
+            when (intent?.action) {
                 BluetoothDevice.ACTION_FOUND -> {
                     val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        intent.getParcelableExtra(
-                            BluetoothDevice.EXTRA_DEVICE,
-                            BluetoothDevice::class.java
-                        )
+                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
                     } else {
                         intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                     }
                     device?.let { dev ->
                         discoveredDevices.add(dev)
+                        onPairedDevicesChanged?.invoke(discoveredDevices.toList())
+                    }
+                }
+                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
+                    val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                    device?.let {
+                        if (socket?.remoteDevice == device) {
+                            connectionEstablished = false
+                            Log.d("Bluetooth", "Verbindung zu ${device.name} wurde getrennt")
+                        }
+                        onPairedDevicesChanged?.invoke(discoveredDevices.toList())
                     }
                 }
             }
@@ -59,18 +69,12 @@ class BluetoothRepository @Inject constructor(
     private var socket: BluetoothSocket? = null
     private val readBuffer: ByteArray = ByteArray(BUFFER_SIZE) // Buffer store for the stream
 
-    companion object {
-        const val BUFFER_SIZE = 2048
-        const val SERVICE_NAME = "CoinCraze"
-        val SERVICE_UUID: UUID = UUID.nameUUIDFromBytes(SERVICE_NAME.toByteArray())
+    fun setOnPairedDevicesChanged(callback: (List<BluetoothDevice>) -> Unit) {
+        onPairedDevicesChanged = callback
     }
 
     fun isConnected(): Boolean {
         return connectionEstablished
-    }
-
-    fun getDiscoveredDevices(): Set<BluetoothDevice> {
-        return discoveredDevices.toSet()
     }
 
     // Returns true if the device has activated bluetooth
@@ -96,15 +100,6 @@ class BluetoothRepository @Inject constructor(
         ) == PackageManager.PERMISSION_GRANTED
 
         return bluetoothConnectPermission && bluetoothScanPermission && bluetoothAdvertisePermission
-    }
-
-    @SuppressLint("MissingPermission")
-    fun getPairedDevices(): Set<BluetoothDevice> {
-        if (!checkBluetoothPermissions()) {
-            Log.d("getPairedDevices()", "Missing permissions")
-            return setOf()
-        }
-        return bluetoothAdapter?.bondedDevices ?: setOf()
     }
 
     @SuppressLint("MissingPermission")
@@ -171,6 +166,7 @@ class BluetoothRepository @Inject constructor(
         if (!checkBluetoothPermissions()) {
             return
         }
+
         if (socket == null) {
             createClientSocket(device)
             if (socket == null) {
@@ -178,6 +174,7 @@ class BluetoothRepository @Inject constructor(
                 return
             }
         }
+
         // Cancel discovery because it otherwise slows down the connection.
         bluetoothAdapter?.cancelDiscovery()
 
@@ -231,7 +228,6 @@ class BluetoothRepository @Inject constructor(
             }
         } catch (e: IOException) {
             Log.e("write(...)", "Error occurred when sending data", e)
-            return
         }
     }
 
@@ -242,10 +238,17 @@ class BluetoothRepository @Inject constructor(
         }
         try {
             socket?.close()
-            connectionEstablished = false
         } catch (e: IOException) {
-            Log.e("closeConnection()", "Could not close the connect socket", e)
+            Log.e("setSocketsNull", "Error closing socket", e)
         }
+        try {
+            serverSocket?.close()
+        } catch (e: IOException) {
+            Log.e("setSocketsNull", "Error closing serverSocket", e)
+        }
+        socket = null
+        serverSocket = null
+        connectionEstablished = false
     }
 
     @SuppressLint("MissingPermission")
@@ -256,6 +259,10 @@ class BluetoothRepository @Inject constructor(
         context.registerReceiver(
             foundDeviceReceiver,
             IntentFilter(BluetoothDevice.ACTION_FOUND)
+        )
+        context.registerReceiver(
+            foundDeviceReceiver,
+            IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED)
         )
         bluetoothAdapter?.startDiscovery()
     }
@@ -271,6 +278,7 @@ class BluetoothRepository @Inject constructor(
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             enableBtIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(enableBtIntent)
+            bluetooth.adapter.isEnabled
         }
     }
 
@@ -301,7 +309,6 @@ class BluetoothRepository @Inject constructor(
             Log.d("startBluetoothScan():", "Bluetooth is not enabled")
             return
         }
-        stopScanning()
         startScanning()
     }
 
@@ -313,4 +320,9 @@ class BluetoothRepository @Inject constructor(
         }
     }
 
+    companion object {
+        const val BUFFER_SIZE = 2048
+        const val SERVICE_NAME = "CoinCraze"
+        val SERVICE_UUID: UUID = UUID.nameUUIDFromBytes(SERVICE_NAME.toByteArray())
+    }
 }
