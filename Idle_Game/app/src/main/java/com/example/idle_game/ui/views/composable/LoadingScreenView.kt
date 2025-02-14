@@ -73,7 +73,7 @@ fun LoadingScreenView(
                 fontSize = 30.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(all = 40.dp),
-                color = Color.White
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }
