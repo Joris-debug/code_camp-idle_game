@@ -1,10 +1,5 @@
 package com.example.idle_game.ui.views.models
 
-import android.Manifest
-import android.app.Activity
-import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.PeriodicWorkRequest
@@ -168,21 +163,5 @@ class StartViewModel @Inject constructor(
                 boostActiveUntil = inventoryFlow.first().boostActiveUntil
             )
         gameRepository.isBoostActive()
-    }
-
-    fun checkAndRequestBluetoothPermissions(activity: Activity) {
-        val permissions = listOf(
-            Manifest.permission.BLUETOOTH_CONNECT,
-            Manifest.permission.BLUETOOTH_SCAN,
-            Manifest.permission.BLUETOOTH_ADVERTISE
-        )
-
-        val permissionsToRequest = permissions.filter {
-            ContextCompat.checkSelfPermission(activity, it) != PackageManager.PERMISSION_GRANTED
-        }
-
-        if (permissionsToRequest.isNotEmpty()) {
-            ActivityCompat.requestPermissions(activity, permissionsToRequest.toTypedArray(), 1)
-        }
     }
 }

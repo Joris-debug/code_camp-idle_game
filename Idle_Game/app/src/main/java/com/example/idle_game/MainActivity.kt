@@ -1,8 +1,5 @@
 package com.example.idle_game
 
-import android.app.Activity
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,8 +7,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.idle_game.data.repositories.SettingsRepository
@@ -20,6 +15,7 @@ import com.example.idle_game.ui.views.composable.Idle_GameLauncher
 import com.example.idle_game.ui.views.composable.LoadingScreenView
 import com.example.idle_game.ui.views.composable.LoginView
 import com.example.idle_game.util.SoundManager
+import com.example.idle_game.util.checkAndRequestNotificationPermission
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -62,21 +58,6 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
-            }
-        }
-    }
-
-    private fun checkAndRequestNotificationPermission(activity: Activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    activity,
-                    android.Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(
-                    activity,
-                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                    1
-                )
             }
         }
     }

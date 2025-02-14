@@ -1,5 +1,6 @@
 package com.example.idle_game.ui.views.composable
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,22 +27,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idle_game.ui.views.models.SettingsViewModel
+import com.example.idle_game.util.checkAndRequestNotificationPermission
 import kotlin.system.exitProcess
 
 @Composable
 fun SettingsView(viewModel: SettingsViewModel = hiltViewModel()) {
     val viewState by viewModel.viewState.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
+    var checkPermission by remember { mutableStateOf(false) }
 
     Column {
         SettingsSwitch(
             text = "Benachrichtigungen",
-            onCheckedChange = { viewModel.saveOption(it, 0) },
+            onCheckedChange = {
+                viewModel.saveOption(it, 0)
+                checkPermission = it
+
+            },
             checked = viewState.switchState[0]
+
         )
         SettingsSwitch(
             text = "Große Nummern abkürzen",
@@ -49,15 +59,27 @@ fun SettingsView(viewModel: SettingsViewModel = hiltViewModel()) {
         )
         SettingsSwitch(
             text = "Dunkelmodus",
-            onCheckedChange = { viewModel.saveOption(it, 2) },
+            onCheckedChange = {
+                viewModel.saveOption(it, 2)
+            },
             checked = viewState.switchState[2]
         )
-        SettingsButton(text = "Username: ${viewState.username}", action = {
-            showDialog = true
-        })
+        SettingsButton(text = "Username: ${viewState.username}", action = { showDialog = true })
 
         if (showDialog) {
-            WarningDialog(onConfirm = { viewModel.logout(); showDialog = false; exitProcess(0) }, onDismiss = { showDialog = false })
+            WarningDialog(
+                onConfirm = { viewModel.logout(); showDialog = false; exitProcess(0) },
+                onDismiss = { showDialog = false })
+        }
+        if (checkPermission) {
+            val context = LocalContext.current
+            val activity = context as? Activity
+            LaunchedEffect(Unit) {
+                activity?.let {
+                    checkAndRequestNotificationPermission(it)
+                }
+            }
+            viewModel.notification(true)
         }
 
     }

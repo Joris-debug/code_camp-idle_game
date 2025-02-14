@@ -42,6 +42,7 @@ import com.example.idle_game.R
 import com.example.idle_game.ui.views.models.BluetoothDialogModel
 import com.example.idle_game.ui.views.models.StartViewModel
 import com.example.idle_game.util.SoundManager
+import com.example.idle_game.util.checkAndRequestBluetoothPermissions
 import kotlinx.coroutines.delay
 
 
@@ -161,7 +162,7 @@ fun StartView(
 
             LaunchedEffect(Unit) {
                 activity?.let {
-                    viewModel.checkAndRequestBluetoothPermissions(it)
+                    checkAndRequestBluetoothPermissions(it)
                 }
             }
 

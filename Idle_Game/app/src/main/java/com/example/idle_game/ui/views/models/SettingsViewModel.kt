@@ -6,7 +6,6 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.example.idle_game.data.repositories.GameRepository
 import com.example.idle_game.data.repositories.SettingsRepository
-//import com.example.idle_game.data.repositories.ThemeRepository
 import com.example.idle_game.ui.views.states.SettingsViewState
 import com.example.idle_game.util.OPTION_NOTIFICATIONS
 import com.example.idle_game.util.OPTION_THEME
@@ -25,8 +24,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     val settingsRepository: SettingsRepository,
     val gameRepository: GameRepository,
-    private val workManager: WorkManager,
-//    val themeRepository: ThemeRepository
+    private val workManager: WorkManager
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(SettingsViewState())
     val viewState: StateFlow<SettingsViewState> = _viewState.asStateFlow()

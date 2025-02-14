@@ -10,7 +10,6 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.Worker
-import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.example.idle_game.MainActivity
 import com.example.idle_game.R

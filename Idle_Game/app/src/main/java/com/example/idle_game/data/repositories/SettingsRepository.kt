@@ -35,6 +35,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         }
     }
 
+
     // Theme - datastore
 
     private val THEME_KEY = booleanPreferencesKey("option_${OPTION_THEME}")

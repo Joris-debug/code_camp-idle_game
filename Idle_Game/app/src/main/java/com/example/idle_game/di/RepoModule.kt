@@ -10,9 +10,7 @@ import com.example.idle_game.api.GameApi
 import com.example.idle_game.data.database.GameDatabase
 import com.example.idle_game.data.repositories.GameRepository
 import com.example.idle_game.data.repositories.SettingsRepository
-//import com.example.idle_game.data.repositories.ThemeRepository
 import com.example.idle_game.util.dataStore
-//import com.example.idle_game.util.themeStore
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
