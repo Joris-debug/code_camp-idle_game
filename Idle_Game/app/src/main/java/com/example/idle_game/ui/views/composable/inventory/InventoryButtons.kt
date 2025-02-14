@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.idle_game.R
 import com.example.idle_game.data.database.models.ShopData
+import com.example.idle_game.ui.views.models.InventoryViewModel
 import com.example.idle_game.ui.views.states.InventoryViewState
 import kotlinx.coroutines.delay
 
@@ -43,7 +44,8 @@ fun ShopItemButtons(
     itemAmount: Int,
     onBuyClick: () -> Unit,
     onApplyClick: () -> Unit,
-    viewState: InventoryViewState
+    viewState: InventoryViewState,
+    viewModel: InventoryViewModel
 ) {
     val isSpecialItem = item.name.contains("low passive", ignoreCase = true) ||
             item.name.contains("medium passive", ignoreCase = true) ||
@@ -96,7 +98,7 @@ fun ShopItemButtons(
                     ) {
 
                         Text(
-                            text = "${item.cost}",
+                            text = viewModel.toDisplay(item.cost),
                             fontSize = 16.sp,
                             color = Color.Black
                         )
@@ -115,11 +117,11 @@ fun ShopItemButtons(
                     modifier = Modifier
                         .padding(start = 16.dp)
                 ) {
-                    Text(text = "Lvl1: ${getQuantities(item,1,viewState)}")
-                    Text(text = "Lvl2: ${getQuantities(item,2,viewState)}")
-                    Text(text = "Lvl3: ${getQuantities(item,3,viewState)}")
-                    Text(text = "Lvl4: ${getQuantities(item,4,viewState)}")
-                    Text(text = "Lvl5: ${getQuantities(item,5,viewState)}")
+                    Text(text = "Lvl1: ${viewModel.toDisplay(getQuantities(item,1,viewState, viewModel))}")
+                    Text(text = "Lvl2: ${viewModel.toDisplay(getQuantities(item,2,viewState, viewModel))}")
+                    Text(text = "Lvl3: ${viewModel.toDisplay(getQuantities(item,3,viewState, viewModel))}")
+                    Text(text = "Lvl4: ${viewModel.toDisplay(getQuantities(item,4,viewState, viewModel))}")
+                    Text(text = "Lvl5: ${viewModel.toDisplay(getQuantities(item,5,viewState, viewModel))}")
                 }
             }
 
@@ -140,11 +142,11 @@ fun ShopItemButtons(
                         enabled = itemAmount > 0
                     ) {
                         val text = when (item.name) {
-                            "upgrade lvl 2" -> "Anwenden (${viewState.inventoryData?.upgradeLvl2})"
-                            "upgrade lvl 3" -> "Anwenden (${viewState.inventoryData?.upgradeLvl3})"
-                            "upgrade lvl 4" -> "Anwenden (${viewState.inventoryData?.upgradeLvl4})"
-                            "upgrade lvl 5" -> "Anwenden (${viewState.inventoryData?.upgradeLvl5})"
-                            else -> "Anwenden(${itemAmount})"
+                            "upgrade lvl 2" -> "Anwenden (${viewState.inventoryData?.upgradeLvl2?.let {viewModel.toDisplay(it)}})"
+                            "upgrade lvl 3" -> "Anwenden (${viewState.inventoryData?.upgradeLvl3?.let {viewModel.toDisplay(it)}})"
+                            "upgrade lvl 4" -> "Anwenden (${viewState.inventoryData?.upgradeLvl4?.let {viewModel.toDisplay(it)}})"
+                            "upgrade lvl 5" -> "Anwenden (${viewState.inventoryData?.upgradeLvl5?.let {viewModel.toDisplay(it)}})"
+                            else -> "Anwenden(${viewModel.toDisplay(itemAmount)})"
                         }
                         Text(
                             text = text,
@@ -208,36 +210,40 @@ private fun getIcon(item: ShopData): Painter? {
     return null
 }
 
-private fun getQuantities(item: ShopData, lvl: Int, viewState: InventoryViewState): Int {
+private fun getQuantities(item: ShopData, lvl: Int, viewState: InventoryViewState, viewModel: InventoryViewModel): Int {
     when (item.name) {
-        "low passive" -> {
+        "low passive" -> {viewModel.toDisplay(
             when (lvl){
                 1 -> return viewState.inventoryData?.hackersLvl1 ?: 0
                 2 -> return viewState.inventoryData?.hackersLvl2 ?: 0
                 3 -> return viewState.inventoryData?.hackersLvl3 ?: 0
                 4 -> return viewState.inventoryData?.hackersLvl4 ?: 0
                 5 -> return viewState.inventoryData?.hackersLvl5 ?: 0
+                else -> 0
             }
+        )
         }
 
-        "medium passive" -> {
+        "medium passive" -> {viewModel.toDisplay(
             when (lvl){
                 1 -> return viewState.inventoryData?.cryptoMinersLvl1 ?: 0
                 2 -> return viewState.inventoryData?.cryptoMinersLvl2 ?: 0
                 3 -> return viewState.inventoryData?.cryptoMinersLvl3 ?: 0
                 4 -> return viewState.inventoryData?.cryptoMinersLvl4 ?: 0
                 5 -> return viewState.inventoryData?.cryptoMinersLvl5 ?: 0
-            }
+                else -> 0
+            })
         }
 
-        "high passive" -> {
+        "high passive" -> { viewModel.toDisplay(
             when (lvl){
                 1 -> return viewState.inventoryData?.botnetsLvl1 ?: 0
                 2 -> return viewState.inventoryData?.botnetsLvl2 ?: 0
                 3 -> return viewState.inventoryData?.botnetsLvl3 ?: 0
                 4 -> return viewState.inventoryData?.botnetsLvl4 ?: 0
                 5 -> return viewState.inventoryData?.botnetsLvl5 ?: 0
-            }
+                else -> 0
+            })
         }
     }
     return 0

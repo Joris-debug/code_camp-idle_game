@@ -110,6 +110,9 @@ dependencies {
     // Pager for Inventory/Shop
     implementation ("com.google.accompanist:accompanist-pager:0.24.13-rc")
     implementation ("com.google.accompanist:accompanist-pager-indicators:0.24.13-rc")
+
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 }
 
 // Allow references to generated code

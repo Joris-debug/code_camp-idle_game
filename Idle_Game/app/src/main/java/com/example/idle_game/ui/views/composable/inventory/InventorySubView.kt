@@ -185,7 +185,8 @@ fun ShowDialog(
                         },
                         onDismiss = onDismiss,
                         itemToBuy = itemToBuy,
-                        viewState = viewState
+                        viewState = viewState,
+                        viewModel
                     )
                 } else {
                     ApplyDialog(
@@ -258,7 +259,8 @@ fun ApplyOnDialog(
     onMinerClick: () -> Unit,
     onDismiss: () -> Unit,
     itemToBuy: ShopData?,
-    viewState: InventoryViewState
+    viewState: InventoryViewState,
+    viewModel: InventoryViewModel
 ) {
     var enoughHacker = false
     var enoughMiner = false
@@ -319,21 +321,21 @@ fun ApplyOnDialog(
                     modifier = Modifier.padding(vertical = 4.dp),
                     enabled = enoughHacker
                 ) {
-                    Text(text = "Hacker, Verfügbar: $availableHackers")
+                    Text(text = "Hacker, Verfügbar: ${viewModel.toDisplay(availableHackers)}")
                 }
                 Button(
                     onClick = onMinerClick,
                     modifier = Modifier.padding(vertical = 4.dp),
                     enabled = enoughMiner
                 ) {
-                    Text(text = "Miner, Verfügbar: $availableMiner")
+                    Text(text = "Miner, Verfügbar: ${viewModel.toDisplay(availableMiner)}")
                 }
                 Button(
                     onClick = onBotNetClick,
                     modifier = Modifier.padding(vertical = 4.dp),
                     enabled = enoughBotNets
                 ) {
-                    Text(text = "BotNet, Verfügbar: $availableBotNets")
+                    Text(text = "BotNet, Verfügbar: ${viewModel.toDisplay(availableBotNets)}")
                 }
             }
         },

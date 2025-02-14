@@ -4,24 +4,42 @@ import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.database.models.InventoryData
 import com.example.idle_game.data.database.models.ShopData
 import com.example.idle_game.data.repositories.GameRepository
+import com.example.idle_game.data.repositories.SettingsRepository
 import com.example.idle_game.ui.views.states.InventoryViewState
+import com.example.idle_game.util.OPTION_SORTNUMBERS
+import com.example.idle_game.util.shortBigNumbers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 
 @HiltViewModel
 class InventoryViewModel @Inject constructor(
+    val settingsRepository: SettingsRepository,
     val gameRepository: GameRepository
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(InventoryViewState())
     val viewState: StateFlow<InventoryViewState> = _viewState
 
+    private var showShorted: Boolean = false
+
+    fun toDisplay(value: Number): String {
+        return if (showShorted) {
+            shortBigNumbers(value.toLong())
+        } else {
+            value.toString()
+        }
+    }
+
     init {
         initShop()
         fetchInventory()
+        viewModelScope.launch {
+            showShorted = settingsRepository.getOption(OPTION_SORTNUMBERS).first()
+        }
     }
 
     //Get amount of certain items

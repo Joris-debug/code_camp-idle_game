@@ -1,5 +1,6 @@
 package com.example.idle_game.ui.views.composable.inventory
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +21,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,12 +52,11 @@ fun CategoryScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 16.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 120.dp)
+                .padding(vertical = 50.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -67,45 +70,54 @@ fun CategoryScreen(
                     itemAmount = itemAmount,
                     onBuyClick = { onBuyClick(item) },
                     onApplyClick = { onApplyClick(item) },
-                    viewState = viewState
+                    viewState = viewState,
+                    viewModel
                 )
             }
         }
-        if (page > 0) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Swipe left",
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(16.dp)
-                    .size(40.dp)
-            )
-        }
-
-        if (page < 2) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Swipe right",
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-                    .size(40.dp)
-            )
-        }
-
-        Row(
+        Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .background(Brush.verticalGradient(colors = listOf(Color(0x00000000), MaterialTheme.colorScheme.background)))
                 .padding(bottom = 16.dp)
         ) {
-            Text(
-                text = "BTC: $bitcoinBalance",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
+            if (page > 0) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Swipe left",
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(16.dp)
+                        .size(40.dp)
+                )
+            }
+
+            if (page < 2) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Swipe right",
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                        .size(40.dp)
+                )
+            }
+
+            Row(
                 modifier = Modifier
-                    .padding(horizontal = 32.dp)
-                    .align(Alignment.CenterVertically)
-            )
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp)
+            ) {
+                Text(
+                    text = "BTC: ${viewModel.toDisplay(bitcoinBalance)}",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(horizontal = 32.dp)
+                        .align(Alignment.CenterVertically)
+                )
+            }
         }
     }
 }

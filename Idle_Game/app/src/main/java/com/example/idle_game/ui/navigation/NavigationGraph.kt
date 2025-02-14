@@ -2,6 +2,7 @@ package com.example.idle_game.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
@@ -17,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.idle_game.R
 import com.example.idle_game.ui.views.composable.ScoreBoardView
+import com.example.idle_game.ui.views.composable.SettingsView
 import com.example.idle_game.ui.views.composable.StartView
 import com.example.idle_game.ui.views.composable.inventory.InventoryView
 import com.example.idle_game.util.SoundManager
@@ -40,6 +42,9 @@ fun NavigationGraph(
         }
         composable("ScoreBoardView") {
             ScoreBoardView()
+        }
+        composable("SettingsView") {
+            SettingsView()
         }
     }
 }
@@ -91,5 +96,18 @@ fun BottomBar(navController: NavController, soundManager: SoundManager) {
             val scoreboardIcon = painterResource(id = R.drawable.ic_scoreboard)
             Icon(scoreboardIcon, contentDescription = "Scoreboard")
         })
+
+        NavigationBarItem(selected = currentRoute == "SettingsView", onClick = {
+            soundManager.playSound(SoundManager.SWIPE_SOUND_RESOURCE_ID)
+            navController.navigate("SettingsView") {
+                navController.graph.startDestinationRoute?.let { screenRoute ->
+                    popUpTo(screenRoute) {
+                        saveState = false
+                        inclusive = false
+                    }
+                }
+                launchSingleTop = true
+                restoreState = false }
+        }, icon = { Icon(Icons.Default.Settings, contentDescription = "Settings")})
     }
 }
