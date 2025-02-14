@@ -32,7 +32,10 @@ class SettingsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             settingsRepository.getOptions(3).collect { options ->
-                _viewState.value = _viewState.value.copy(switchState = options, username = gameRepository.getPlayerDataFlow().first().username)
+                _viewState.value = _viewState.value.copy(
+                    switchState = options,
+                    username = gameRepository.getPlayerDataFlow().first().username
+                )
             }
         }
     }
@@ -40,32 +43,59 @@ class SettingsViewModel @Inject constructor(
     fun saveOption(option: Boolean, num: Int) {
         viewModelScope.launch {
             settingsRepository.saveOption(option, num)
-            when(num){
+            when (num) {
                 OPTION_NOTIFICATIONS -> notification(option)
                 OPTION_THEME -> selectTheme(option)
             }
         }
     }
 
-    fun logout(){
+    fun logout() {
         viewModelScope.launch {
             gameRepository.logout()
         }
     }
 
-    fun selectTheme(theme: Boolean){
+    fun selectTheme(theme: Boolean) {
         viewModelScope.launch {
             settingsRepository.saveTheme(theme)
         }
     }
 
-    fun notification(value: Boolean){
+    fun notification(value: Boolean) {
         workManager.cancelAllWork()
-        if(value){
-            val periodicWorkRequest = PeriodicWorkRequest.Builder(NotificationWorker::class.java, 15, TimeUnit.MINUTES)
-                .build()
+        if (value) {
+            val periodicWorkRequest =
+                PeriodicWorkRequest.Builder(NotificationWorker::class.java, 15, TimeUnit.MINUTES)
+                    .build()
             workManager.enqueue(periodicWorkRequest)
         }
     }
+
+    fun checkCheatCode(text: String): String {
+        if(text.isEmpty()) {
+            return ""
+        }
+        if (text.last() == '\n') {
+            runCheatCode(text)
+            return ""
+        }
+        return text
+    }
+
+    private fun runCheatCode(input: String) {
+        var text = input.removeSuffix("\n")
+        viewModelScope.launch {
+            if (text.startsWith("add ")) {
+                text = text.removePrefix("add ")
+                if (text.startsWith("btc ")) {
+                    text = text.removePrefix("btc ")
+                    gameRepository.addBitcoins(text.toLong())
+                }
+            }
+        }
+    }
+
+
 }
 
