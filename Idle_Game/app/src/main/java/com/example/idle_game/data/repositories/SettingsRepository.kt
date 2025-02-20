@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -53,14 +54,13 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
-            dataStore.data.map { preferences ->
-                preferences[THEME_KEY] ?: true
-            }.collect { isDark ->
+            combine(
+                dataStore.data.map { preferences -> preferences[THEME_KEY] ?: true },
+                dataStore.data.map { preferences -> preferences[CONTRAST_KEY] ?: LOW_CONTRAST }
+            ) { isDark, contrast ->
+                Pair(isDark, contrast)
+            }.collect { (isDark, contrast) ->
                 _themeState.value = isDark
-            }
-            dataStore.data.map { preferences ->
-                preferences[CONTRAST_KEY] ?: LOW_CONTRAST  // Default contrast is 0
-            }.collect { contrast ->
                 _contrastState.value = contrast
             }
         }
