@@ -90,7 +90,9 @@ class SettingsViewModel @Inject constructor(
                 text = text.removePrefix("add ")
                 if (text.startsWith("btc ")) {
                     text = text.removePrefix("btc ")
-                    gameRepository.addBitcoins(text.toLong())
+                    try {
+                        gameRepository.addBitcoins(text.toLong())
+                    } catch (_: Exception){}
                 }
             }
         }
