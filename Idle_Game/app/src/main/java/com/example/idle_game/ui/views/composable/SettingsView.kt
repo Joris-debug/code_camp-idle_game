@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,6 +36,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.idle_game.ui.theme.HIGH_CONTRAST
+import com.example.idle_game.ui.theme.LOW_CONTRAST
+import com.example.idle_game.ui.theme.MEDIUM_CONTRAST
 import com.example.idle_game.ui.views.models.SettingsViewModel
 import com.example.idle_game.util.checkAndRequestNotificationPermission
 import kotlin.system.exitProcess
@@ -62,6 +66,7 @@ fun SettingsView(viewModel: SettingsViewModel = hiltViewModel()) {
             onCheckedChange = { viewModel.saveOption(it, 1) },
             checked = viewState.switchState[1]
         )
+        SettingsButton(text = "Username: ${viewState.username}", action = { showDialog = true })
         SettingsSwitch(
             text = "Dunkelmodus",
             onCheckedChange = {
@@ -69,7 +74,30 @@ fun SettingsView(viewModel: SettingsViewModel = hiltViewModel()) {
             },
             checked = viewState.switchState[2]
         )
-        SettingsButton(text = "Username: ${viewState.username}", action = { showDialog = true })
+        Column {
+            Text("Farbkontrast:")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(
+                    selected = viewState.contrast == LOW_CONTRAST,
+                    onClick = { viewModel.saveContrast(LOW_CONTRAST) }
+                )
+                Text("Niedrieger Kontrast")
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(
+                    selected = viewState.contrast == MEDIUM_CONTRAST,
+                    onClick = { viewModel.saveContrast(MEDIUM_CONTRAST) }
+                )
+                Text("Mittler Kontrast")
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(
+                    selected = viewState.contrast == HIGH_CONTRAST,
+                    onClick = { viewModel.saveContrast(HIGH_CONTRAST) }
+                )
+                Text("Hoher Kontrast")
+            }
+        }
 
         if (showDialog) {
             WarningDialog(

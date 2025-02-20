@@ -4,6 +4,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import com.example.idle_game.ui.theme.HIGH_CONTRAST
+import com.example.idle_game.ui.theme.LOW_CONTRAST
 import com.example.idle_game.util.OPTION_THEME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +18,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class SettingsRepository(private val dataStore: DataStore<Preferences>) {
+    private val CONTRAST_KEY = intPreferencesKey("option_contrast")
+
+    private val _contrastState = MutableStateFlow(LOW_CONTRAST)  // Default contrast value is 0
+    val contrastState: StateFlow<Int> = _contrastState.asStateFlow()
+
     private fun getOptionKey(num: Int) = booleanPreferencesKey("option_$num")
 
     fun getOption(num: Int): Flow<Boolean> {
@@ -50,6 +58,11 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
             }.collect { isDark ->
                 _themeState.value = isDark
             }
+            dataStore.data.map { preferences ->
+                preferences[CONTRAST_KEY] ?: LOW_CONTRAST  // Default contrast is 0
+            }.collect { contrast ->
+                _contrastState.value = contrast
+            }
         }
     }
 
@@ -60,4 +73,18 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         _themeState.value = theme
     }
 
+    suspend fun saveContrast(contrast: Int) {
+        if (contrast in LOW_CONTRAST..HIGH_CONTRAST) {  // Ensure contrast value is between 0 and 2
+            dataStore.edit { preferences ->
+                preferences[CONTRAST_KEY] = contrast
+            }
+            _contrastState.value = contrast
+        }
+    }
+
+    fun getContrast(): Flow<Int> {
+        return dataStore.data.map { preferences ->
+            preferences[CONTRAST_KEY] ?: LOW_CONTRAST  // Default to 0 if not set
+        }
+    }
 }

@@ -29,9 +29,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
+            val contrast by settingsRepository.contrastState.collectAsState()
             val isDarkTheme by settingsRepository.themeState.collectAsState()
-                AppTheme (darkTheme = isDarkTheme) {
+            AppTheme (darkTheme = isDarkTheme, contrast = contrast) {
                 val navController = rememberNavController()
 
                 val isLoggedIn = remember { mutableStateOf<Boolean?>(null) } // True when logged in to an existing (in db) account
