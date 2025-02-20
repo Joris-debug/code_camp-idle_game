@@ -172,7 +172,6 @@ class GameRepository(
                 gameDao.insertScoreBoard(player.toScoreBoardData())
             }
         } catch (e: Exception) {
-            println(e)
             onFailure()
         }
     }
