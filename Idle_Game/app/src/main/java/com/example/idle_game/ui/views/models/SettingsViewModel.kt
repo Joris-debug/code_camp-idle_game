@@ -34,7 +34,8 @@ class SettingsViewModel @Inject constructor(
             settingsRepository.getOptions(3).collect { options ->
                 _viewState.value = _viewState.value.copy(
                     switchState = options,
-                    username = gameRepository.getPlayerDataFlow().first().username
+                    username = gameRepository.getPlayerDataFlow().first().username,
+                    contrast = settingsRepository.getContrast().first()
                 )
             }
         }
@@ -47,6 +48,15 @@ class SettingsViewModel @Inject constructor(
                 OPTION_NOTIFICATIONS -> notification(option)
                 OPTION_THEME -> selectTheme(option)
             }
+        }
+    }
+
+    fun saveContrast(contrast: Int) {
+        viewModelScope.launch {
+            settingsRepository.saveContrast(contrast)
+            _viewState.value = _viewState.value.copy(
+                contrast = contrast
+            )
         }
     }
 
@@ -97,7 +107,5 @@ class SettingsViewModel @Inject constructor(
             }
         }
     }
-
-
 }
 

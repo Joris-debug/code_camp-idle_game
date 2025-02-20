@@ -1,6 +1,7 @@
 package com.example.idle_game.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
@@ -254,14 +255,25 @@ val unspecified_scheme = ColorFamily(
     Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
 )
 
+const val LOW_CONTRAST = 0;
+const val MEDIUM_CONTRAST = 1;
+const val HIGH_CONTRAST = 2;
+
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    contrast: Int,
     content: @Composable() () -> Unit
 ) {
+    println("Contrast is: $contrast")
     val colorScheme = when {
-        darkTheme -> darkScheme
-        else -> lightScheme
+        darkTheme && contrast == LOW_CONTRAST -> darkScheme
+        darkTheme && contrast == MEDIUM_CONTRAST -> mediumContrastDarkColorScheme
+        darkTheme && contrast == HIGH_CONTRAST -> highContrastDarkColorScheme
+        !darkTheme && contrast == LOW_CONTRAST -> lightScheme
+        !darkTheme && contrast == MEDIUM_CONTRAST -> mediumContrastLightColorScheme
+        !darkTheme && contrast == HIGH_CONTRAST -> highContrastLightColorScheme
+        else -> lightScheme // Default, should not happen, but just in case
     }
 
     MaterialTheme(
