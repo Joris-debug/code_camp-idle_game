@@ -122,7 +122,7 @@ fun ScanDialog(
                 Text("Gefundene Geräte:")
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (discoveredDevices.isEmpty() || discoveredDevices.all {it.name == null}) {
+                if (discoveredDevices.isEmpty() || discoveredDevices.all { it.name == null }) {
                     Text("Keine Geräte gefunden.")
                 } else {
                     LazyColumn {
@@ -142,7 +142,8 @@ fun ScanDialog(
                                                         delay(500)
                                                     }
                                                 }
-                                                maxBTC = bluetoothViewModel.getBitcoinBalance(viewModel)
+                                                maxBTC =
+                                                    bluetoothViewModel.getBitcoinBalance(viewModel)
                                                 showInputDialog = true
                                             } catch (e: TimeoutCancellationException) {
                                                 showErrorDialog = true
@@ -206,7 +207,7 @@ fun ScanDialog(
             Button(
                 onClick = {
                     onDismiss()
-                          },
+                },
                 enabled = !isLoading
             ) {
                 Text("Abbrechen")
@@ -245,7 +246,7 @@ fun BTCInputDialog(
             }
         }, confirmButton = {
             Button(onClick = {
-                if(bluetoothDialogModel.isConnected()) {
+                if (bluetoothDialogModel.isConnected()) {
                     onSend(btcAmount)
                 } else {
                     onDismiss()
@@ -263,7 +264,7 @@ fun BTCInputDialog(
         })
     }
 
-    if(showErrorDialog) {
+    if (showErrorDialog) {
         AlertDialog(
             onDismissRequest = { showErrorDialog = false },
             title = { Text("Fehler") },
@@ -288,17 +289,17 @@ fun WaitingForRequestDialog(
         onDismiss()
     }
 
-        AlertDialog(
-            onDismissRequest = {
+    AlertDialog(
+        onDismissRequest = {
             onDismiss()
         },
-            title = { Text("Warten auf Anfragen...") },
-            text = { Text("Dein Gerät ist jetzt sichtbar und kann BTC empfangen.") },
-            confirmButton = {
-                Button(onClick = {
-                    onDismiss()
-                }) {
-                    Text("Abbrechen")
-                }
-            })
+        title = { Text("Warten auf Anfragen...") },
+        text = { Text("Dein Gerät ist jetzt sichtbar und kann BTC empfangen.") },
+        confirmButton = {
+            Button(onClick = {
+                onDismiss()
+            }) {
+                Text("Abbrechen")
+            }
+        })
 }

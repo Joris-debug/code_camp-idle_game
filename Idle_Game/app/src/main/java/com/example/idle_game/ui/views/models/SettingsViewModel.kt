@@ -113,7 +113,7 @@ class SettingsViewModel @Inject constructor(
                     gameRepository.addBitcoins(text.toLong())
                 } catch (_: Exception) {
                 }
-            } else if (text.startsWith("set btc ")){
+            } else if (text.startsWith("set btc ")) {
                 text = text.removePrefix("set btc ")
                 try {
                     gameRepository.setBitcoin(text.toLong())

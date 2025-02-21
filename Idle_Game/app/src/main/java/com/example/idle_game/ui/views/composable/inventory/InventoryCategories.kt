@@ -82,7 +82,14 @@ fun CategoryScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .background(Brush.verticalGradient(colors = listOf(Color(0x00000000), MaterialTheme.colorScheme.background)))
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0x00000000),
+                            MaterialTheme.colorScheme.background
+                        )
+                    )
+                )
                 .padding(bottom = 16.dp)
         ) {
             if (page > 0) {

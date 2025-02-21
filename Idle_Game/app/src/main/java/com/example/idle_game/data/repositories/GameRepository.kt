@@ -338,28 +338,52 @@ class GameRepository(
             1 -> {
                 val upgrades = inventory.upgradeLvl2
                 if (cmLvl1 >= quantity && upgrades >= quantity) {
-                    gameDao.setCryptoMiners(cmLvl1 - quantity, cmLvl2 + quantity, cmLvl3, cmLvl4, cmLvl5)
+                    gameDao.setCryptoMiners(
+                        cmLvl1 - quantity,
+                        cmLvl2 + quantity,
+                        cmLvl3,
+                        cmLvl4,
+                        cmLvl5
+                    )
                 }
             }
 
             2 -> {
                 val upgrades = inventory.upgradeLvl3
                 if (cmLvl2 >= quantity && upgrades >= quantity) {
-                    gameDao.setCryptoMiners(cmLvl1, cmLvl2 - quantity, cmLvl3 + quantity, cmLvl4, cmLvl5)
+                    gameDao.setCryptoMiners(
+                        cmLvl1,
+                        cmLvl2 - quantity,
+                        cmLvl3 + quantity,
+                        cmLvl4,
+                        cmLvl5
+                    )
                 }
             }
 
             3 -> {
                 val upgrades = inventory.upgradeLvl4
                 if (cmLvl3 >= quantity && upgrades >= quantity) {
-                    gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3 - quantity, cmLvl4 + quantity, cmLvl5)
+                    gameDao.setCryptoMiners(
+                        cmLvl1,
+                        cmLvl2,
+                        cmLvl3 - quantity,
+                        cmLvl4 + quantity,
+                        cmLvl5
+                    )
                 }
             }
 
             4 -> {
                 val upgrades = inventory.upgradeLvl5
                 if (cmLvl4 >= quantity && upgrades >= quantity) {
-                    gameDao.setCryptoMiners(cmLvl1, cmLvl2, cmLvl3, cmLvl4 - quantity, cmLvl5 + quantity)
+                    gameDao.setCryptoMiners(
+                        cmLvl1,
+                        cmLvl2,
+                        cmLvl3,
+                        cmLvl4 - quantity,
+                        cmLvl5 + quantity
+                    )
                 }
             }
 
@@ -415,23 +439,23 @@ class GameRepository(
 
     private suspend fun addUpgradeLvl2(amount: Int) {
         val upgrades = inventoryDataFlow.first().upgradeLvl2
-            gameDao.updateLvl2Upgrades(upgrades + amount)
+        gameDao.updateLvl2Upgrades(upgrades + amount)
     }
 
     private suspend fun addUpgradeLvl3(amount: Int) {
         val upgrades = inventoryDataFlow.first().upgradeLvl3
-            gameDao.updateLvl3Upgrades(upgrades + amount)
+        gameDao.updateLvl3Upgrades(upgrades + amount)
     }
 
     private suspend fun addUpgradeLvl4(amount: Int) {
         val upgrades = inventoryDataFlow.first().upgradeLvl4
-            gameDao.updateLvl4Upgrades(upgrades + amount)
+        gameDao.updateLvl4Upgrades(upgrades + amount)
     }
 
     @SuppressLint("SuspiciousIndentation")
     private suspend fun addUpgradeLvl5(amount: Int) {
         val upgrades = inventoryDataFlow.first().upgradeLvl5
-            gameDao.updateLvl5Upgrades(upgrades + amount)
+        gameDao.updateLvl5Upgrades(upgrades + amount)
     }
 
     // Adds new low boosts to the inventory
@@ -574,15 +598,16 @@ class GameRepository(
                     }
 
                     "Miner" -> {
-                        upgradeCryptoMiner(1,quantity)
+                        upgradeCryptoMiner(1, quantity)
                     }
 
                     "BotNet" -> {
-                        upgradeBotnet(1,quantity)
+                        upgradeBotnet(1, quantity)
                     }
                 }
                 addUpgradeLvl2(-quantity)
             }
+
             "upgrade lvl 3" -> {
                 when (useOn) {
                     "Hacker" -> {
@@ -599,6 +624,7 @@ class GameRepository(
                 }
                 addUpgradeLvl3(-quantity)
             }
+
             "upgrade lvl 4" -> {
                 when (useOn) {
                     "Hacker" -> {
@@ -615,6 +641,7 @@ class GameRepository(
                 }
                 addUpgradeLvl4(-quantity)
             }
+
             "upgrade lvl 5" -> {
                 when (useOn) {
                     "Hacker" -> {

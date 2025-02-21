@@ -62,7 +62,7 @@ fun ScoreBoardView(viewModel: ScoreBoardViewModel = hiltViewModel()) {
                     style = TextStyle(fontSize = 20.sp)
                 )
             }
-            scoreList.forEachIndexed  { index, scoreEntity ->
+            scoreList.forEachIndexed { index, scoreEntity ->
                 val backgroundColor = if (scoreEntity.username == playerObject?.username) {
                     MaterialTheme.colorScheme.primary
                 } else if (index % 2 == 0) {

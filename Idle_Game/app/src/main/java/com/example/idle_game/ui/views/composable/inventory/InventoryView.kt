@@ -63,7 +63,13 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
                             setItemToBuy(item)
                             setShowDialog(true)
                             setDialogTitle("Kaufen")
-                            setDialogMessage("Willst du wirklich ${item.name} für ${viewModel.toDisplay(item.cost)} kaufen?")
+                            setDialogMessage(
+                                "Willst du wirklich ${item.name} für ${
+                                    viewModel.toDisplay(
+                                        item.cost
+                                    )
+                                } kaufen?"
+                            )
                         },
                         onApplyClick = { item ->
                             setItemToBuy(item)
@@ -89,7 +95,13 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
                             setItemToBuy(item)
                             setShowDialog(true)
                             setDialogTitle("Kaufen")
-                            setDialogMessage("Willst du wirklich ${item.name} für ${viewModel.toDisplay(item.cost)} kaufen?")
+                            setDialogMessage(
+                                "Willst du wirklich ${item.name} für ${
+                                    viewModel.toDisplay(
+                                        item.cost
+                                    )
+                                } kaufen?"
+                            )
                         },
                         onApplyClick = { item ->
                             setItemToBuy(item)
@@ -115,7 +127,13 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
                             setItemToBuy(item)
                             setShowDialog(true)
                             setDialogTitle("Kaufen")
-                            setDialogMessage("Willst du wirklich ${item.name} für ${viewModel.toDisplay(item.cost)} kaufen?")
+                            setDialogMessage(
+                                "Willst du wirklich ${item.name} für ${
+                                    viewModel.toDisplay(
+                                        item.cost
+                                    )
+                                } kaufen?"
+                            )
                         },
                         onApplyClick = { item ->
                             setItemToBuy(item)

@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class InventoryData (
+data class InventoryData(
     @PrimaryKey(autoGenerate = false)
     val uid: Int = 1,
     @ColumnInfo(name = "bitcoins") val bitcoins: Long = 0,

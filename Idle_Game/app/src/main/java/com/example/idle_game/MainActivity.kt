@@ -23,6 +23,7 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var soundManager: SoundManager
+
     @Inject
     lateinit var settingsRepository: SettingsRepository
 
@@ -31,12 +32,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             val contrast by settingsRepository.contrastState.collectAsState()
             val isDarkTheme by settingsRepository.themeState.collectAsState()
-            AppTheme (darkTheme = isDarkTheme, contrast = contrast) {
+            AppTheme(darkTheme = isDarkTheme, contrast = contrast) {
                 val navController = rememberNavController()
 
-                val isLoggedIn = remember { mutableStateOf<Boolean?>(null) } // True when logged in to an existing (in db) account
+                val isLoggedIn =
+                    remember { mutableStateOf<Boolean?>(null) } // True when logged in to an existing (in db) account
                 val isWifiOK = remember { mutableStateOf(false) }
-                val isSignedUp = remember { mutableStateOf(false) }  // True when signed-up and logged-in
+                val isSignedUp =
+                    remember { mutableStateOf(false) }  // True when signed-up and logged-in
 
                 if (isSignedUp.value || isLoggedIn.value == true) {
                     Idle_GameLauncher(navController = navController, soundManager)

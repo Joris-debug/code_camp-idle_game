@@ -65,8 +65,9 @@ fun BottomBar(navController: NavController, soundManager: SoundManager) {
                     }
                 }
                 launchSingleTop = true
-                restoreState = false }
-        }, icon = { Icon(Icons.Default.Home, contentDescription = "Start")})
+                restoreState = false
+            }
+        }, icon = { Icon(Icons.Default.Home, contentDescription = "Start") })
 
         NavigationBarItem(selected = currentRoute == "InventoryView", onClick = {
             soundManager.playSound(SoundManager.SWIPE_SOUND_RESOURCE_ID)
@@ -78,8 +79,9 @@ fun BottomBar(navController: NavController, soundManager: SoundManager) {
                     }
                 }
                 launchSingleTop = true
-                restoreState = false }
-        }, icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Inventory")})
+                restoreState = false
+            }
+        }, icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Inventory") })
 
         NavigationBarItem(selected = currentRoute == "ScoreBoardView", onClick = {
             soundManager.playSound(SoundManager.SWIPE_SOUND_RESOURCE_ID)
@@ -91,7 +93,8 @@ fun BottomBar(navController: NavController, soundManager: SoundManager) {
                     }
                 }
                 launchSingleTop = true
-                restoreState = false }
+                restoreState = false
+            }
         }, icon = {
             val scoreboardIcon = painterResource(id = R.drawable.ic_scoreboard)
             Icon(scoreboardIcon, contentDescription = "Scoreboard")
@@ -107,7 +110,8 @@ fun BottomBar(navController: NavController, soundManager: SoundManager) {
                     }
                 }
                 launchSingleTop = true
-                restoreState = false }
-        }, icon = { Icon(Icons.Default.Settings, contentDescription = "Settings")})
+                restoreState = false
+            }
+        }, icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") })
     }
 }

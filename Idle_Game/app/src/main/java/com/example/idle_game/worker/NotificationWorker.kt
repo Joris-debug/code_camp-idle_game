@@ -64,7 +64,8 @@ class NotificationWorker(appContext: Context, workerParams: WorkerParameters) :
 
     @SuppressLint("ServiceCast")
     private fun isAppInForeground(): Boolean {
-        val activityManager = applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val activityManager =
+            applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val runningProcesses = activityManager.runningAppProcesses
 
         return runningProcesses?.any {

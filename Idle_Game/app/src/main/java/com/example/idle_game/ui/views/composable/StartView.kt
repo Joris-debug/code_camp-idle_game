@@ -170,7 +170,7 @@ fun StartView(
                 onDismiss = {
                     showBluetoothDialog = false
                     bluetoothDialogModel.closeConnection()
-                            },
+                },
                 onReceive = {
                     bluetoothDialogModel.listenOnSocketServer()
                     showWaitingDialog = true
@@ -187,14 +187,14 @@ fun StartView(
                 onDismiss = {
                     showScanWindow = false
                     bluetoothDialogModel.closeConnection()
-                            },
+                },
                 onScanClicked = {
                     bluetoothDialogModel.startScanning()
                 }
             )
         }
 
-        if(showWaitingDialog){
+        if (showWaitingDialog) {
             WaitingForRequestDialog(
                 onDismiss = onDismiss
             )

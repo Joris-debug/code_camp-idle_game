@@ -92,7 +92,7 @@ class StartViewModel @Inject constructor(
     /**
      * Updates the display of all passives (Bots, Miners, Botnets)
      */
-    private fun updatePassivesCount(){
+    private fun updatePassivesCount() {
         viewModelScope.launch {
             val inventory = inventoryFlow.first()
             _viewState.value = _viewState.value.copy(
@@ -121,7 +121,7 @@ class StartViewModel @Inject constructor(
             gameRepository.updateShop()
             _viewState.value =
                 _viewState.value.copy(coins = toDisplay(inventoryFlow.first().bitcoins))
-            if(settingsRepository.getOption(OPTION_NOTIFICATIONS).first()){
+            if (settingsRepository.getOption(OPTION_NOTIFICATIONS).first()) {
                 scheduleNotificationWorker(workManager)
             }
 
@@ -169,12 +169,13 @@ class StartViewModel @Inject constructor(
     }
 
     private fun scheduleNotificationWorker(workManager: WorkManager) {
-        val periodicWorkRequest = PeriodicWorkRequest.Builder(NotificationWorker::class.java, 15, TimeUnit.MINUTES)
-            .build()
+        val periodicWorkRequest =
+            PeriodicWorkRequest.Builder(NotificationWorker::class.java, 15, TimeUnit.MINUTES)
+                .build()
         workManager.enqueue(periodicWorkRequest)
     }
 
-    private suspend fun fetchBoost(){
+    private suspend fun fetchBoost() {
         _viewState.value =
             _viewState.value.copy(
                 activeBoost = inventoryFlow.first().activeBoostType,

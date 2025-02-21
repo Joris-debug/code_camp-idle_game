@@ -12,7 +12,8 @@ fun checkAndRequestNotificationPermission(activity: Activity) {
         if (ContextCompat.checkSelfPermission(
                 activity,
                 android.Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED) {
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             ActivityCompat.requestPermissions(
                 activity,
                 arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),

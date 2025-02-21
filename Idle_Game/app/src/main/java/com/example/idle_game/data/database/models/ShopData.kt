@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class ShopData (
+data class ShopData(
     @PrimaryKey val name: String,
     @ColumnInfo(name = "cost") val cost: Int,
     @ColumnInfo(name = "duration") val duration: Int? = null,

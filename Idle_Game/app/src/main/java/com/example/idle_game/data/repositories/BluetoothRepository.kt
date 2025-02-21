@@ -40,7 +40,10 @@ class BluetoothRepository @Inject constructor(
             when (intent?.action) {
                 BluetoothDevice.ACTION_FOUND -> {
                     val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
+                        intent.getParcelableExtra(
+                            BluetoothDevice.EXTRA_DEVICE,
+                            BluetoothDevice::class.java
+                        )
                     } else {
                         intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                     }
@@ -49,8 +52,10 @@ class BluetoothRepository @Inject constructor(
                         onPairedDevicesChanged?.invoke(discoveredDevices.toList())
                     }
                 }
+
                 BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-                    val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                    val device: BluetoothDevice? =
+                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                     device?.let {
                         if (socket?.remoteDevice == device) {
                             connectionEstablished = false
@@ -253,7 +258,7 @@ class BluetoothRepository @Inject constructor(
 
     @SuppressLint("MissingPermission")
     fun startScanning() {
-        if(!checkBluetoothPermissions()) {
+        if (!checkBluetoothPermissions()) {
             return
         }
         context.registerReceiver(
@@ -290,9 +295,10 @@ class BluetoothRepository @Inject constructor(
                 Log.d("enableBluetoothDiscoverability():", "Missing permissions")
                 return
             }
-            val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
-                putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
-            }
+            val discoverableIntent: Intent =
+                Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
+                    putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
+                }
             discoverableIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(discoverableIntent)
         }

@@ -8,4 +8,4 @@ import kotlinx.coroutines.flow.emptyFlow
 data class InventoryViewState(
     val shopData: Flow<List<ShopData>> = emptyFlow(),
     val inventoryData: InventoryData? = null
-    )
+)

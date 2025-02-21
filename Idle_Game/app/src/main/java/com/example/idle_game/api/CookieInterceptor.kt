@@ -16,7 +16,7 @@ class CookieInterceptor(private val sharedPreferences: SharedPreferences) : Inte
             if (cookieParts.isEmpty()) {
                 continue // Cookie does not have the format I am looking for
             }
-            if(cookieParts.first().startsWith("refresh_token=")) {
+            if (cookieParts.first().startsWith("refresh_token=")) {
                 val tokenValue = cookieParts.first()
                 sharedPreferences.edit().putString("refresh_token", tokenValue).apply()
             }
