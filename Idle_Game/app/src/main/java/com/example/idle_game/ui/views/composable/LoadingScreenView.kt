@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -72,7 +73,8 @@ fun LoadingScreenView(
                 text = viewState.value.connectionString,
                 fontSize = 30.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(all = 40.dp)
+                modifier = Modifier.padding(all = 40.dp),
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }

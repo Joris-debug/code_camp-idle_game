@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 sealed class BluetoothState {
@@ -108,7 +109,7 @@ class BluetoothDialogModel @Inject constructor(
         }
     }
 
-    fun connectToSelectedDevice(device: BluetoothDevice) {
+    private fun connectToSelectedDevice(device: BluetoothDevice) {
         viewModelScope.launch {
             bluetoothRepository.connectFromClientSocket(device)
         }
@@ -176,6 +177,15 @@ class BluetoothDialogModel @Inject constructor(
                 break
             }
             delay(WAIT_TIME)
+        }
+    }
+
+    suspend fun initiateConnection(device: BluetoothDevice) {
+        connectToSelectedDevice(device)
+        withTimeout(WAIT_TIME * MAX_WAIT_CYCLES) {
+            while (!isConnected()) {
+                delay(WAIT_TIME)
+            }
         }
     }
 

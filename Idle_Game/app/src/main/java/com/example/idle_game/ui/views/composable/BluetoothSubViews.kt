@@ -38,9 +38,7 @@ import com.example.idle_game.ui.views.models.StartViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 
 @SuppressLint("StateFlowValueCalledInComposition", "MissingPermission")
 @Composable
@@ -115,33 +113,28 @@ fun ScanDialog(
             onDismiss()
         },
         title = {
-            androidx.compose.material3.Text("Geräte scannen")
+            Text("Geräte scannen")
         },
         text = {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Gefundene Geräte:")
                 Spacer(modifier = Modifier.height(16.dp))
-
-                if (discoveredDevices.isEmpty() || discoveredDevices.all { it.name == null }) {
+                val devicesWithName =
+                    discoveredDevices.filter { it.name != null && it.name.isNotEmpty() }
+                if (devicesWithName.isEmpty()) {
                     Text("Keine Geräte gefunden.")
                 } else {
                     LazyColumn {
-                        items(discoveredDevices) { device ->
+                        items(devicesWithName) { device ->
                             Text(
-                                text = device.name ?: "Unbekannt",
+                                text = device.name,
                                 modifier = Modifier
                                     .padding(8.dp)
                                     .clickable(enabled = !isLoading) {
                                         isLoading = true
                                         CoroutineScope(Dispatchers.Main).launch {
                                             try {
-                                                bluetoothViewModel.connectToSelectedDevice(device)
-
-                                                withTimeout(10000) {
-                                                    while (!bluetoothViewModel.isConnected()) {
-                                                        delay(500)
-                                                    }
-                                                }
+                                                bluetoothViewModel.initiateConnection(device)
                                                 maxBTC =
                                                     bluetoothViewModel.getBitcoinBalance(viewModel)
                                                 showInputDialog = true
@@ -151,7 +144,6 @@ fun ScanDialog(
                                                 showErrorDialog = true
                                             } finally {
                                                 isLoading = false
-
                                             }
                                         }
                                     })
