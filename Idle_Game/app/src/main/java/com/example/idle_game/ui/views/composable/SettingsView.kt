@@ -14,10 +14,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExposedDropdownMenuDefaults
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -36,9 +41,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.idle_game.ui.theme.HIGH_CONTRAST
-import com.example.idle_game.ui.theme.LOW_CONTRAST
-import com.example.idle_game.ui.theme.MEDIUM_CONTRAST
 import com.example.idle_game.ui.views.models.SettingsViewModel
 import com.example.idle_game.util.checkAndRequestNotificationPermission
 import kotlin.system.exitProcess
@@ -51,6 +53,7 @@ fun SettingsView(viewModel: SettingsViewModel = hiltViewModel()) {
     var inputCheatCode by remember { mutableStateOf("") }
 
     Column {
+
         SettingsSwitch(
             text = "Benachrichtigungen",
             onCheckedChange = {
@@ -61,12 +64,15 @@ fun SettingsView(viewModel: SettingsViewModel = hiltViewModel()) {
             checked = viewState.switchState[0]
 
         )
+
         SettingsSwitch(
             text = "Große Nummern abkürzen",
             onCheckedChange = { viewModel.saveOption(it, 1) },
             checked = viewState.switchState[1]
         )
+
         SettingsButton(text = "Username: ${viewState.username}", action = { showDialog = true })
+
         SettingsSwitch(
             text = "Dunkelmodus",
             onCheckedChange = {
@@ -74,30 +80,15 @@ fun SettingsView(viewModel: SettingsViewModel = hiltViewModel()) {
             },
             checked = viewState.switchState[2]
         )
-        Column {
-            Text("Farbkontrast:")
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
-                    selected = viewState.contrast == LOW_CONTRAST,
-                    onClick = { viewModel.saveContrast(LOW_CONTRAST) }
-                )
-                Text("Niedrieger Kontrast")
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
-                    selected = viewState.contrast == MEDIUM_CONTRAST,
-                    onClick = { viewModel.saveContrast(MEDIUM_CONTRAST) }
-                )
-                Text("Mittler Kontrast")
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
-                    selected = viewState.contrast == HIGH_CONTRAST,
-                    onClick = { viewModel.saveContrast(HIGH_CONTRAST) }
-                )
-                Text("Hoher Kontrast")
-            }
-        }
+
+        SettingsDropDown(
+            text = "Kontrast",
+            onValueChanged = {
+                viewModel.saveContrast(it)
+            },
+            value = viewState.contrast,
+            options = listOf("Niedrieger Kontrast", "Mittler Kontrast", "Hoher Kontrast")
+        )
 
         if (showDialog) {
             WarningDialog(
@@ -129,6 +120,7 @@ fun SettingsView(viewModel: SettingsViewModel = hiltViewModel()) {
 
     }
 }
+
 
 @Composable
 fun SettingsBody(
@@ -163,6 +155,53 @@ fun SettingsBody(
                 fontSize = 16.sp
             )
             actor()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@Composable
+fun SettingsDropDown(
+    options: List<String>,
+    text: String,
+    onValueChanged: (Int) -> Unit,
+    value: Int
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf(options[0]) }
+
+    SettingsBody(text = text)
+    {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            TextField(
+                value = options[value],
+                onValueChange = {},
+                readOnly = true,
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth(0.5f),
+                singleLine = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+            )
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        content = { Text(option) },
+                        onClick = {
+                            onValueChanged(options.indexOf(option))
+                            selectedOption = option
+                            expanded = false
+                        }
+                    )
+                }
+            }
         }
     }
 }

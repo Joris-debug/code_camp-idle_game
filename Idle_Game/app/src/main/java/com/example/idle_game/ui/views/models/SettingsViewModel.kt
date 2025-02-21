@@ -6,6 +6,9 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.example.idle_game.data.repositories.GameRepository
 import com.example.idle_game.data.repositories.SettingsRepository
+import com.example.idle_game.ui.theme.HIGH_CONTRAST
+import com.example.idle_game.ui.theme.LOW_CONTRAST
+import com.example.idle_game.ui.theme.MEDIUM_CONTRAST
 import com.example.idle_game.ui.views.states.SettingsViewState
 import com.example.idle_game.util.OPTION_NOTIFICATIONS
 import com.example.idle_game.util.OPTION_THEME
