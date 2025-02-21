@@ -23,29 +23,6 @@ import kotlinx.coroutines.launch
  */
 class SettingsRepository(private val dataStore: DataStore<Preferences>) {
 
-    private fun getOptionKey(num: Int) = booleanPreferencesKey("option_$num")
-
-    fun getOption(num: Int): Flow<Boolean> {
-        return dataStore.data.map { preferences ->
-            preferences[getOptionKey(num)] ?: true
-        }
-    }
-
-    fun getOptions(count: Int): Flow<List<Boolean>> {
-        return dataStore.data.map { preferences ->
-            List(count) { index -> preferences[getOptionKey(index)] ?: true }
-        }
-    }
-
-    suspend fun saveOption(option: Boolean, num: Int) {
-        dataStore.edit { settings ->
-            settings[getOptionKey(num)] = option
-        }
-    }
-
-
-    // Theme & Contrast level
-
     private val THEME_KEY = booleanPreferencesKey("option_${OPTION_THEME}")
     private val CONTRAST_KEY = intPreferencesKey("option_contrast")
 
@@ -67,6 +44,32 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
             }
         }
     }
+
+
+    // Methods for normal Options
+
+    private fun getOptionKey(num: Int) = booleanPreferencesKey("option_$num")
+
+    fun getOption(num: Int): Flow<Boolean> {
+        return dataStore.data.map { preferences ->
+            preferences[getOptionKey(num)] ?: true
+        }
+    }
+
+    fun getOptions(count: Int): Flow<List<Boolean>> {
+        return dataStore.data.map { preferences ->
+            List(count) { index -> preferences[getOptionKey(index)] ?: true }
+        }
+    }
+
+    suspend fun saveOption(option: Boolean, num: Int) {
+        dataStore.edit { settings ->
+            settings[getOptionKey(num)] = option
+        }
+    }
+
+
+    // Methods for Theme & Contrast level
 
     suspend fun saveTheme(theme: Boolean) {
         dataStore.edit { preferences ->
