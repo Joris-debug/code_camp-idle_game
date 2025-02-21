@@ -44,7 +44,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     }
 
 
-    // Theme & Contras level
+    // Theme & Contrast level
 
     private val THEME_KEY = booleanPreferencesKey("option_${OPTION_THEME}")
     private val CONTRAST_KEY = intPreferencesKey("option_contrast")

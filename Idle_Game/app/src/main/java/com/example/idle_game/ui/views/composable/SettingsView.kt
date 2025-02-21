@@ -122,7 +122,7 @@ fun SettingsView(viewModel: SettingsViewModel = hiltViewModel()) {
 }
 
 /**
- * Settings Body is an Outlined-Box with a Description on the left and an actor (e.g. Button) on the right side
+ * SettingsBody is an Outlined-Box with a description on the left and an actor (e.g. Button) on the right side
  */
 @Composable
 fun SettingsBody(
