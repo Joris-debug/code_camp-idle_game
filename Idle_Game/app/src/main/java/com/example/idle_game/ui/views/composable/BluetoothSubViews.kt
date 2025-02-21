@@ -38,9 +38,7 @@ import com.example.idle_game.ui.views.models.StartViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 
 @SuppressLint("StateFlowValueCalledInComposition", "MissingPermission")
 @Composable
@@ -115,34 +113,30 @@ fun ScanDialog(
             onDismiss()
         },
         title = {
-            androidx.compose.material3.Text("Geräte scannen")
+            Text("Geräte scannen")
         },
         text = {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Gefundene Geräte:")
                 Spacer(modifier = Modifier.height(16.dp))
-
-                if (discoveredDevices.isEmpty() || discoveredDevices.all {it.name == null}) {
+                val devicesWithName =
+                    discoveredDevices.filter { it.name != null && it.name.isNotEmpty() }
+                if (devicesWithName.isEmpty()) {
                     Text("Keine Geräte gefunden.")
                 } else {
                     LazyColumn {
-                        items(discoveredDevices) { device ->
+                        items(devicesWithName) { device ->
                             Text(
-                                text = device.name ?: "Unbekannt",
+                                text = device.name,
                                 modifier = Modifier
                                     .padding(8.dp)
                                     .clickable(enabled = !isLoading) {
                                         isLoading = true
                                         CoroutineScope(Dispatchers.Main).launch {
                                             try {
-                                                bluetoothViewModel.connectToSelectedDevice(device)
-
-                                                withTimeout(10000) {
-                                                    while (!bluetoothViewModel.isConnected()) {
-                                                        delay(500)
-                                                    }
-                                                }
-                                                maxBTC = bluetoothViewModel.getBitcoinBalance(viewModel)
+                                                bluetoothViewModel.initiateConnection(device)
+                                                maxBTC =
+                                                    bluetoothViewModel.getBitcoinBalance(viewModel)
                                                 showInputDialog = true
                                             } catch (e: TimeoutCancellationException) {
                                                 showErrorDialog = true
@@ -150,7 +144,6 @@ fun ScanDialog(
                                                 showErrorDialog = true
                                             } finally {
                                                 isLoading = false
-
                                             }
                                         }
                                     })
@@ -206,7 +199,7 @@ fun ScanDialog(
             Button(
                 onClick = {
                     onDismiss()
-                          },
+                },
                 enabled = !isLoading
             ) {
                 Text("Abbrechen")
@@ -245,7 +238,7 @@ fun BTCInputDialog(
             }
         }, confirmButton = {
             Button(onClick = {
-                if(bluetoothDialogModel.isConnected()) {
+                if (bluetoothDialogModel.isConnected()) {
                     onSend(btcAmount)
                 } else {
                     onDismiss()
@@ -263,7 +256,7 @@ fun BTCInputDialog(
         })
     }
 
-    if(showErrorDialog) {
+    if (showErrorDialog) {
         AlertDialog(
             onDismissRequest = { showErrorDialog = false },
             title = { Text("Fehler") },
@@ -288,17 +281,17 @@ fun WaitingForRequestDialog(
         onDismiss()
     }
 
-        AlertDialog(
-            onDismissRequest = {
+    AlertDialog(
+        onDismissRequest = {
             onDismiss()
         },
-            title = { Text("Warten auf Anfragen...") },
-            text = { Text("Dein Gerät ist jetzt sichtbar und kann BTC empfangen.") },
-            confirmButton = {
-                Button(onClick = {
-                    onDismiss()
-                }) {
-                    Text("Abbrechen")
-                }
-            })
+        title = { Text("Warten auf Anfragen...") },
+        text = { Text("Dein Gerät ist jetzt sichtbar und kann BTC empfangen.") },
+        confirmButton = {
+            Button(onClick = {
+                onDismiss()
+            }) {
+                Text("Abbrechen")
+            }
+        })
 }
