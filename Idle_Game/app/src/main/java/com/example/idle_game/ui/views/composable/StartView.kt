@@ -42,6 +42,7 @@ import com.example.idle_game.R
 import com.example.idle_game.ui.views.models.BluetoothDialogModel
 import com.example.idle_game.ui.views.models.StartViewModel
 import com.example.idle_game.util.SoundManager
+import com.example.idle_game.util.checkAndRequestBluetoothPermissions
 import kotlinx.coroutines.delay
 
 
@@ -161,7 +162,7 @@ fun StartView(
 
             LaunchedEffect(Unit) {
                 activity?.let {
-                    viewModel.checkAndRequestBluetoothPermissions(it)
+                    checkAndRequestBluetoothPermissions(it)
                 }
             }
 
@@ -169,7 +170,7 @@ fun StartView(
                 onDismiss = {
                     showBluetoothDialog = false
                     bluetoothDialogModel.closeConnection()
-                            },
+                },
                 onReceive = {
                     bluetoothDialogModel.listenOnSocketServer()
                     showWaitingDialog = true
@@ -186,14 +187,14 @@ fun StartView(
                 onDismiss = {
                     showScanWindow = false
                     bluetoothDialogModel.closeConnection()
-                            },
+                },
                 onScanClicked = {
                     bluetoothDialogModel.startScanning()
                 }
             )
         }
 
-        if(showWaitingDialog){
+        if (showWaitingDialog) {
             WaitingForRequestDialog(
                 onDismiss = onDismiss
             )

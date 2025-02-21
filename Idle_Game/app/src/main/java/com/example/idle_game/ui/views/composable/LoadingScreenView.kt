@@ -41,7 +41,8 @@ fun LoadingScreenView(
         onLoginFailure = { onLoginFailure() },
         context,
         { onWifiOK() })
-    Box(modifier = Modifier
+    Box(
+        modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center

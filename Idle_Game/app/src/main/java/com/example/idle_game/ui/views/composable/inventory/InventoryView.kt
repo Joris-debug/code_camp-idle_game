@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.idle_game.data.database.models.ShopData
 import com.example.idle_game.ui.views.models.InventoryViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -62,7 +63,13 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
                             setItemToBuy(item)
                             setShowDialog(true)
                             setDialogTitle("Kaufen")
-                            setDialogMessage("Willst du wirklich ${item.name} für ${item.cost} kaufen?")
+                            setDialogMessage(
+                                "Willst du wirklich ${item.name} für ${
+                                    viewModel.toDisplay(
+                                        item.cost
+                                    )
+                                } kaufen?"
+                            )
                         },
                         onApplyClick = { item ->
                             setItemToBuy(item)
@@ -88,7 +95,13 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
                             setItemToBuy(item)
                             setShowDialog(true)
                             setDialogTitle("Kaufen")
-                            setDialogMessage("Willst du wirklich ${item.name} für ${item.cost} kaufen?")
+                            setDialogMessage(
+                                "Willst du wirklich ${item.name} für ${
+                                    viewModel.toDisplay(
+                                        item.cost
+                                    )
+                                } kaufen?"
+                            )
                         },
                         onApplyClick = { item ->
                             setItemToBuy(item)
@@ -114,7 +127,13 @@ fun InventoryView(viewModel: InventoryViewModel = hiltViewModel()) {
                             setItemToBuy(item)
                             setShowDialog(true)
                             setDialogTitle("Kaufen")
-                            setDialogMessage("Willst du wirklich ${item.name} für ${item.cost} kaufen?")
+                            setDialogMessage(
+                                "Willst du wirklich ${item.name} für ${
+                                    viewModel.toDisplay(
+                                        item.cost
+                                    )
+                                } kaufen?"
+                            )
                         },
                         onApplyClick = { item ->
                             setItemToBuy(item)

@@ -2,11 +2,15 @@ package com.example.idle_game.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import com.example.idle_game.api.CookieInterceptor
 import com.example.idle_game.api.GameApi
 import com.example.idle_game.data.database.GameDatabase
 import com.example.idle_game.data.repositories.GameRepository
+import com.example.idle_game.data.repositories.SettingsRepository
+import com.example.idle_game.util.dataStore
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -73,5 +77,16 @@ class RepoModule {
         return Room.databaseBuilder(
             context, GameDatabase::class.java, "gamedatabase"
         ).fallbackToDestructiveMigration().build()
+    }
+
+    @Provides
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return context.dataStore
+    }
+
+    @Provides
+    fun providesSettingsRepo(dataStore: DataStore<Preferences>): SettingsRepository {
+        val dataStore = dataStore
+        return SettingsRepository(dataStore)
     }
 }

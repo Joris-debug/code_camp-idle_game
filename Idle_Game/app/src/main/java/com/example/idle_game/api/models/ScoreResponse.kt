@@ -7,7 +7,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class ScoreResponse(
     @Json(name = "username") val username: String,
-    @Json(name = "score") val score: Long
+    @Json(name = "score") val score: String
 ) {
 
     companion object {
@@ -17,7 +17,11 @@ data class ScoreResponse(
     fun toScoreBoardData(): ScoreBoardData {
         return ScoreBoardData(
             username = formatName(username),
-            score = score
+            score = try {
+                score.toLong()
+            } catch (e: NumberFormatException) {
+                0
+            }
         )
     }
 

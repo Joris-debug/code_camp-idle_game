@@ -19,7 +19,9 @@ class MainApplication : Application(), Configuration.Provider {
     }
 
     private val customWorkManagerConfiguration = Configuration.Builder()
-        .setWorkerFactory(EntryPoints.get(this, HiltWorkerFactoryEntryPoint::class.java).workerFactory())
+        .setWorkerFactory(
+            EntryPoints.get(this, HiltWorkerFactoryEntryPoint::class.java).workerFactory()
+        )
         .build()
 
     override fun onCreate() {

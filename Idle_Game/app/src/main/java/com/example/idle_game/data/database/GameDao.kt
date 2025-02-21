@@ -42,11 +42,13 @@ interface GameDao {
     @Query("UPDATE inventorydata SET bitcoins = :bitcoins")
     suspend fun setBitcoins(bitcoins: Long)
 
-    @Query("""
+    @Query(
+        """
     UPDATE inventorydata
     SET bitcoins = bitcoins - :bitcoins,
         issued_bitcoins = issued_bitcoins + :bitcoins
-    """)
+    """
+    )
     suspend fun issueBitcoins(bitcoins: Long)
 
     @Query("UPDATE inventorydata SET issued_bitcoins = :bitcoins")
@@ -55,14 +57,16 @@ interface GameDao {
     @Query("UPDATE inventorydata SET hackers_lvl_1 = hackers_lvl_1 + :amount")
     suspend fun addNewHacker(amount: Int)
 
-    @Query("""
+    @Query(
+        """
     UPDATE inventorydata 
     SET hackers_lvl_1 = :hackersLvL1, 
         hackers_lvl_2 = :hackersLvL2, 
         hackers_lvl_3 = :hackersLvL3, 
         hackers_lvl_4 = :hackersLvL4,
         hackers_lvl_5 = :hackersLvL5
-    """)
+    """
+    )
     suspend fun setHackers(
         hackersLvL1: Int,
         hackersLvL2: Int,
@@ -74,14 +78,16 @@ interface GameDao {
     @Query("UPDATE inventorydata SET crypto_miners_lvl_1 = crypto_miners_lvl_1 + :amount")
     suspend fun addNewCryptoMiner(amount: Int)
 
-    @Query("""
+    @Query(
+        """
     UPDATE inventorydata 
     SET crypto_miners_lvl_1 = :cryptoMinersLvL1, 
         crypto_miners_lvl_2 = :cryptoMinersLvL2, 
         crypto_miners_lvl_3 = :cryptoMinersLvL3, 
         crypto_miners_lvl_4 = :cryptoMinersLvL4,
         crypto_miners_lvl_5 = :cryptoMinersLvL5
-    """)
+    """
+    )
     suspend fun setCryptoMiners(
         cryptoMinersLvL1: Int,
         cryptoMinersLvL2: Int,
@@ -93,14 +99,16 @@ interface GameDao {
     @Query("UPDATE inventorydata SET botnets_lvl_1 = botnets_lvl_1 + :amount")
     suspend fun addNewBotnet(amount: Int)
 
-    @Query("""
+    @Query(
+        """
     UPDATE inventorydata 
     SET botnets_lvl_1 = :botnetsLvL1, 
         botnets_lvl_2 = :botnetsLvL2, 
         botnets_lvl_3 = :botnetsLvL3, 
         botnets_lvl_4 = :botnetsLvL4,
         botnets_lvl_5 = :botnetsLvL5
-    """)
+    """
+    )
     suspend fun setBotnets(
         botnetsLvL1: Int,
         botnetsLvL2: Int,
