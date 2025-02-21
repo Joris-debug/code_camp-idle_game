@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 sealed class BluetoothState {
@@ -51,7 +52,8 @@ class BluetoothDialogModel @Inject constructor(
             override fun onReceive(context: Context?, intent: Intent?) {
                 when (intent?.action) {
                     BluetoothAdapter.ACTION_STATE_CHANGED -> {
-                        val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
+                        val state =
+                            intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
                         _bluetoothStatus.value = when (state) {
                             BluetoothAdapter.STATE_ON -> BluetoothState.Enabled
                             BluetoothAdapter.STATE_OFF -> BluetoothState.Disabled
@@ -100,14 +102,14 @@ class BluetoothDialogModel @Inject constructor(
         bluetoothRepository.startBluetoothScan()
     }
 
-    fun listenOnSocketServer(){
+    fun listenOnSocketServer() {
         bluetoothRepository.enableBluetoothDiscoverability()
         viewModelScope.launch {
             bluetoothRepository.listenOnServerSocket()
         }
     }
 
-    fun connectToSelectedDevice(device: BluetoothDevice){
+    private fun connectToSelectedDevice(device: BluetoothDevice) {
         viewModelScope.launch {
             bluetoothRepository.connectFromClientSocket(device)
         }
@@ -118,18 +120,18 @@ class BluetoothDialogModel @Inject constructor(
         _discoveredDevices.value = devices
     }
 
-    fun closeConnection(){
+    fun closeConnection() {
         bluetoothRepository.closeConnection()
         bluetoothRepository.cancelListenOnServerSocket()
         bluetoothRepository.stopScanning()
         _discoveredDevices.value = emptyList()
     }
 
-    fun getBitcoinBalance(viewModel: StartViewModel): Long{
+    fun getBitcoinBalance(viewModel: StartViewModel): Long {
         return viewModel.viewState.value.coins.toLongOrNull() ?: 0L
     }
 
-    private fun updateBitcoinBalance(amount: Long){
+    private fun updateBitcoinBalance(amount: Long) {
         viewModelScope.launch {
             gameRepository.addBitcoins(amount)
         }
@@ -175,6 +177,15 @@ class BluetoothDialogModel @Inject constructor(
                 break
             }
             delay(WAIT_TIME)
+        }
+    }
+
+    suspend fun initiateConnection(device: BluetoothDevice) {
+        connectToSelectedDevice(device)
+        withTimeout(WAIT_TIME * MAX_WAIT_CYCLES) {
+            while (!isConnected()) {
+                delay(WAIT_TIME)
+            }
         }
     }
 

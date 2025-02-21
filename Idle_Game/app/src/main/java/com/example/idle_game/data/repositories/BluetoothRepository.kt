@@ -184,9 +184,9 @@ class BluetoothRepository @Inject constructor(
             try {
                 withContext(Dispatchers.IO) {
                     socket.connect()
+                    // The connection attempt succeeded.
+                    connectionEstablished = true
                 }
-                // The connection attempt succeeded.
-                connectionEstablished = true
             } catch (e: IOException) {
                 Log.d("connectFromClientSocket", "Connection failed: ${e.message}", e)
             }
@@ -267,7 +267,6 @@ class BluetoothRepository @Inject constructor(
         bluetoothAdapter?.startDiscovery()
     }
 
-    // Only for debugging, activities are not supposed to be started here
     @SuppressLint("MissingPermission")
     fun enableBluetoothConnection() {
         if (!isBluetoothEnabled()) {
@@ -282,7 +281,6 @@ class BluetoothRepository @Inject constructor(
         }
     }
 
-    // Only for debugging, activities are not supposed to be started here
     @SuppressLint("MissingPermission")
     fun enableBluetoothDiscoverability() {
         if (isBluetoothEnabled()) {

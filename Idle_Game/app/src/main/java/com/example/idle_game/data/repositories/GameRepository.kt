@@ -103,11 +103,6 @@ class GameRepository(
     // Called on the settings-page
     suspend fun logout() {
         gameDao.updateRefreshToken("") // Default value for the refresh token
-        /*
-        * Important:
-        * Warn user: Login in with an other account will make him lose all data
-        * Info user: Restart the app to return to login page (or force him to do: auto restart app (bad practice) or load LoginView)
-        */
     }
 
     // Makes a server request and gets a new access_token
