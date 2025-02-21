@@ -5,8 +5,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
-import com.example.idle_game.ui.theme.HIGH_CONTRAST
-import com.example.idle_game.ui.theme.LOW_CONTRAST
+import com.example.idle_game.util.HIGH_CONTRAST
+import com.example.idle_game.util.LOW_CONTRAST
 import com.example.idle_game.util.OPTION_THEME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,11 +18,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+/**
+ * Repo: Datastore for all option on the settings-page
+ */
 class SettingsRepository(private val dataStore: DataStore<Preferences>) {
-    private val CONTRAST_KEY = intPreferencesKey("option_contrast")
-
-    private val _contrastState = MutableStateFlow(LOW_CONTRAST)  // Default contrast value is 0
-    val contrastState: StateFlow<Int> = _contrastState.asStateFlow()
 
     private fun getOptionKey(num: Int) = booleanPreferencesKey("option_$num")
 
@@ -45,10 +44,13 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     }
 
 
-    // Theme - datastore
+    // Theme & Contras level
 
     private val THEME_KEY = booleanPreferencesKey("option_${OPTION_THEME}")
+    private val CONTRAST_KEY = intPreferencesKey("option_contrast")
 
+    private val _contrastState = MutableStateFlow(LOW_CONTRAST)  // Default contrast value is 0
+    val contrastState: StateFlow<Int> = _contrastState.asStateFlow()
     private val _themeState = MutableStateFlow(true)
     val themeState: StateFlow<Boolean> = _themeState.asStateFlow()
 

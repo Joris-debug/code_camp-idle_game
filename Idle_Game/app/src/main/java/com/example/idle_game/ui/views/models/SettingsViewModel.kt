@@ -6,9 +6,6 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.example.idle_game.data.repositories.GameRepository
 import com.example.idle_game.data.repositories.SettingsRepository
-import com.example.idle_game.ui.theme.HIGH_CONTRAST
-import com.example.idle_game.ui.theme.LOW_CONTRAST
-import com.example.idle_game.ui.theme.MEDIUM_CONTRAST
 import com.example.idle_game.ui.views.states.SettingsViewState
 import com.example.idle_game.util.OPTION_NOTIFICATIONS
 import com.example.idle_game.util.OPTION_THEME
@@ -44,6 +41,9 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * handles value changes in the view
+     */
     fun saveOption(option: Boolean, num: Int) {
         viewModelScope.launch {
             settingsRepository.saveOption(option, num)
@@ -85,8 +85,11 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Submit CheatCode with new-line
+     */
     fun checkCheatCode(text: String): String {
-        if(text.isEmpty()) {
+        if (text.isEmpty()) {
             return ""
         }
         if (text.last() == '\n') {
@@ -96,16 +99,25 @@ class SettingsViewModel @Inject constructor(
         return text
     }
 
+    /**
+     * Cheat codes:
+     *  add btc {number}
+     *  set btc {number}
+     */
     private fun runCheatCode(input: String) {
         var text = input.removeSuffix("\n")
         viewModelScope.launch {
-            if (text.startsWith("add ")) {
-                text = text.removePrefix("add ")
-                if (text.startsWith("btc ")) {
-                    text = text.removePrefix("btc ")
-                    try {
-                        gameRepository.addBitcoins(text.toLong())
-                    } catch (_: Exception){}
+            if (text.startsWith("add btc ")) {
+                text = text.removePrefix("add btc ")
+                try {
+                    gameRepository.addBitcoins(text.toLong())
+                } catch (_: Exception) {
+                }
+            } else if (text.startsWith("set btc ")){
+                text = text.removePrefix("set btc ")
+                try {
+                    gameRepository.setBitcoin(text.toLong())
+                } catch (_: Exception) {
                 }
             }
         }

@@ -43,6 +43,10 @@ class StartViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Changes the settings for shorted numbers.
+     * E.g.: 10000 vs. 10K
+     */
     fun switchDisplayMode() {
         viewModelScope.launch {
             showShorted = !showShorted
@@ -85,16 +89,26 @@ class StartViewModel @Inject constructor(
         return passiveCoinsPerSec
     }
 
-    private fun addCoins(newCoins: Long) {
+    /**
+     * Updates the display of all passives (Bots, Miners, Botnets)
+     */
+    private fun updatePassivesCount(){
         viewModelScope.launch {
             val inventory = inventoryFlow.first()
             _viewState.value = _viewState.value.copy(
-                coins = toDisplay(coins + newCoins),
                 hackerCount = toDisplay(inventory.hackersLvl1 + inventory.hackersLvl2 + inventory.hackersLvl3 + inventory.hackersLvl4 + inventory.hackersLvl5),
                 minerCount = toDisplay(inventory.cryptoMinersLvl1 + inventory.cryptoMinersLvl2 + inventory.cryptoMinersLvl3 + inventory.cryptoMinersLvl4 + inventory.cryptoMinersLvl5),
                 botnetCount = toDisplay(inventory.botnetsLvl1 + inventory.botnetsLvl2 + inventory.botnetsLvl3 + inventory.botnetsLvl4 + inventory.botnetsLvl5)
             )
+        }
+    }
+
+    private fun addCoins(newCoins: Long) {
+        viewModelScope.launch {
             coins += newCoins
+            _viewState.value = _viewState.value.copy(
+                coins = toDisplay(coins)
+            )
             if (newCoins > 0) {
                 gameRepository.addBitcoins(newCoins)
             }
@@ -126,11 +140,15 @@ class StartViewModel @Inject constructor(
                 gameRepository.setMiningTimestamp(lastTimestamp + duration)
                 // ^ Ensure the timestamp is incremented in 1-second intervals only ^
                 addCoins((getPassiveCoinsPerSecond() * duration / (millisPerSec * 1.0)).toLong())
+                updatePassivesCount()
                 delay(millisPerSec)
             }
         }
     }
 
+    /**
+     * Function getting called from the view by clicking the coin
+     */
     fun coinClick() {
         viewModelScope.launch {
             val clickedCoins: Long = 1 * let {

@@ -1,5 +1,9 @@
 package com.example.idle_game.util
 
-val OPTION_NOTIFICATIONS = 0
-val OPTION_SORTNUMBERS = 1
-val OPTION_THEME = 2
+const val OPTION_NOTIFICATIONS = 0
+const val OPTION_SORTNUMBERS = 1
+const val OPTION_THEME = 2
+
+const val LOW_CONTRAST = 0
+const val MEDIUM_CONTRAST = 1
+const val HIGH_CONTRAST = 2

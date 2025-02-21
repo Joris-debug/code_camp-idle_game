@@ -121,7 +121,9 @@ fun SettingsView(viewModel: SettingsViewModel = hiltViewModel()) {
     }
 }
 
-
+/**
+ * Settings Body is an Outlined-Box with a Description on the left and an actor (e.g. Button) on the right side
+ */
 @Composable
 fun SettingsBody(
     text: String = "Option",
@@ -168,7 +170,6 @@ fun SettingsDropDown(
     value: Int
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(options[0]) }
 
     SettingsBody(text = text)
     {
@@ -196,7 +197,6 @@ fun SettingsDropDown(
                         content = { Text(option) },
                         onClick = {
                             onValueChanged(options.indexOf(option))
-                            selectedOption = option
                             expanded = false
                         }
                     )

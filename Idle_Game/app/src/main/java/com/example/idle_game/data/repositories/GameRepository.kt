@@ -634,6 +634,10 @@ class GameRepository(
         }
     }
 
+    suspend fun setBitcoin(bitcoins: Long) {
+        gameDao.setBitcoins(bitcoins)
+    }
+
     companion object {
         const val LOW_BOOST_ID = 1
         const val MEDIUM_BOOST_ID = 2

@@ -8,6 +8,9 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import com.example.idle_game.util.HIGH_CONTRAST
+import com.example.idle_game.util.LOW_CONTRAST
+import com.example.idle_game.util.MEDIUM_CONTRAST
 
 @Immutable
 data class ExtendedColorScheme(
@@ -254,10 +257,6 @@ data class ColorFamily(
 val unspecified_scheme = ColorFamily(
     Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
 )
-
-const val LOW_CONTRAST = 0;
-const val MEDIUM_CONTRAST = 1;
-const val HIGH_CONTRAST = 2;
 
 @Composable
 fun AppTheme(
