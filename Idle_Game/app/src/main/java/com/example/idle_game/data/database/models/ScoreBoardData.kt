@@ -5,8 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class ScoreBoardData (
-    @PrimaryKey(autoGenerate = false) val id: String,
-    @ColumnInfo(name = "score") val score: Int,
-    @ColumnInfo(name = "username") val username: String,
+data class ScoreBoardData(
+    @PrimaryKey val username: String,
+    @ColumnInfo(name = "score") val score: Long
 )
